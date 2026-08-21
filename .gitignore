@@ -1,0 +1,32 @@
+@"
+# Virtual environment
+.venv/
+
+# Environment variables
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Test/cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Generated database
+*.db
+
+# Generated outputs
+output/*.csv
+
+# Raw/source data
+data/raw/
+*.zip
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+"@ | Set-Content .gitignore
