@@ -1,0 +1,63 @@
+NIFTY100 FINANCIAL INTELLIGENCE
+FINAL DATABASE VALIDATION REPORT
+======================================================================
+
+1. FOREIGN KEY INTEGRITY
+----------------------------------------
+Violations: 0
+STATUS: PASS
+
+2. TABLE ROW COUNTS
+----------------------------------------
+analysis             16
+balancesheet         1058
+cashflow             1063
+companies            92
+documents            1457
+financial_ratios     1041
+market_cap           552
+peer_groups          56
+profitandloss        1073
+prosandcons          14
+sectors              92
+stock_prices         5520
+
+3. COMPANY COVERAGE
+----------------------------------------
+companies            92
+profitandloss        92
+balancesheet         91
+cashflow             92
+financial_ratios     90
+market_cap           92
+sectors              92
+stock_prices         92
+
+4. DUPLICATE COMPANY-YEAR CHECK
+----------------------------------------
+profitandloss        duplicate groups: 0
+balancesheet         duplicate groups: 0
+cashflow             duplicate groups: 0
+financial_ratios     duplicate groups: 0
+market_cap           duplicate groups: 0
+STATUS: PASS
+
+5. SOURCE DATA COVERAGE LIMITATIONS
+----------------------------------------
+Companies without financial ratios: 2
+  ATGL, SBIN
+Companies without balance sheet data: 1
+  SBIN
+
+These are source-data coverage limitations.
+No synthetic records were created.
+
+6. FINAL STATUS
+----------------------------------------
+Database load: PASS
+Foreign keys: PASS
+Duplicate checks: PASS
+Processed validation: PASS
+Automated tests: 79 passed
+
+Overall database integrity: PASS
