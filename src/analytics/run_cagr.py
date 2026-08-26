@@ -1,274 +1,218 @@
 import pandas as pd
 
-from src.analytics.cagr import calculate_cagr
+from src.analytics.cagr import calculate_growth_metrics
 
 
 # ==========================================================
-# 1. LOAD DATA
+# CONFIGURATION
 # ==========================================================
 
-pnl = pd.read_excel(
-    "data/raw/profitandloss.xlsx",
-    header=1
+pnl_path = "data/processed/profitandloss_cleaned.csv"
+output_path = "output/cagr_analysis.csv"
+
+analysis_year = 2024
+
+
+# ==========================================================
+# 1. LOAD CLEANED P&L DATA
+# ==========================================================
+
+print("\nLoading cleaned P&L data...")
+
+pnl = pd.read_csv(pnl_path)
+
+print("Rows loaded:", len(pnl))
+
+
+# ==========================================================
+# 2. NORMALIZE REQUIRED COLUMNS
+# ==========================================================
+
+pnl.columns = [
+    str(col).strip().lower()
+    for col in pnl.columns
+]
+
+pnl["company_id"] = (
+    pnl["company_id"]
+    .astype(str)
+    .str.strip()
+    .str.upper()
 )
 
-companies = pd.read_excel(
-    "data/raw/companies.xlsx",
-    header=1
+pnl["year"] = pd.to_numeric(
+    pnl["year"],
+    errors="coerce"
 )
 
+pnl = pnl.dropna(
+    subset=["company_id", "year"]
+).copy()
 
-# ==========================================================
-# 2. KEEP OFFICIAL N100 COMPANIES
-# ==========================================================
-
-valid_companies = set(
-    companies["id"].dropna()
-)
-
-pnl = pnl[
-    pnl["company_id"].isin(valid_companies)
-].copy()
+pnl["year"] = pnl["year"].astype(int)
 
 
 # ==========================================================
 # 3. KEEP REQUIRED COLUMNS
 # ==========================================================
 
-pnl = pnl[
-    [
-        "company_id",
-        "year",
-        "sales",
-        "net_profit",
-        "eps",
-    ]
-].copy()
+required_columns = [
+    "company_id",
+    "year",
+    "sales",
+    "net_profit",
+    "eps",
+]
+
+missing_columns = [
+    column
+    for column in required_columns
+    if column not in pnl.columns
+]
+
+if missing_columns:
+    raise ValueError(
+        f"Missing required columns: {missing_columns}"
+    )
+
+pnl = pnl[required_columns].copy()
 
 
 # ==========================================================
-# 4. CONVERT YEAR TO NUMERIC YEAR
+# 4. VERIFY COMPANY-YEAR UNIQUENESS
 # ==========================================================
 
-pnl["year_num"] = (
-    pnl["year"]
-    .astype(str)
-    .str.extract(r"(\d{4})")[0]
+duplicates = pnl.duplicated(
+    subset=["company_id", "year"]
+).sum()
+
+print(
+    "Company-year duplicates:",
+    duplicates
 )
 
-pnl["year_num"] = pd.to_numeric(
-    pnl["year_num"],
-    errors="coerce"
-)
-
-# Remove rows where year cannot be determined
-pnl = pnl.dropna(
-    subset=["year_num"]
-).copy()
-
-pnl["year_num"] = pnl["year_num"].astype(int)
-
-
-# ==========================================================
-# 5. REMOVE DUPLICATE COMPANY-YEAR RECORDS
-# ==========================================================
-
-pnl = pnl.sort_values(
-    ["company_id", "year_num"]
-)
-
-pnl = pnl.drop_duplicates(
-    subset=["company_id", "year_num"],
-    keep="last"
-)
-
-
-# ==========================================================
-# 6. CAGR HELPER
-# ==========================================================
-
-def get_cagr_for_window(
-    company_data,
-    value_column,
-    window
-):
-    """
-    Calculate CAGR using the earliest and latest
-    available observations within the requested window.
-
-    Example:
-        5-year CAGR requires approximately 5 years
-        between start and end observations.
-    """
-
-    data = company_data[
-        ["year_num", value_column]
-    ].dropna()
-
-    data = data.sort_values("year_num")
-
-    if data.empty:
-        return None, "INSUFFICIENT"
-
-    latest_year = data["year_num"].max()
-
-    target_start_year = latest_year - window
-
-    # Look for the observation at the target year
-    start_rows = data[
-        data["year_num"] == target_start_year
-    ]
-
-    end_rows = data[
-        data["year_num"] == latest_year
-    ]
-
-    if start_rows.empty or end_rows.empty:
-        return None, "INSUFFICIENT"
-
-    start_value = start_rows.iloc[0][value_column]
-    end_value = end_rows.iloc[0][value_column]
-
-    return calculate_cagr(
-        start_value,
-        end_value,
-        window
+if duplicates > 0:
+    raise ValueError(
+        "Duplicate company-year records found "
+        "in cleaned P&L data."
     )
 
 
 # ==========================================================
-# 7. CALCULATE CAGR FOR EACH COMPANY
+# 5. VERIFY ANALYSIS YEAR
+# ==========================================================
+
+available_years = set(
+    pnl["year"].unique()
+)
+
+if analysis_year not in available_years:
+    raise ValueError(
+        f"Analysis year {analysis_year} "
+        "is not available in P&L data."
+    )
+
+
+# ==========================================================
+# 6. CALCULATE CAGR
 # ==========================================================
 
 results = []
 
-windows = [3, 5, 10]
+companies = sorted(
+    pnl["company_id"].unique()
+)
 
-for company_id, company_data in pnl.groupby(
-    "company_id"
-):
+print(
+    f"\nCalculating CAGR for "
+    f"{len(companies)} companies..."
+)
+
+for company_id in companies:
+
+    metrics = calculate_growth_metrics(
+        df=pnl,
+        company_id=company_id,
+        end_year=analysis_year,
+    )
 
     row = {
-        "company_id": company_id
+        "company_id": company_id,
+        **metrics,
     }
-
-    for window in windows:
-
-        # ------------------------------
-        # Revenue CAGR
-        # ------------------------------
-
-        revenue_value, revenue_flag = get_cagr_for_window(
-            company_data,
-            "sales",
-            window
-        )
-
-        row[f"revenue_cagr_{window}yr"] = revenue_value
-        row[f"revenue_cagr_{window}yr_flag"] = revenue_flag
-
-
-        # ------------------------------
-        # PAT CAGR
-        # ------------------------------
-
-        pat_value, pat_flag = get_cagr_for_window(
-            company_data,
-            "net_profit",
-            window
-        )
-
-        row[f"pat_cagr_{window}yr"] = pat_value
-        row[f"pat_cagr_{window}yr_flag"] = pat_flag
-
-
-        # ------------------------------
-        # EPS CAGR
-        # ------------------------------
-
-        eps_value, eps_flag = get_cagr_for_window(
-            company_data,
-            "eps",
-            window
-        )
-
-        row[f"eps_cagr_{window}yr"] = eps_value
-        row[f"eps_cagr_{window}yr_flag"] = eps_flag
 
     results.append(row)
 
 
 # ==========================================================
-# 8. CREATE RESULT DATAFRAME
+# 7. CREATE RESULT DATAFRAME
 # ==========================================================
 
 result_df = pd.DataFrame(results)
 
 
 # ==========================================================
-# 9. BASIC CHECKS
+# 8. BASIC VALIDATION
 # ==========================================================
 
-print("Total companies:", result_df["company_id"].nunique())
+print("\n========================================")
+print("CAGR VALIDATION")
+print("========================================")
+
+print(
+    "Total companies:",
+    result_df["company_id"].nunique()
+)
 
 print(
     "Result rows:",
     len(result_df)
 )
 
-print("\nSample CAGR results:")
+print(
+    "Expected companies:",
+    len(companies)
+)
+
+
+# ==========================================================
+# 9. FLAG COUNTS
+# ==========================================================
+
+for metric in [
+    "revenue",
+    "pat",
+    "eps",
+]:
+
+    print(
+        f"\n{metric.upper()} CAGR 5Y flags:"
+    )
+
+    print(
+        result_df[
+            f"{metric}_cagr_5yr_flag"
+        ].value_counts(dropna=False)
+    )
+
+
+# ==========================================================
+# 10. SAVE OUTPUT
+# ==========================================================
+
+result_df.to_csv(
+    output_path,
+    index=False
+)
+
+print(
+    f"\nSaved: {output_path}"
+)
+
+print("\nSample results:")
 
 print(
     result_df.head(10).to_string(
         index=False
     )
-)
-
-
-# ==========================================================
-# 10. FLAG COUNTS
-# ==========================================================
-
-print("\nRevenue CAGR flags:")
-
-print(
-    result_df[
-        "revenue_cagr_5yr_flag"
-    ].value_counts(dropna=False)
-)
-
-
-print("\nPAT CAGR flags:")
-
-print(
-    result_df[
-        "pat_cagr_5yr_flag"
-    ].value_counts(dropna=False)
-)
-
-
-print("\nEPS CAGR flags:")
-
-print(
-    result_df[
-        "eps_cagr_5yr_flag"
-    ].value_counts(dropna=False)
-)
-
-
-# ==========================================================
-# 11. SAVE OUTPUT
-# ==========================================================
-
-result_df.to_csv(
-    "output/cagr_analysis.csv",
-    index=False
-)
-
-print(
-    "\nSaved:"
-)
-
-print(
-    "output/cagr_analysis.csv"
 )
