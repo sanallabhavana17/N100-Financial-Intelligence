@@ -252,9 +252,9 @@ def main():
     # ---------------------------------------------------------
 
     companies = pd.read_excel(
-        "data/raw/companies.xlsx"
-    )
-
+    "data/raw/companies.xlsx",
+    header=1
+)
     companies.columns = [
         str(c).strip().lower()
         for c in companies.columns

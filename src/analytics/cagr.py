@@ -140,3 +140,100 @@ def eps_cagr(start_eps, end_eps, years):
         end_eps,
         years
     )
+
+def calculate_cagr_for_years(
+    df,
+    company_id,
+    end_year,
+    value_column,
+    years,
+):
+    """
+    Calculate CAGR for a specific company and historical window.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Data containing company_id, year and the requested value column.
+    company_id : str
+        Company identifier.
+    end_year : int
+        Ending year.
+    value_column : str
+        Column to calculate CAGR for.
+    years : int
+        Number of years in the CAGR window.
+
+    Returns
+    -------
+    tuple
+        (cagr_value, flag)
+    """
+
+    start_year = end_year - years
+
+    company_data = df[
+        (df["company_id"] == company_id)
+        & (df["year"].isin([start_year, end_year]))
+    ]
+
+    # Both required years must exist
+    if len(company_data) < 2:
+        return None, "INSUFFICIENT"
+
+    start_row = company_data[company_data["year"] == start_year]
+    end_row = company_data[company_data["year"] == end_year]
+
+    if start_row.empty or end_row.empty:
+        return None, "INSUFFICIENT"
+
+    start_value = start_row.iloc[0][value_column]
+    end_value = end_row.iloc[0][value_column]
+
+    return calculate_cagr(
+        start_value,
+        end_value,
+        years,
+    )
+
+
+def calculate_growth_metrics(
+    df,
+    company_id,
+    end_year,
+):
+    """
+    Calculate 3-year, 5-year and 10-year CAGR metrics
+    for revenue, PAT and EPS.
+    """
+
+    result = {}
+
+    windows = {
+        3: "",
+        5: "",
+        10: "",
+    }
+
+    metrics = {
+        "sales": "revenue_cagr",
+        "net_profit": "pat_cagr",
+        "eps": "eps_cagr",
+    }
+
+    for years in windows:
+
+        for source_column, output_name in metrics.items():
+
+            value, flag = calculate_cagr_for_years(
+                df,
+                company_id,
+                end_year,
+                source_column,
+                years,
+            )
+
+            result[f"{output_name}_{years}yr"] = value
+            result[f"{output_name}_{years}yr_flag"] = flag
+
+    return result
