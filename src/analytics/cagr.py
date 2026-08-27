@@ -1,3 +1,21 @@
+"""
+CAGR Engine
+
+Handles CAGR calculations for:
+- Revenue
+- Net Profit (PAT)
+- EPS
+
+Supported edge cases:
+1. Positive -> Positive
+2. Positive -> Negative
+3. Negative -> Positive
+4. Negative -> Negative
+5. Zero base
+6. Insufficient data
+"""
+
+
 def calculate_cagr(start_value, end_value, years):
     """
     Calculate CAGR.
@@ -7,114 +25,118 @@ def calculate_cagr(start_value, end_value, years):
 
     Returns:
         (cagr_value, flag)
+
+    Possible flags:
+        None
+        DECLINE_TO_LOSS
+        TURNAROUND
+        BOTH_NEGATIVE
+        ZERO_BASE
+        INSUFFICIENT
     """
+
+    # ---------------------------------------------------------
+    # 1. Validate number of years
+    # ---------------------------------------------------------
 
     if years is None or years <= 0:
         return None, "INSUFFICIENT"
 
-    if start_value == 0:
-        return None, "ZERO_BASE"
-
-    if start_value > 0 and end_value > 0:
-        cagr = ((end_value / start_value) ** (1 / years) - 1) * 100
-        return cagr, None
-
-    if start_value > 0 and end_value < 0:
-        return None, "DECLINE_TO_LOSS"
-
-    if start_value < 0 and end_value > 0:
-        return None, "TURNAROUND"
-
-    if start_value < 0 and end_value < 0:
-        return None, "BOTH_NEGATIVE"
-
-    if end_value == 0:
-        return None, "DECLINE_TO_LOSS"
-
-    return None, "INSUFFICIENT"
-
-
-def calculate_cagr_for_years(
-    df,
-    company_id,
-    end_year,
-    value_column,
-    years,
-):
-    """
-    Calculate CAGR for a company using an exact historical year.
-
-    Example:
-        end_year = 2024
-        years = 5
-
-    Requires data for:
-        2019 -> 2024
-
-    Returns:
-        (cagr_value, flag)
-    """
-
-    start_year = end_year - years
-
-    company_data = df[
-        (df["company_id"] == company_id)
-        & (df["year"].isin([start_year, end_year]))
-    ].copy()
-
-    if len(company_data) < 2:
-        return None, "INSUFFICIENT"
-
-    start_rows = company_data[company_data["year"] == start_year]
-    end_rows = company_data[company_data["year"] == end_year]
-
-    if start_rows.empty or end_rows.empty:
-        return None, "INSUFFICIENT"
-
-    start_value = start_rows.iloc[0][value_column]
-    end_value = end_rows.iloc[0][value_column]
+    # ---------------------------------------------------------
+    # 2. Missing values
+    # ---------------------------------------------------------
 
     if start_value is None or end_value is None:
         return None, "INSUFFICIENT"
 
+    # ---------------------------------------------------------
+    # 3. Convert to float
+    # ---------------------------------------------------------
+
+    try:
+        start_value = float(start_value)
+        end_value = float(end_value)
+    except (TypeError, ValueError):
+        return None, "INSUFFICIENT"
+
+    # ---------------------------------------------------------
+    # 4. Zero base
+    # ---------------------------------------------------------
+
+    if start_value == 0:
+        return None, "ZERO_BASE"
+
+    # ---------------------------------------------------------
+    # 5. Positive -> Positive
+    # ---------------------------------------------------------
+
+    if start_value > 0 and end_value > 0:
+
+        cagr = (
+            (end_value / start_value) ** (1 / years) - 1
+        ) * 100
+
+        return cagr, None
+
+    # ---------------------------------------------------------
+    # 6. Positive -> Negative
+    # ---------------------------------------------------------
+
+    if start_value > 0 and end_value < 0:
+        return None, "DECLINE_TO_LOSS"
+
+    # ---------------------------------------------------------
+    # 7. Negative -> Positive
+    # ---------------------------------------------------------
+
+    if start_value < 0 and end_value > 0:
+        return None, "TURNAROUND"
+
+    # ---------------------------------------------------------
+    # 8. Negative -> Negative
+    # ---------------------------------------------------------
+
+    if start_value < 0 and end_value < 0:
+        return None, "BOTH_NEGATIVE"
+
+    # ---------------------------------------------------------
+    # 9. Remaining zero-end case
+    # ---------------------------------------------------------
+
+    return None, "INSUFFICIENT"
+
+
+def revenue_cagr(start_revenue, end_revenue, years):
+    """
+    Revenue CAGR wrapper.
+    """
+
     return calculate_cagr(
-        start_value,
-        end_value,
-        years,
+        start_revenue,
+        end_revenue,
+        years
     )
 
 
-def calculate_growth_metrics(df, company_id, end_year):
+def pat_cagr(start_pat, end_pat, years):
     """
-    Calculate Revenue, PAT and EPS CAGR for 3Y, 5Y and 10Y.
-
-    Returns a dictionary containing both CAGR values
-    and their corresponding edge-case flags.
+    PAT / Net Profit CAGR wrapper.
     """
 
-    result = {}
+    return calculate_cagr(
+        start_pat,
+        end_pat,
+        years
+    )
 
-    metrics = {
-        "revenue": "sales",
-        "pat": "net_profit",
-        "eps": "eps",
-    }
 
-    windows = [3, 5, 10]
+def eps_cagr(start_eps, end_eps, years):
+    """
+    EPS CAGR wrapper.
+    """
 
-    for metric_name, column_name in metrics.items():
-
-        for years in windows:
-
-            value, flag = calculate_cagr_for_years(
-                df=df,
-                company_id=company_id,
-                end_year=end_year,
-                value_column=column_name,
-                years=years,
-            )
-
-            result[f"{metric_name}_cagr_{years}yr"] = value
-            result[f"{metric_name}_cagr_{years}yr_flag"] = flag
-
-    return result
+    return calculate_cagr(
+        start_eps,
+        end_eps,
+        years
+    )

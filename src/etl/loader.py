@@ -5,10 +5,17 @@ import pandas as pd
 from src.etl.normaliser import normalize_year
 
 
+# ==========================================================
+# DATA DIRECTORY
+# ==========================================================
+
 RAW_DATA_DIR = Path("data/raw")
 
 
-# These files have a title row before the real column headers.
+# ==========================================================
+# CORE FILES
+# ==========================================================
+
 CORE_FILES = {
     "companies.xlsx",
     "profitandloss.xlsx",
@@ -19,6 +26,10 @@ CORE_FILES = {
     "prosandcons.xlsx",
 }
 
+
+# ==========================================================
+# LOAD ONE EXCEL FILE
+# ==========================================================
 
 def load_excel(file_path):
     """
@@ -33,17 +44,38 @@ def load_excel(file_path):
 
     file_path = Path(file_path)
 
-    if file_path.name in CORE_FILES:
-        df = pd.read_excel(file_path, header=1)
-    else:
-        df = pd.read_excel(file_path, header=0)
+    if not file_path.exists():
+        raise FileNotFoundError(
+            f"Excel file not found: {file_path}"
+        )
 
-    # Remove completely empty rows and columns
-    df = df.dropna(axis=0, how="all")
-    df = df.dropna(axis=1, how="all")
+    if file_path.name in CORE_FILES:
+        df = pd.read_excel(
+            file_path,
+            header=1
+        )
+    else:
+        df = pd.read_excel(
+            file_path,
+            header=0
+        )
+
+    df = df.dropna(
+        axis=0,
+        how="all"
+    )
+
+    df = df.dropna(
+        axis=1,
+        how="all"
+    )
 
     return df
 
+
+# ==========================================================
+# NORMALIZE DATAFRAME
+# ==========================================================
 
 def normalize_dataframe(df):
     """
@@ -52,15 +84,22 @@ def normalize_dataframe(df):
 
     df = df.copy()
 
-    # Normalize year if a year column exists
-    if "year" in df.columns:
-        df["year"] = df["year"].apply(normalize_year)
+    df.columns = [
+        str(col).strip()
+        for col in df.columns
+    ]
 
-    # Remove leading/trailing spaces from column names
-    df.columns = [str(col).strip() for col in df.columns]
+    if "year" in df.columns:
+        df["year"] = df["year"].apply(
+            normalize_year
+        )
 
     return df
 
+
+# ==========================================================
+# LOAD ALL RAW EXCEL FILES
+# ==========================================================
 
 def load_all_files():
     """
@@ -71,10 +110,19 @@ def load_all_files():
             filename -> DataFrame
     """
 
+    if not RAW_DATA_DIR.exists():
+        raise FileNotFoundError(
+            f"Raw data directory not found: {RAW_DATA_DIR}"
+        )
+
     datasets = {}
 
-    for file_path in sorted(RAW_DATA_DIR.glob("*.xlsx")):
+    for file_path in sorted(
+        RAW_DATA_DIR.glob("*.xlsx")
+    ):
+
         df = load_excel(file_path)
+
         df = normalize_dataframe(df)
 
         datasets[file_path.name] = df
@@ -82,10 +130,22 @@ def load_all_files():
     return datasets
 
 
+# ==========================================================
+# MAIN TEST
+# ==========================================================
+
 if __name__ == "__main__":
+
     datasets = load_all_files()
 
-    print("\nExcel files loaded successfully:\n")
+    print(
+        "\nExcel files loaded successfully:\n"
+    )
 
     for filename, df in datasets.items():
-        print(f"{filename}: {len(df)} rows × {len(df.columns)} columns")
+
+        print(
+            f"{filename}: "
+            f"{len(df)} rows × "
+            f"{len(df.columns)} columns"
+        )

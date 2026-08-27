@@ -12,17 +12,22 @@ from src.analytics.ratios import (
 
 
 # ==========================================================
-# 1. LOAD DATA
+# LEVERAGE & EFFICIENCY ANALYSIS
 # ==========================================================
 
-pnl = pd.read_excel(
-    "data/raw/profitandloss.xlsx",
-    header=1
+
+# ==========================================================
+# 1. LOAD CLEANED FINANCIAL DATA
+# ==========================================================
+
+print("\nLoading cleaned financial data...")
+
+pnl = pd.read_csv(
+    "data/processed/profitandloss_cleaned.csv"
 )
 
-balance = pd.read_excel(
-    "data/raw/balancesheet.xlsx",
-    header=1
+balance = pd.read_csv(
+    "data/processed/balancesheet_cleaned.csv"
 )
 
 companies = pd.read_excel(
@@ -44,8 +49,107 @@ sectors = pd.read_excel(
 )
 
 
+print("P&L rows loaded:", len(pnl))
+print("Balance Sheet rows loaded:", len(balance))
+
+
 # ==========================================================
-# 2. KEEP REQUIRED P&L COLUMNS
+# 2. NORMALIZE IDENTIFIERS
+# ==========================================================
+
+def normalize_company_id(value):
+    if pd.isna(value):
+        return None
+
+    return str(value).strip().upper()
+
+
+def normalize_year(value):
+    """
+    Convert year values such as:
+
+        2012
+        2012.0
+        Mar 2012
+        Dec 2012
+
+    into integer year values.
+    """
+
+    if pd.isna(value):
+        return None
+
+    text = str(value).strip()
+
+    # Direct numeric year
+    try:
+        number = float(text)
+
+        if 1900 <= number <= 2100:
+            return int(number)
+    except (ValueError, TypeError):
+        pass
+
+    # Extract four-digit year
+    import re
+
+    match = re.search(
+        r"(19|20)\d{2}",
+        text
+    )
+
+    if match:
+        return int(match.group())
+
+    return None
+
+
+pnl["company_id"] = (
+    pnl["company_id"]
+    .apply(normalize_company_id)
+)
+
+balance["company_id"] = (
+    balance["company_id"]
+    .apply(normalize_company_id)
+)
+
+companies["id"] = (
+    companies["id"]
+    .apply(normalize_company_id)
+)
+
+sectors["company_id"] = (
+    sectors["company_id"]
+    .apply(normalize_company_id)
+)
+
+pnl["year"] = (
+    pnl["year"]
+    .apply(normalize_year)
+)
+
+balance["year"] = (
+    balance["year"]
+    .apply(normalize_year)
+)
+
+
+# Remove unusable company-year rows
+pnl = pnl.dropna(
+    subset=["company_id", "year"]
+).copy()
+
+balance = balance.dropna(
+    subset=["company_id", "year"]
+).copy()
+
+pnl["year"] = pnl["year"].astype(int)
+balance["year"] = balance["year"].astype(int)
+
+
+# ==========================================================
+# 3. KEEP REQUIRED P&L COLUMNS
 # ==========================================================
 
 pnl = pnl[
@@ -58,11 +162,11 @@ pnl = pnl[
         "interest",
         "net_profit",
     ]
-]
+].copy()
 
 
 # ==========================================================
-# 3. KEEP REQUIRED BALANCE SHEET COLUMNS
+# 4. KEEP REQUIRED BALANCE SHEET COLUMNS
 # ==========================================================
 
 balance = balance[
@@ -75,16 +179,22 @@ balance = balance[
         "investments",
         "total_assets",
     ]
-]
+].copy()
 
 
 # ==========================================================
-# 4. KEEP ONLY OFFICIAL N100 COMPANIES
+# 5. KEEP OFFICIAL N100 COMPANIES
 # ==========================================================
 
 valid_companies = set(
     companies["id"].dropna()
 )
+
+print(
+    "Official N100 companies:",
+    len(valid_companies)
+)
+
 
 pnl = pnl[
     pnl["company_id"].isin(valid_companies)
@@ -95,20 +205,115 @@ balance = balance[
 ].copy()
 
 
+print("\nAfter official-company filtering:")
+
+print(
+    "P&L rows:",
+    len(pnl)
+)
+
+print(
+    "Balance Sheet rows:",
+    len(balance)
+)
+
+print(
+    "P&L companies:",
+    pnl["company_id"].nunique()
+)
+
+print(
+    "Balance Sheet companies:",
+    balance["company_id"].nunique()
+)
+
+
 # ==========================================================
-# 5. MERGE P&L + BALANCE SHEET
+# 6. VERIFY COMPANY-YEAR UNIQUENESS
+# ==========================================================
+
+pnl_duplicates = pnl.duplicated(
+    subset=["company_id", "year"]
+).sum()
+
+balance_duplicates = balance.duplicated(
+    subset=["company_id", "year"]
+).sum()
+
+
+print(
+    "\nP&L company-year duplicates:",
+    pnl_duplicates
+)
+
+print(
+    "Balance Sheet company-year duplicates:",
+    balance_duplicates
+)
+
+
+if pnl_duplicates > 0:
+    raise ValueError(
+        "Duplicate company-year records found "
+        "in cleaned P&L data."
+    )
+
+
+if balance_duplicates > 0:
+    raise ValueError(
+        "Duplicate company-year records found "
+        "in cleaned Balance Sheet data."
+    )
+
+
+# ==========================================================
+# 7. MERGE P&L + BALANCE SHEET
 # ==========================================================
 
 df = pd.merge(
     pnl,
     balance,
     on=["company_id", "year"],
-    how="inner"
+    how="inner",
+    validate="one_to_one"
+)
+
+
+print(
+    "\nRows after P&L + Balance Sheet merge:",
+    len(df)
+)
+
+print(
+    "Companies after merge:",
+    df["company_id"].nunique()
 )
 
 
 # ==========================================================
-# 6. ADD SECTOR INFORMATION
+# 8. VERIFY MERGED UNIQUENESS
+# ==========================================================
+
+merged_duplicates = df.duplicated(
+    subset=["company_id", "year"]
+).sum()
+
+
+print(
+    "Merged company-year duplicates:",
+    merged_duplicates
+)
+
+
+if merged_duplicates > 0:
+    raise ValueError(
+        "Duplicate company-year records found "
+        "after P&L + Balance Sheet merge."
+    )
+
+
+# ==========================================================
+# 9. PREPARE SECTOR DATA
 # ==========================================================
 
 sectors = sectors[
@@ -117,41 +322,77 @@ sectors = sectors[
         "broad_sector",
         "sector"
     ]
-].drop_duplicates(
+].copy()
+
+
+# One sector record per company
+sectors = sectors.drop_duplicates(
     subset=["company_id"]
 )
+
+
+print(
+    "Unique sector companies:",
+    sectors["company_id"].nunique()
+)
+
+
+# ==========================================================
+# 10. MERGE SECTOR INFORMATION
+# ==========================================================
 
 df = df.merge(
     sectors,
     on="company_id",
-    how="left"
+    how="left",
+    validate="many_to_one"
+)
+
+
+print(
+    "Rows after sector merge:",
+    len(df)
+)
+
+print(
+    "Companies with sector information:",
+    df["broad_sector"].notna().sum()
+)
+
+print(
+    "Companies without sector information:",
+    df["broad_sector"].isna().sum()
 )
 
 
 # ==========================================================
-# 7. FINANCIALS SECTOR FLAG
+# 11. FINANCIALS SECTOR FLAG
 # ==========================================================
 
 df["is_financials_sector"] = (
-    df["broad_sector"] == "Financials"
+    df["broad_sector"]
+    .astype(str)
+    .str.strip()
+    .eq("Financials")
 )
 
-
-print("Rows after merging:", len(df))
-
-print(
-    "Companies:",
-    df["company_id"].nunique()
-)
 
 print(
     "Financials company-year rows:",
     df["is_financials_sector"].sum()
 )
 
+print(
+    "Financials companies:",
+    df.loc[
+        df["is_financials_sector"],
+        "company_id"
+    ].nunique()
+)
+
 
 # ==========================================================
-# 8. DEBT-TO-EQUITY
+# 12. DEBT-TO-EQUITY
 # ==========================================================
 
 df["debt_to_equity"] = df.apply(
@@ -165,7 +406,7 @@ df["debt_to_equity"] = df.apply(
 
 
 # ==========================================================
-# 9. HIGH LEVERAGE FLAG
+# 13. HIGH LEVERAGE FLAG
 # ==========================================================
 
 df["high_leverage_flag"] = df.apply(
@@ -178,7 +419,7 @@ df["high_leverage_flag"] = df.apply(
 
 
 # ==========================================================
-# 10. INTEREST COVERAGE RATIO
+# 14. INTEREST COVERAGE RATIO
 # ==========================================================
 
 df["interest_coverage"] = df.apply(
@@ -192,20 +433,23 @@ df["interest_coverage"] = df.apply(
 
 
 # ==========================================================
-# 11. ICR LABEL
+# 15. ICR LABEL
 # ==========================================================
-
-# ==========================================================
-# 11. ICR LABEL
-# ==========================================================
+#
+# IMPORTANT:
+# Use the project function from ratios.py.
+#
+# If ICR is None because interest expense = 0,
+# the company is labelled "Debt Free".
+#
 
 df["icr_label"] = df["interest_coverage"].apply(
-    lambda x: "Debt Free" if pd.isna(x) else None
+    icr_label
 )
 
 
 # ==========================================================
-# 12. ICR WARNING FLAG
+# 16. ICR WARNING FLAG
 # ==========================================================
 
 df["icr_warning_flag"] = df["interest_coverage"].apply(
@@ -214,7 +458,7 @@ df["icr_warning_flag"] = df["interest_coverage"].apply(
 
 
 # ==========================================================
-# 13. NET DEBT
+# 17. NET DEBT
 # ==========================================================
 
 df["net_debt_cr"] = df.apply(
@@ -227,7 +471,7 @@ df["net_debt_cr"] = df.apply(
 
 
 # ==========================================================
-# 14. ASSET TURNOVER
+# 18. ASSET TURNOVER
 # ==========================================================
 
 df["asset_turnover"] = df.apply(
@@ -240,7 +484,102 @@ df["asset_turnover"] = df.apply(
 
 
 # ==========================================================
-# 15. DISPLAY SAMPLE
+# 19. FINAL VALIDATION
+# ==========================================================
+
+print("\n========================================")
+print("LEVERAGE & EFFICIENCY VALIDATION")
+print("========================================")
+
+
+print(
+    "Total companies:",
+    df["company_id"].nunique()
+)
+
+print(
+    "Total company-year rows:",
+    len(df)
+)
+
+print(
+    "Company-year duplicates:",
+    df.duplicated(
+        ["company_id", "year"]
+    ).sum()
+)
+
+print(
+    "Expected official companies:",
+    len(valid_companies)
+)
+
+
+# Missing official companies
+output_companies = set(
+    df["company_id"].dropna()
+)
+
+missing_companies = sorted(
+    valid_companies - output_companies
+)
+
+print(
+    "\nMissing official companies:",
+    missing_companies
+)
+
+print(
+    "Missing company count:",
+    len(missing_companies)
+)
+
+
+# ==========================================================
+# 20. BASIC RATIO CHECKS
+# ==========================================================
+
+print("\nBasic checks:")
+
+
+print(
+    "Debt-free company-years:",
+    (df["debt_to_equity"] == 0).sum()
+)
+
+
+print(
+    "High leverage flags:",
+    df["high_leverage_flag"].sum()
+)
+
+
+print(
+    "Debt-free ICR labels:",
+    (df["icr_label"] == "Debt Free").sum()
+)
+
+
+print(
+    "ICR warning flags:",
+    df["icr_warning_flag"].sum()
+)
+
+
+print(
+    "Null ICR:",
+    df["interest_coverage"].isna().sum()
+)
+
+
+print(
+    "Null Asset Turnover:",
+    df["asset_turnover"].isna().sum()
+)
+
+
+# ==========================================================
+# 21. SAMPLE RESULTS
 # ==========================================================
 
 print("\nSample results:")
@@ -266,50 +605,43 @@ print(
 
 
 # ==========================================================
-# 16. BASIC CHECKS
+# 22. FINAL OUTPUT UNIQUENESS CHECK
 # ==========================================================
 
-print("\nBasic checks:")
+final_duplicates = df.duplicated(
+    subset=["company_id", "year"]
+).sum()
 
-print(
-    "Debt-free company-years:",
-    (df["debt_to_equity"] == 0).sum()
-)
 
-print(
-    "High leverage flags:",
-    df["high_leverage_flag"].sum()
-)
-
-print(
-    "Debt-free ICR labels:",
-    (df["icr_label"] == "Debt Free").sum()
-)
-
-print(
-    "ICR warning flags:",
-    df["icr_warning_flag"].sum()
-)
-
-print(
-    "Null ICR:",
-    df["interest_coverage"].isna().sum()
-)
-
-print(
-    "Null Asset Turnover:",
-    df["asset_turnover"].isna().sum()
-)
+if final_duplicates > 0:
+    raise ValueError(
+        "Final leverage output contains "
+        "duplicate company-year records."
+    )
 
 
 # ==========================================================
-# 17. SAVE OUTPUT
+# 23. SAVE OUTPUT
 # ==========================================================
+
+output_path = (
+    "output/leverage_efficiency_ratios.csv"
+)
 
 df.to_csv(
-    "output/leverage_efficiency_ratios.csv",
+    output_path,
     index=False
 )
 
+
 print("\nSaved:")
-print("output/leverage_efficiency_ratios.csv")
+print(output_path)
+
+
+# ==========================================================
+# 24. COMPLETION MESSAGE
+# ==========================================================
+
+print("\n========================================")
+print("LEVERAGE ANALYSIS COMPLETED")
+print("========================================")
