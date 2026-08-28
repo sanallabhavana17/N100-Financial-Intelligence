@@ -17,41 +17,13 @@ Supported edge cases:
 
 
 def calculate_cagr(start_value, end_value, years):
-    """
-    Calculate CAGR.
-
-    Formula:
-        ((end / start) ** (1 / years) - 1) * 100
-
-    Returns:
-        (cagr_value, flag)
-
-    Possible flags:
-        None
-        DECLINE_TO_LOSS
-        TURNAROUND
-        BOTH_NEGATIVE
-        ZERO_BASE
-        INSUFFICIENT
-    """
-
-    # ---------------------------------------------------------
-    # 1. Validate number of years
-    # ---------------------------------------------------------
+    """Calculate CAGR and return (value, flag)."""
 
     if years is None or years <= 0:
         return None, "INSUFFICIENT"
 
-    # ---------------------------------------------------------
-    # 2. Missing values
-    # ---------------------------------------------------------
-
     if start_value is None or end_value is None:
         return None, "INSUFFICIENT"
-
-    # ---------------------------------------------------------
-    # 3. Convert to float
-    # ---------------------------------------------------------
 
     try:
         start_value = float(start_value)
@@ -59,49 +31,24 @@ def calculate_cagr(start_value, end_value, years):
     except (TypeError, ValueError):
         return None, "INSUFFICIENT"
 
-    # ---------------------------------------------------------
-    # 4. Zero base
-    # ---------------------------------------------------------
+    if start_value != start_value or end_value != end_value:
+        return None, "INSUFFICIENT"
 
     if start_value == 0:
         return None, "ZERO_BASE"
 
-    # ---------------------------------------------------------
-    # 5. Positive -> Positive
-    # ---------------------------------------------------------
-
     if start_value > 0 and end_value > 0:
-
-        cagr = (
-            (end_value / start_value) ** (1 / years) - 1
-        ) * 100
-
+        cagr = ((end_value / start_value) ** (1 / years) - 1) * 100
         return cagr, None
-
-    # ---------------------------------------------------------
-    # 6. Positive -> Negative
-    # ---------------------------------------------------------
 
     if start_value > 0 and end_value < 0:
         return None, "DECLINE_TO_LOSS"
 
-    # ---------------------------------------------------------
-    # 7. Negative -> Positive
-    # ---------------------------------------------------------
-
     if start_value < 0 and end_value > 0:
         return None, "TURNAROUND"
 
-    # ---------------------------------------------------------
-    # 8. Negative -> Negative
-    # ---------------------------------------------------------
-
     if start_value < 0 and end_value < 0:
         return None, "BOTH_NEGATIVE"
-
-    # ---------------------------------------------------------
-    # 9. Remaining zero-end case
-    # ---------------------------------------------------------
 
     return None, "INSUFFICIENT"
 
@@ -221,7 +168,7 @@ def calculate_growth_metrics(
         "eps": "eps_cagr",
     }
 
-    for years in windows:
+    for years in [3, 5, 10]:
 
         for source_column, output_name in metrics.items():
 

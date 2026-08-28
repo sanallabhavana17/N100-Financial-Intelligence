@@ -525,26 +525,3 @@ def prepare_ratio_data():
         balance.groupby("year")["company_id"]
         .nunique()
     )
-
-    # =========================================================
-    # 20. SIEMENS check
-    # =========================================================
-
-    print("\nSIEMENS Balance Sheet records:")
-
-    siemens = balance[
-        balance["company_id"] == "SIEMENS"
-    ]
-
-    if siemens.empty:
-        print("No SIEMENS records found.")
-    else:
-        print(
-            siemens.to_string(index=False)
-        )
-
-    
-
-
-if __name__ == "__main__":
-    prepare_ratio_data()

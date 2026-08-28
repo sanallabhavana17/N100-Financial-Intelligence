@@ -160,11 +160,17 @@ def icr_label(interest_coverage):
     """
     Display label for Interest Coverage Ratio.
 
-    None means the company has no interest expense,
+    None or NaN means the company has no interest expense,
     therefore it is treated as Debt Free.
     """
     if interest_coverage is None:
         return "Debt Free"
+
+    try:
+        if interest_coverage != interest_coverage:
+            return "Debt Free"
+    except TypeError:
+        return None
 
     return None
 
