@@ -1,0 +1,88 @@
+N100 FINANCIAL INTELLIGENCE
+SPRINT 2 ? DAY 13 RATIO EDGE CASE LOG
+======================================================================
+
+CROSS-CHECK METHOD
+----------------------------------------------------------------------
+Computed ROE and ROCE were compared against the pre-computed company-level values in companies.xlsx using the latest available financial year for each company.
+Anomaly threshold: absolute difference > 5 percentage points.
+
+SUMMARY
+----------------------------------------------------------------------
+Companies checked: 92
+ROE anomalies (>5%): 18
+ROCE anomalies (>5%): 40
+
+FORMULA DECISION
+----------------------------------------------------------------------
+The ratio-engine values are retained for analytics. Source ROE/ROCE values from companies.xlsx are treated as reference/display values. Differences are not automatically treated as formula errors.
+
+ROE ANOMALIES
+----------------------------------------------------------------------
+ADANIENT | 2024 | Engine ROE=8.5347% | Source ROE=13.6400% | Difference=5.1053% | Category=Formula discrepancy
+ADANIPOWER | 2024 | Engine ROE=48.2767% | Source ROE=57.1000% | Difference=8.8233% | Category=Formula discrepancy
+BAJAJFINSV | 2024 | Engine ROE=25.8504% | Source ROE=11.7200% | Difference=14.1304% | Category=Financial sector / formula basis difference
+BEL | 2024 | Engine ROE=4744.0476% | Source ROE=26.3000% | Difference=4717.7476% | Category=Data source / denominator issue
+BPCL | 2024 | Engine ROE=35.5113% | Source ROE=41.9000% | Difference=6.3887% | Category=Formula discrepancy
+COALINDIA | 2024 | Engine ROE=45.1698% | Source ROE=52.0000% | Difference=6.8302% | Category=Formula discrepancy
+GODREJCP | 2024 | Engine ROE=-4.4531% | Source ROE=6.7700% | Difference=11.2231% | Category=Formula discrepancy
+HAL | 2024 | Engine ROE=3816.5829% | Source ROE=28.9000% | Difference=3787.6829% | Category=Data source / denominator issue
+IRCTC | 2024 | Engine ROE=34.3963% | Source ROE=40.4000% | Difference=6.0037% | Category=Formula discrepancy
+LICI | 2024 | Engine ROE=49.4471% | Source ROE=63.6100% | Difference=14.1629% | Category=Financial sector / formula basis difference
+LT | 2024 | Engine ROE=77.6651% | Source ROE=10.4900% | Difference=67.1751% | Category=Formula discrepancy
+NESTLEIND | 2024 | Engine ROE=117.7545% | Source ROE=135.6100% | Difference=17.8555% | Category=Formula discrepancy
+PFC | 2024 | Engine ROE=26.1609% | Source ROE=19.4900% | Difference=6.6709% | Category=Financial sector / formula basis difference
+PNB | 2024 | Engine ROE=61.3206% | Source ROE=8.7000% | Difference=52.6206% | Category=Financial sector / formula basis difference
+TATAMOTORS | 2024 | Engine ROE=37.4561% | Source ROE=49.4000% | Difference=11.9439% | Category=Formula discrepancy
+TATASTEEL | 2024 | Engine ROE=-5.3349% | Source ROE=6.5500% | Difference=11.8849% | Category=Formula discrepancy
+TCS | 2024 | Engine ROE=50.9443% | Source ROE=0.5200% | Difference=50.4243% | Category=Data source issue
+TRENT | 2024 | Engine ROE=36.3078% | Source ROE=27.2000% | Difference=9.1078% | Category=Formula discrepancy
+
+ROCE ANOMALIES
+----------------------------------------------------------------------
+ABB | 2024 | Engine ROCE=38.4188% | Source ROCE=46.0000% | Difference=7.5812% | Category=Formula discrepancy
+ADANIGREEN | 2024 | Engine ROCE=9.7976% | Source ROCE=96.5000% | Difference=86.7024% | Category=Formula discrepancy
+ADANIPOWER | 2024 | Engine ROCE=23.4411% | Source ROCE=32.2000% | Difference=8.7589% | Category=Formula discrepancy
+ASIANPAINT | 2024 | Engine ROCE=35.7749% | Source ROCE=41.7500% | Difference=5.9751% | Category=Formula discrepancy
+BAJAJ-AUTO | 2024 | Engine ROCE=28.3896% | Source ROCE=33.5000% | Difference=5.1104% | Category=Formula discrepancy
+BAJAJFINSV | 2024 | Engine ROCE=11.7064% | Source ROCE=21.1400% | Difference=9.4336% | Category=Financial sector / formula basis difference
+BAJAJHLDNG | 2024 | Engine ROCE=2.8761% | Source ROCE=13.1000% | Difference=10.2239% | Category=Financial sector / formula basis difference
+BAJFINANCE | 2024 | Engine ROCE=4.3506% | Source ROCE=11.9000% | Difference=7.5494% | Category=Financial sector / formula basis difference
+BEL | 2024 | Engine ROCE=3977.1654% | Source ROCE=34.6000% | Difference=3942.5654% | Category=Data source / denominator issue
+BHARTIARTL | 2024 | Engine ROCE=26.2539% | Source ROCE=13.1000% | Difference=13.1539% | Category=Formula discrepancy
+CHOLAFIN | 2024 | Engine ROCE=3.4952% | Source ROCE=10.4000% | Difference=6.9048% | Category=Financial sector / formula basis difference
+CIPLA | 2024 | Engine ROCE=71.4579% | Source ROCE=22.8000% | Difference=48.6579% | Category=Formula discrepancy
+COALINDIA | 2024 | Engine ROCE=105.7130% | Source ROCE=63.6000% | Difference=42.1130% | Category=Formula discrepancy
+EICHERMOT | 2024 | Engine ROCE=23.4456% | Source ROCE=31.1000% | Difference=7.6544% | Category=Formula discrepancy
+GODREJCP | 2024 | Engine ROCE=18.6915% | Source ROCE=26.4900% | Difference=7.7985% | Category=Formula discrepancy
+HAL | 2024 | Engine ROCE=3027.6398% | Source ROCE=38.9000% | Difference=2988.7398% | Category=Data source / denominator issue
+HDFCLIFE | 2024 | Engine ROCE=646.4588% | Source ROCE=6.6100% | Difference=639.8488% | Category=Financial sector / formula basis difference
+HEROMOTOCO | 2024 | Engine ROCE=177.8421% | Source ROCE=29.1000% | Difference=148.7421% | Category=Formula discrepancy
+HINDALCO | 2024 | Engine ROCE=118.2078% | Source ROCE=11.3000% | Difference=106.9078% | Category=Formula discrepancy
+HINDUNILVR | 2024 | Engine ROCE=89.6304% | Source ROCE=27.2000% | Difference=62.4304% | Category=Formula discrepancy
+ICICIGI | 2024 | Engine ROCE=146.3235% | Source ROCE=22.5000% | Difference=123.8235% | Category=Financial sector / formula basis difference
+ICICIPRULI | 2024 | Engine ROCE=754.9037% | Source ROCE=8.7500% | Difference=746.1537% | Category=Financial sector / formula basis difference
+INDIGO | 2024 | Engine ROCE=5640.8798% | Source ROCE=24.5000% | Difference=5616.3798% | Category=Data source / denominator issue
+IRCTC | 2024 | Engine ROCE=44.5593% | Source ROCE=53.8000% | Difference=9.2407% | Category=Formula discrepancy
+LICI | 2024 | Engine ROCE=39.6135% | Source ROCE=63.7900% | Difference=24.1765% | Category=Financial sector / formula basis difference
+LT | 2024 | Engine ROCE=135.2030% | Source ROCE=17.1800% | Difference=118.0230% | Category=Formula discrepancy
+LTIM | 2024 | Engine ROCE=28.9148% | Source ROCE=34.1000% | Difference=5.1852% | Category=Formula discrepancy
+M&M | 2024 | Engine ROCE=14.2373% | Source ROCE=26.9800% | Difference=12.7427% | Category=Formula discrepancy
+MOTHERSON | 2024 | Engine ROCE=20.2314% | Source ROCE=13.7000% | Difference=6.5314% | Category=Formula discrepancy
+NESTLEIND | 2024 | Engine ROCE=157.7476% | Source ROCE=185.4300% | Difference=27.6824% | Category=Formula discrepancy
+PFC | 2024 | Engine ROCE=3.4859% | Source ROCE=9.9600% | Difference=6.4741% | Category=Financial sector / formula basis difference
+POWERGRID | 2024 | Engine ROCE=18.9052% | Source ROCE=13.2000% | Difference=5.7052% | Category=Formula discrepancy
+SBILIFE | 2024 | Engine ROCE=1.6501% | Source ROCE=13.2000% | Difference=11.5499% | Category=Financial sector / formula basis difference
+SHREECEM | 2024 | Engine ROCE=20.2066% | Source ROCE=14.8000% | Difference=5.4066% | Category=Formula discrepancy
+SHRIRAMFIN | 2024 | Engine ROCE=4.3049% | Source ROCE=11.3000% | Difference=6.9951% | Category=Financial sector / formula basis difference
+SIEMENS | 2024 | Engine ROCE=19.8516% | Source ROCE=25.6000% | Difference=5.7484% | Category=Formula discrepancy
+TATAMOTORS | 2024 | Engine ROCE=30.9803% | Source ROCE=20.1000% | Difference=10.8803% | Category=Formula discrepancy
+TATASTEEL | 2024 | Engine ROCE=12.4209% | Source ROCE=7.0200% | Difference=5.4009% | Category=Formula discrepancy
+TORNTPHARM | 2024 | Engine ROCE=30.9616% | Source ROCE=23.2000% | Difference=7.7616% | Category=Formula discrepancy
+TRENT | 2024 | Engine ROCE=33.8602% | Source ROCE=23.8000% | Difference=10.0602% | Category=Formula discrepancy
+
+SPECIAL CASE ? TCS
+----------------------------------------------------------------------
+TCS 2024: Engine ROE=50.9443%, Source ROE=0.5200%. The source value appears anomalous and is retained only for display/reference. Engine ROE is used for analytics.
+
+END OF EDGE CASE LOG
