@@ -1,0 +1,3985 @@
+CONFIDENTIAL  ·  INTERNAL USE ONLY  ·  DATA ANALYTICS DIVISION
+Version 1.0  ·  June 2026
+NIFTY 100 FINANCIAL
+INTELLIGENCE PLATFORM
+Project Execution Plan  ·  Technical Specification  ·  Feature Catalogue
+Project Title:
+Nifty 100 Financial Intelligence Platform
+Document Type:
+Full Technical Specification & Project Execution Plan
+Duration:
+45 Calendar Days  |  6 Weekly Sprints  |  3 Buffer Days
+Dataset Universe:
+92 Nifty 100 Companies  |  7 Core + 5 Supplementary Datasets
+Total Records:
+~11,000+ Data Points Across All Financial Statements
+Platform:
+12 Modules  |  120+ Features  |  50+ Financial KPIs
+Document Pages:
+50 Pages
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 2
+1. Document Control & Classification
+Administrative Record
+Field
+Detail
+Document Title
+Nifty 100 Financial Intelligence Platform — Project Execution Plan
+Document ID
+DAD-PROJ-001  |  Version 1.0
+Classification
+Confidential — Internal Use Only
+Status
+Approved for Distribution
+Project Duration
+45 Calendar Days  |  6 Weekly Sprints  |  3 Buffer Days
+Effective Date
+June 2026
+Owner
+Data Analytics Division — Project Lead
+Distribution
+Data Analyst Team Members (individually assigned)
+Total Pages
+50
+Datasets
+7 Core Datasets + 5 Supplementary Datasets
+Companies
+92 (Nifty 100 Index Constituents)
+KPIs Defined
+50+ Financial Key Performance Indicators
+Currency Standard
+All monetary values in Indian Rupees — Crore (I Cr) unless stated
+Version History
+Version
+Date
+Change Description
+1.0
+June 2026
+Initial release — full specification for 45-day project
+1.1
+Post-Sprint 1
+Updates based on data quality findings from ETL validation
+1.2
+Post-Sprint 3
+Screener and scoring refinements after testing
+2.0
+Day 45
+Final delivery version — all acceptance criteria verified
+How to Use This Document
+Section
+Pages
+Primary Reader
+Purpose
+1 — Document Control
+2
+All
+Classification, version history, reader guide
+2 — Table of Contents
+3
+All
+Navigation index
+3 — Executive Summary
+4–5
+All
+Platform overview, key metrics, outcomes
+4 — Project Overview
+6–7
+All
+Objectives, scope, stakeholder RACI
+5 — Dataset Catalogue
+8–14
+Data Engineers
+Full data dictionary for all 12 datasets
+6 — Data Relationships
+15
+All
+Entity relationships, join patterns, data gaps
+7 — System Architecture
+16
+All
+Folder structure, layers, data flow
+8–19 — Module Specifications 17–34
+Analysts
+Feature-by-feature breakdown of all 12 modules
+20 — Sprint Plan & Timeline
+35–40
+All
+Day-by-day tasks, exit criteria for each sprint
+21 — KPI Reference
+41–43
+Analytics
+Formulas, edge cases, benchmarks for 50+ KPIs
+22 — Data Quality Rules
+44
+Data Engineers
+14 validation rules — severity, action, test
+23 — API Specification
+45
+Backend
+Optional FastAPI endpoint definitions
+24 — Risk Register
+46
+Project Lead
+Risks, likelihood, impact, mitigations
+25 — Deliverables Checklist
+47
+All
+What to submit, format, due date, evaluation
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 3
+Section
+Pages
+Primary Reader
+Purpose
+26 — Tech Stack & Standards 48
+All
+Libraries, versions, code quality gates
+27 — Acceptance Criteria
+49
+All
+20 mandatory gates — definition of done
+28 — Glossary
+50
+All
+Definitions of all technical terms
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 4
+Table of Contents
+Section Title
+Pg
+1
+Document Control & Classification
+2
+2
+Table of Contents
+3
+3
+Executive Summary
+4
+4
+Project Overview & Objectives
+6
+4.1
+Mission & Objectives Matrix
+6
+4.2
+Scope Boundaries
+6
+4.3
+Stakeholder Matrix & RACI
+7
+5
+Dataset Catalogue — Core Datasets
+8
+5.1
+companies.xlsx
+8
+5.2
+profitandloss.xlsx
+9
+5.3
+balancesheet.xlsx
+10
+5.4
+cashflow.xlsx
+11
+5.5
+analysis.xlsx
+11
+5.6
+documents.xlsx
+12
+5.7
+prosandcons.xlsx
+12
+6
+Supplementary Datasets
+13
+6.1–6.5
+sectors / stock_prices / market_cap / financial_ratios / peer_groups
+13
+7
+Data Relationships & Entity Map
+15
+8
+System Architecture
+16
+9
+Module 1 — Data Engineering & ETL Pipeline
+17
+10
+Module 2 — Financial Ratio Engine (50+ KPIs)
+19
+11
+Module 3 — Company Intelligence Dashboard
+22
+12
+Module 4 — Investment Screener
+23
+13
+Module 5 — Financial Health Scoring Model
+25
+14
+Module 6 — Sector Analytics
+27
+15
+Module 7 — Cash Flow Intelligence
+29
+16
+Module 8 — Trend & Growth Analytics
+30
+17
+Module 9 — Peer Comparison Engine
+31
+18
+Module 10 — Reporting & Export Engine
+32
+19
+Module 11 — Document Intelligence Repository
+33
+20
+Module 12 — Alerts & Watchlist
+34
+21
+45-Day Sprint Plan & Timeline
+35
+21.1
+Sprint 1 — Foundation & Data Engineering
+35
+21.2
+Sprint 2 — Financial Ratio Engine
+36
+21.3
+Sprint 3 — Screener, Scoring & Sector Analytics
+37
+21.4
+Sprint 4 — Peer, Trend, Cash Flow & Documents
+38
+21.5
+Sprint 5 — Dashboard & Reporting
+39
+21.6
+Sprint 6 — Testing, Documentation & Delivery
+40
+22
+KPI Definitions & Business Logic
+41
+23
+Data Quality & Validation Rules
+44
+24
+API & Service Layer Specification
+45
+25
+Risk Register
+46
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 5
+26
+Deliverables Checklist
+47
+27
+Technical Stack & Code Standards
+48
+28
+Acceptance Criteria — Definition of Done
+49
+29
+Glossary of Terms
+50
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 6
+3. Executive Summary
+Strategic Overview &
+Key Metrics
+Attribute
+Detail
+Platform Name
+Nifty 100 Financial Intelligence Platform
+Core Purpose
+Transform raw financial statement data into structured analytics intelligence for 92 Nifty 100 companies
+Data Foundation
+7 core + 5 supplementary datasets covering P&L, Balance Sheet, Cash Flow, Sectors, Market Cap, Pricing
+Analytical Scope
+10–13 years of annual financial history per company; 50+ computed KPIs; 12 analytics modules
+Primary Outputs
+Investment screener, financial health scores, sector benchmarks, automated PDF/Excel reports, Streamlit dashboard
+Target Users
+Data Analysts — individually assigned to specific modules per this project document
+Build Timeline
+45 calendar days  |  6 weekly sprints  |  3 buffer days
+Quality Standard
+Production-grade: ≥80% test coverage, full documentation, zero critical bugs at handoff
+Currency Standard
+All monetary values in Indian Rupees — Crore (I Cr) unless explicitly stated otherwise
+Index Universe
+Nifty 100 — 92 companies after data availability filter applied
+Category
+Metric
+Value
+Category
+Metric
+Value
+Data
+Core Datasets
+7
+Platform
+Analytics Modules
+12
+Data
+Supplementary Datasets
+5
+Platform
+Total Features
+120+
+Data
+Total Companies
+92
+Platform
+Financial KPIs
+50+
+Data
+P&L Records
+1,276
+Platform
+Screener Filters
+18
+Data
+Balance Sheet Records
+1,312
+Platform
+Pre-built Screens
+6
+Data
+Cash Flow Records
+1,187
+Platform
+Peer Groups
+11
+Data
+Annual Report Links
+1,585
+Platform
+Sector Categories
+11
+Data
+Stock Price Records
+5,520
+Quality
+Test Coverage Target
+≥80%
+Data
+Computed Ratio Records
+1,184
+Quality
+DQ Validation Rules
+14
+Time
+Total Duration
+45 Days
+Quality
+Acceptance Criteria
+20
+#
+Key Outcome
+Business Value
+Owner Module
+01
+Unified financial data warehouse for 92 companies
+Single source of truth; eliminates manual data gathering
+ETL Pipeline
+02
+50+ computed KPIs per company per year
+Instant quantitative assessment without manual calculation
+Ratio Engine
+03
+Multi-parameter investment screener (18 filters)
+Reduces analyst time-to-insight from hours to seconds
+Screener
+04
+Composite Financial Health Score (0–100)
+Standardised risk triage across the full universe
+Health Score
+05
+Sector benchmarks across 11 broad sectors
+Sector rotation analysis and relative positioning
+Sector Analytics
+06
+Peer comparison engine for 11 peer groups
+Identifies best-in-class within comparable peer universes
+Peer Comparison
+07
+Automated PDF and Excel report generation
+Reproducible, consistent output; eliminates manual writing
+Reporting
+08
+Streamlit dashboard — analyst-facing interface
+Zero-code interface for non-programmer stakeholders
+Dashboard
+09
+Annual report repository — 1,585 links Direct access to primary source documents Document Repo
+10
+Rule-based alert system and company watchlist
+Proactive KPI deterioration monitoring
+Alerts
+Sprint
+Days
+Focus Area
+Primary Deliverable
+Exit Gate
+Sprint 1
+1–7
+Foundation & ETL
+SQLite DB loaded; DQ report
+0 critical DQ violations; ≥80% ETL coverage
+Sprint 2
+8–14
+Ratio Engine
+50+ KPIs in financial_ratios table
+Values validated vs 5 companies ±2%
+Sprint 3
+15–21
+Screener, Score & Sector
+Screener, FHS, Sector module
+All 3 modules correct; scores 0–100 for all 92
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 7
+Sprint
+Days
+Focus Area
+Primary Deliverable
+Exit Gate
+Sprint 4
+22–28
+Peer / Trend / CF / Docs
+4 analytics modules complete
+All modules integrated; peer comparison works
+Sprint 5
+29–35
+Dashboard & Reporting
+Streamlit app; PDF/Excel generatorsApp runs; 10+ company PDFs generated
+Sprint 6
+36–45
+Testing, Docs & Delivery
+v1.0 tagged release
+≥80% coverage; 0 critical bugs; README verified
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 8
+4. Project Overview & Objectives
+Mission, Scope,
+Stakeholders &
+Governance
+4.1 Mission & Objectives Matrix
+Attribute
+Statement
+Mission
+Build a self-contained, production-grade financial intelligence system enabling analysts to query, screen, score, and compare all 92 N
+Vision
+Become the definitive internal reference for Nifty 100 fundamental analysis — reproducible, auditable, and version-controlled from pub
+Principle
+Every insight must be traceable to a formula, every formula to a source column, every column to a dataset file. No black-box numbers
+ID
+Objective
+Success Metric
+Priority
+Sprint
+O-01
+Data Engineering
+All 12 datasets loaded; 0 critical DQ violations
+Critical
+1
+O-02
+KPI Computation
+50+ KPIs for all company-year combinations
+Critical
+2
+O-03
+Investment Screener
+18 filter types; 6 pre-built templates return results
+Critical
+3
+O-04
+Financial Health Scoring
+0–100 score for all 92 companies; correct bands
+Critical
+3
+O-05
+Sector Analytics
+Median KPIs for all 11 sectors; sector ranking
+High
+3
+O-06
+Peer Comparison
+Percentile ranks for all 11 peer groups
+High
+4
+O-07
+Trend & Growth Analytics
+1Y/3Y/5Y/10Y CAGR for revenue, profit, EPS
+High
+4
+O-08
+Cash Flow Intelligence
+Capital allocation matrix for all 92 companies
+High
+4
+O-09
+Dashboard
+Streamlit app — 5 pages functional; no crash
+High
+5
+O-10
+PDF Report Generation
+Company + sector PDFs for all 92 + 11 sectors
+High
+5
+O-11
+Excel Exports
+Screener export, full universe, comparison exports
+Medium
+5
+O-12
+Alerts & Watchlist
+Threshold alerts; YoY deterioration detection
+Medium
+6
+O-13
+Test Coverage
+≥80% unit test coverage across src/
+Critical
+6
+O-14
+Documentation
+README: fresh setup in <30 min; docstrings on all functions
+High
+6
+4.2 Scope Boundaries
+#
+In Scope
+#
+Out of Scope
+S01
+Fundamental analysis — P&L, Balance Sheet, Cash Flow
+X01
+Real-time price feeds or live market data
+S02
+Historical trend analysis — 10–13 years per companyX02
+Technical analysis (RSI, MACD, Bollinger Bands)
+S03
+50+ financial KPI computation from raw data
+X03
+Machine learning price prediction models
+S04
+Investment screener with 18 configurable filters
+X04
+Options, derivatives, or futures analytics
+S05
+Financial Health Score (0–100) composite model
+X05
+User authentication or multi-tenancy
+S06
+Sector benchmarking across 11 sectors
+X06
+Cloud deployment or CI/CD infrastructure
+S07
+Peer comparison for 11 defined peer groups
+X07
+Insider trading or shareholding pattern data
+S08
+Automated PDF and Excel report generation
+X08
+ESG scoring or sustainability metrics
+S09
+Streamlit dashboard — analyst interface
+X09
+International or cross-market comparison
+S10
+Annual report repository — 1,585 links
+X10
+Portfolio construction or optimisation models
+S11
+Simulated stock price & market cap datasets
+X11
+Earnings call transcripts or news sentiment
+S12
+Rule-based alert system and watchlist
+X12
+Regulatory filing alerts or SEBI announcements
+4.3 Stakeholder Matrix & RACI
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 9
+Stakeholder
+Role
+Module Ownership
+Engagement
+Data Analyst — ETL
+Data Engineer
+Module 1 (ETL Pipeline)
+Daily — Sprints 1–2
+Data Analyst — Analytics
+KPI Developer
+Modules 2, 5, 6, 7, 8, 9
+Daily — Sprints 2–4
+Data Analyst — Frontend
+Dashboard Builder
+Module 3, 4 UI (Screener page)
+Daily — Sprint 5
+Data Analyst — Reporting
+Report Developer
+Module 10 (PDF/Excel)
+Daily — Sprint 5
+Data Analyst — QA
+Quality Assurance
+Test suite, documentation
+Daily — Sprint 6
+Project Lead
+Coordinator
+All modules — review & integration
+Weekly review meetings
+Module
+ETL Analyst
+Analytics Analyst
+Frontend Analyst
+Reporting Analyst
+QA Analyst
+ETL Pipeline
+R/A
+C
+I
+I
+C
+Financial Ratio Engine
+C
+R/A
+I
+I
+C
+Investment Screener
+I
+R/A
+C
+I
+C
+Health Scoring
+I
+R/A
+C
+I
+C
+Sector Analytics
+I
+R/A
+C
+I
+C
+Peer Comparison
+I
+R/A
+C
+I
+C
+Trend & Growth
+I
+R/A
+C
+I
+C
+Cash Flow Intelligence
+I
+R/A
+C
+I
+C
+Dashboard
+I
+C
+R/A
+C
+C
+PDF / Excel Reports
+I
+C
+C
+R/A
+C
+Alerts & Watchlist
+I
+R
+C
+I
+A
+Full Test Suite
+C
+C
+C
+C
+R/A
+Documentation
+C
+C
+C
+C
+R
+R = Responsible | A = Accountable | C = Consulted | I = Informed
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 10
+5. Dataset Catalogue — Core Datasets
+Schema, Data
+Dictionary, Quality
+Notes & Usage
+Dataset
+Sheet
+Records
+Cols
+Time Coverage
+Primary Key
+Currency
+companies.xlsx
+Companies
+92
+12
+Current snapshot
+id (NSE ticker)
+N/A
+profitandloss.xlsx
+Profit & Loss
+1,276
+15
+FY 2010–2024
+(company_id, year)
+I Crore
+balancesheet.xlsx
+Balance Sheet
+1,312
+13
+FY 2010–2024
+(company_id, year)
+I Crore
+cashflow.xlsx
+Cash Flow
+1,187
+7
+FY 2010–2024
+(company_id, year)
+I Crore
+analysis.xlsx
+Analysis
+20
+6
+Multi-period text
+company_id
+% strings
+documents.xlsx
+Documents
+1,585
+4
+Calendar 2010–2024 (company_id, Year)
+N/A — URLs
+prosandcons.xlsx
+Pros & Cons
+16
+4
+Current
+id (auto)
+N/A — text
+Load note: Core files use pd.read_excel(path, header=1) — Row 0 is metadata; Row 1 is actual headers. Supplementary files use header=0.
+Normalise company_id to uppercase stripped NSE ticker on every load.
+5.1 companies.xlsx — Master Company Reference
+Column
+Type
+Nullable
+Sample Value
+Description & Notes
+id
+VARCHAR
+No
+TCS
+NSE ticker — Primary Key for entire platform. Strip whitespace; uppercase.
+company_logo
+TEXT
+Yes
+https://…/TCS.png
+URL to company logo image. Some may return 404 — handle gracefully.
+company_name
+VARCHAR
+No
+Tata Consultancy Services LtdFull legal name. Some entries contain embedded \n — strip on load.
+chart_link
+TEXT
+Yes
+https://in.tradingview.com/… TradingView chart URL. For display only; not used in computation.
+about_company
+TEXT
+Yes
+TCS is a leading IT…
+Business description. Length: 50–600 chars. Display in company card.
+website
+TEXT
+Yes
+https://www.tcs.com/
+Official corporate website URL.
+nse_profile
+TEXT
+Yes
+https://nseindia.com/…
+NSE India equity profile page URL.
+bse_profile
+TEXT
+Yes
+https://bseindia.com/…
+BSE India stock page URL.
+face_value
+NUMERIC
+No
+1
+Share face value in I. Common: 1, 2, 5, 10. Used in book value calculation.
+book_value
+NUMERIC
+Yes
+157.40
+Book value per share in I (latest). Display only; compute from BS for analytics
+roce_percentage
+NUMERIC
+Yes
+64.30
+ROCE % (pre-computed). Use for display; Ratio Engine values for analytics.
+roe_percentage
+NUMERIC
+Yes
+0.52
+ROE % (pre-computed). Note: TCS shows 0.52 — anomaly; use Ratio Engine
+5.2 profitandloss.xlsx — Annual Profit & Loss Statements
+Column
+Type
+Nullable
+Sample (TCS FY23)
+Formula / Notes
+id
+INTEGER
+No
+61
+Row ID — not analytically meaningful. Use composite key.
+company_id
+VARCHAR
+No
+TCS
+FK → companies.id. Normalise to uppercase stripped ticker.
+year
+VARCHAR
+No
+Mar-23
+Financial year label. Standardise to 'YYYY-MM' on load via normalize_year().
+sales
+NUMERIC
+No
+225,458
+Net revenue / total income. Must be > 0. I Crore.
+expenses
+NUMERIC
+No
+176,924
+Total operating expenses. I Crore.
+operating_profit
+NUMERIC
+No
+48,534
+EBITDA. Cross-validate: must equal sales − expenses within ±1%.
+opm_percentage
+NUMERIC
+No
+21.5
+OPM %. Validate: = operating_profit/sales×100 ±1%. Flag if diff >1%.
+other_income
+NUMERIC
+Yes
+3,800
+Non-operating income (dividends received, interest). I Crore.
+interest
+NUMERIC
+Yes
+0
+Finance costs. 0 for debt-free companies. I Crore.
+depreciation
+NUMERIC
+Yes
+5,800
+D&A. I Crore. EBIT = operating_profit − depreciation.
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 11
+Column
+Type
+Nullable
+Sample (TCS FY23)
+Formula / Notes
+profit_before_tax
+NUMERIC
+Yes
+46,534
+PBT = EBITDA + other_income − interest − D&A. I Crore.
+tax_percentage
+NUMERIC
+Yes
+25.0
+Effective tax rate %. Verify: (PBT − PAT) / PBT × 100.
+net_profit
+NUMERIC
+Yes
+34,990
+PAT. Can be negative. I Crore.
+eps
+NUMERIC
+Yes
+95.30
+Earnings Per Share in I. Must be > 0 if net_profit > 0.
+dividend_payout
+NUMERIC
+Yes
+45.0
+Dividend payout ratio %. Can exceed 100% in low-profit years.
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 12
+5.3 balancesheet.xlsx — Annual Balance Sheet
+Column
+Type
+Nullable
+Sample (ABB 2024)
+Formula / Notes
+id
+INTEGER
+No
+136
+Row ID.
+company_id
+VARCHAR
+No
+ABB
+FK → companies.id.
+year
+VARCHAR
+No
+Mar-24
+Standardise to YYYY-MM.
+equity_capital
+NUMERIC
+No
+21
+Paid-up share capital. Small for large caps. I Crore.
+reserves
+NUMERIC
+Yes
+626
+Reserves & surplus. Total Equity = equity_capital + reserves.
+borrowings
+NUMERIC
+Yes
+0
+Total debt (short + long term). 0 = debt-free. I Crore.
+other_liabilities
+NUMERIC
+Yes
+260
+Trade payables + other current liabilities. Proxy for CL in ROCE. I Crore.
+total_liabilities
+NUMERIC
+No
+907
+Sum of equity + all liabilities. Must equal total_assets ±1%.
+fixed_assets
+NUMERIC
+Yes
+109
+Net fixed assets (after D&A). I Crore.
+cwip
+NUMERIC
+Yes
+1
+Capital Work In Progress. Add to fixed_assets for gross block proxy.
+investments
+NUMERIC
+Yes
+0
+Long-term investments and securities. Used as liquid proxy for net debt.
+other_asset
+NUMERIC
+Yes
+798
+Current assets + other assets. Catch-all non-fixed.
+total_assets
+NUMERIC
+No
+907
+Sum of all asset-side items. Must equal total_liabilities ±tolerance.
+5.4 cashflow.xlsx — Annual Cash Flow Statements
+Column
+Type
+Sign Convention
+Healthy Signal
+Notes
+id
+INTEGER
+—
+—
+Row ID.
+company_id
+VARCHAR
+—
+—
+FK → companies.id.
+year
+VARCHAR
+—
+—
+Standardise to YYYY-MM.
+operating_activity
+NUMERIC
+Positive = good
+CFO > 0 consistently
+Cash generated from core operations. Primary health indicator. I Crore
+investing_activity
+NUMERIC
+Negative = normal
+Negative = investing in growthCash used for CapEx, acquisitions, investments. I Crore.
+financing_activity
+NUMERIC
+Variable
+Negative = debt repayment / dividends
+Debt raise/repay, equity issuance, dividends paid. I Crore.
+net_cash_flow
+NUMERIC
+Pos = cash grew
+Positive preferred
+= CFO + CFI + CFF. Validate: matches sum ±10 Crore. I Crore.
+5.5 analysis.xlsx — Pre-Computed Growth Metrics (Partial Coverage)
+Column
+Type
+Sample Value
+Parsing Logic
+Usage
+id
+INTEGER
+1
+Direct int cast
+Row ID.
+company_id
+VARCHAR
+HDFCBANK
+Normalise ticker
+FK → companies.id.
+compounded_sales_growth
+TEXT
+10 Years: 21%
+Regex: r'(\d+)\s*Years?:?\s*([\d.]+)%' → (10, 21.0)
+Display + cross-check after parsing
+compounded_profit_growth
+TEXT
+5 Years:  6%
+Same pattern
+Display + cross-check
+stock_price_cagr
+TEXT
+10 Years: 15%
+Same pattern
+Display only — compute from market_cap dataset
+roe
+TEXT
+10 Years: 17%
+Same pattern
+Display only — use Ratio Engine ROE for analytics
+Coverage gap: Only ~8 companies have entries. Compute growth metrics for all 92 via the Ratio Engine (Sprint 2). Use analysis.xlsx values only for
+display cross-check.
+5.6 documents.xlsx — Annual Report Repository
+Column
+Type
+Nullable
+Sample Value
+Notes
+id
+INTEGER
+No
+1
+Row ID.
+company_id
+VARCHAR
+No
+ABB
+FK → companies.id.
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 13
+Column
+Type
+Nullable
+Sample Value
+Notes
+Year
+INTEGER
+No
+2024
+Calendar year of annual report. Note: capital 'Y'. Cast to int.
+Annual_Report
+TEXT
+Yes
+https://bseindia.com/…pdf
+Direct PDF URL on BSE India. Validate with requests.head(). Some return 4
+5.7 prosandcons.xlsx — Qualitative Investment Insights
+Column
+Type
+Nullable
+Sample Value
+Notes
+id
+INTEGER
+No
+1
+Row ID.
+company_id
+VARCHAR
+No
+HDFCBANK
+FK → companies.id.
+pros
+TEXT
+Yes
+Company is expected to give good quarter
+Positive observation. One per row. Multiple rows per company allowed.
+cons
+TEXT
+Yes
+Stock trading at 2.76× book value Risk observation. One per row.
+Coverage gap: Only 16 records covering ~8 companies. Sprint 3 task: auto-generate pros/cons for all 92 companies using KPI threshold rules.
+Examples: ROE>20% sustained → pro; D/E>2.0 → con; FCF negative 3yr → con.
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 14
+6. Supplementary Datasets
+Created to Augment
+Core Analysis —
+Location: supporting
+datasets/
+File
+Rows
+Created From
+Analytical Purpose
+sectors.xlsx
+92
+Manual GICS-style mapping of all 92 companies
+Sector/sub-sector aggregation, relative scoring, sector filter in scree
+stock_prices.xlsx
+5,520
+Simulated monthly OHLCV — Jan 2020 to Dec 2024
+Price trend charts, monthly return calculation, FCF yield denominat
+market_cap.xlsx
+552
+Simulated annual P/E, P/B, EV/EBITDA, Mkt Cap
+Valuation screening (P/E, P/B), EV/EBITDA comp, dividend yield d
+financial_ratios.xlsx
+1,184
+Computed from P&L + Balance Sheet + Cash Flow
+Pre-computed KPI table; screener backbone; health score inputs
+peer_groups.xlsx
+56
+Manually defined 11 peer groups + benchmark flags
+Peer comparison engine; relative percentile ranking
+6.1 sectors.xlsx — Company Sector Mapping
+Column
+Values / Range
+Notes
+company_id
+NSE Ticker (92 unique)
+FK → companies.id. One row per company.
+broad_sector
+11 macro sectors
+Financials, Energy, IT, Consumer Discretionary, Consumer Staples, Healthcare, Materials, Industrials, Comm
+sub_sector
+33 sub-sectors
+e.g. Private Banks, IT Services, Pharmaceuticals, Steel, FMCG, etc.
+index_weight_pct
+0.2 – 4.5%
+Estimated Nifty 100 index weight. For display only; not used in KPI calculations.
+market_cap_category
+Large Cap / Mid Cap
+Classification at dataset creation time.
+Broad Sector
+Sub-Sectors Included
+Companies
+Financials
+Private Banks, Public Sector Banks, Life Insurance, General Insurance, Consumer Finance, Holding Cos, Speciality Finance
+19
+Energy
+Oil & Gas Refining, Oil & Gas Exploration, Power & Utilities, Renewable Energy, Gas Distribution, Power Transmission
+15
+Information Technology
+IT Services, Internet & Platforms
+6
+Consumer Discretionary
+Automobiles, Two Wheelers, Auto Ancillaries, Retail, Gems & Jewellery, Airlines, Travel & Tourism
+12
+Consumer Staples
+FMCG, Food Products, Food & Beverages, Personal Products
+8
+Healthcare
+Pharmaceuticals
+5
+Materials
+Steel, Metals & Mining, Cement, Specialty Chemicals, Paints & Coatings
+8
+Industrials
+Capital Goods, Defence Electronics, Defence & Aerospace, Engineering & Construction, Consumer Electricals
+9
+Communication Services
+Telecommunications, Internet & Platforms
+2
+Real Estate
+Real Estate, Infrastructure
+3
+Conglomerates / Other
+Diversified Conglomerates, Holding Companies
+5
+6.2 stock_prices.xlsx — Monthly OHLCV Price History (Simulated)
+Column
+Type
+Range / Format
+Notes
+company_id
+VARCHAR
+NSE Ticker
+FK → companies.id.
+date
+VARCHAR
+YYYY-MM-DD
+First calendar day of each month. Covers Jan 2020 – Dec 2024 (60 months).
+open_price
+NUMERIC
+I5 – I18,000
+Simulated monthly opening price. For price trend and return charts.
+high_price
+NUMERIC
+I5 – I19,000
+Monthly high. Always ≥ open and ≥ close.
+low_price
+NUMERIC
+I4 – I17,500
+Monthly low. Always ≤ open and ≤ close.
+close_price
+NUMERIC
+I5 – I18,000
+Monthly closing price. Primary field for return calculations.
+volume
+INTEGER
+100K – 50M
+Simulated monthly traded volume in shares.
+adjusted_close
+NUMERIC
+I5 – I18,000
+Same as close_price (no dividend adjustment in simulation).
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 15
+6.3 market_cap.xlsx — Annual Valuation Multiples
+Column
+Type
+Range
+Notes
+company_id
+VARCHAR
+NSE Ticker
+FK → companies.id.
+year
+INTEGER
+2019–2024
+Calendar year. One row per company per year.
+market_cap_crore
+NUMERIC
+I5K–I15L Cr
+Market capitalisation. Simulated. Use for EV, P/E, FCF yield denominator.
+enterprise_value_crore
+NUMERIC
+I4K–I17L Cr
+EV = Mkt Cap + Net Debt (proxy). Simulated.
+pe_ratio
+NUMERIC
+8–80×
+Price-to-Earnings. Simulated around sector norms.
+pb_ratio
+NUMERIC
+0.5–15×
+Price-to-Book. Cross-check vs book_value in companies.xlsx.
+ev_ebitda
+NUMERIC
+5–40×
+EV / EBITDA multiple. Use for sector valuation comparison.
+dividend_yield_pct
+NUMERIC
+0–4.5%
+Annual dividend yield. Simulated.
+6.4 financial_ratios.xlsx — Pre-Computed KPI Table
+Column
+Source
+Formula / Notes
+company_id, year
+All
+Composite PK.
+net_profit_margin_pct
+P&L
+net_profit / sales × 100. Negative allowed.
+operating_profit_margin_pct
+P&L
+From opm_percentage source field. Cross-validate vs computed.
+return_on_equity_pct
+P&L+BS
+net_profit / (equity_cap + reserves) × 100.
+debt_to_equity
+BS
+borrowings / (equity_cap + reserves). 0 = debt-free.
+interest_coverage
+P&L
+(op_profit + other_income) / interest. None if interest = 0.
+asset_turnover
+P&L+BS
+sales / total_assets.
+free_cash_flow_cr
+CF
+operating_activity + investing_activity (I Cr).
+capex_cr
+CF
+abs(investing_activity) — CapEx proxy (I Cr).
+earnings_per_share
+P&L
+eps source field (I).
+book_value_per_share
+BS+Co
+(equity + reserves) / (equity_cap / face_value) (I).
+dividend_payout_ratio_pct
+P&L
+dividend_payout source field (%).
+total_debt_cr
+BS
+borrowings (I Cr).
+cash_from_operations_cr
+CF
+operating_activity (I Cr).
+6.5 peer_groups.xlsx — Peer Comparison Groups
+Peer Group
+Members
+Benchmark
+Private Banks
+HDFCBANK, ICICIBANK, AXISBANK, KOTAKBANK, INDUSINDBK
+HDFCBANK
+Public Banks
+SBIN, BANKBARODA, CANBK, PNB
+SBIN
+IT Services
+TCS, INFY, HCLTECH, TECHM, LTIM
+TCS
+Pharmaceuticals
+SUNPHARMA, CIPLA, DRREDDY, DIVISLAB, TORNTPHARM
+SUNPHARMA
+Automobiles
+MARUTI, TATAMOTORS, M&M, BAJAJ-AUTO, EICHERMOT, HEROMOTOCO, TVSMOTOR
+MARUTI
+Life Insurance
+LICI, HDFCLIFE, SBILIFE, ICICIPRULI
+LICI
+Oil & Gas
+RELIANCE, ONGC, BPCL, IOC, GAIL
+RELIANCE
+Power & Utilities
+NTPC, POWERGRID, TATAPOWER, ADANIPOWER, NHPC, JSWENERGY, ADANIGREEN
+NTPC
+Steel & Metals
+TATASTEEL, JSWSTEEL, JINDALSTEL, HINDALCO
+TATASTEEL
+FMCG
+HINDUNILVR, ITC, BRITANNIA, DABUR, NESTLEIND, GODREJCP, TATACONSUMHINDUNILVR
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 16
+Peer Group
+Members
+Benchmark
+Consumer Finance
+BAJFINANCE, CHOLAFIN, SHRIRAMFIN
+BAJFINANCE
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 17
+7. Data Relationships & Entity Map
+Foreign Keys, Join
+Paths & Coverage
+Matrix
+7.1 Entity-Relationship Summary
+Parent Table
+Parent Key
+Child Table
+Child Key
+Cardinality
+Join Note
+companies
+id (NSE ticker)
+profitandloss
+company_id
+1 : N
+Up to 15 annual rows per company
+companies
+id
+balancesheet
+company_id
+1 : N
+Up to 15 annual rows per company
+companies
+id
+cashflow
+company_id
+1 : N
+Up to 14 annual rows per company
+companies
+id
+analysis
+company_id
+1 : 1
+Partial — ~8 companies have entries
+companies
+id
+documents
+company_id
+1 : N
+1–20 annual report links per company
+companies
+id
+prosandcons
+company_id
+1 : N
+Partial — ~8 companies with entries
+companies
+id
+sectors
+company_id
+1 : 1
+All 92 companies covered
+companies
+id
+stock_prices
+company_id
+1 : N
+60 monthly rows per company
+companies
+id
+market_cap
+company_id
+1 : N
+6 annual rows (2019–2024)
+companies
+id
+financial_ratios
+company_id
+1 : N
+Up to 14 annual rows per company
+companies
+id
+peer_groups
+company_id
+M : N
+A company can be in multiple groups
+7.2 Dataset Coverage Matrix
+Dataset
+Companies Covered
+Years Available
+Completeness
+Data Source
+companies
+92 / 92 (100%)
+Snapshot only
+Complete
+Screener.in scrape
+profitandloss
+92 / 92
+FY 2010–2024
+~95%
+Screener.in / BSE filings
+balancesheet
+92 / 92
+FY 2010–2024
+~97%
+Screener.in / BSE filings
+cashflow
+92 / 92
+FY 2010–2024
+~91%
+Screener.in / BSE filings
+analysis
+~8 / 92 (9%)
+Multi-period
+Partial
+Screener.in pre-computed metrics
+documents
+~75 / 92 (82%)
+Calendar 2010–24
+Partial
+BSE India Annual Reports portal
+prosandcons
+~8 / 92 (9%)
+Snapshot only
+Partial
+Screener.in qualitative section
+sectors
+92 / 92
+Snapshot
+Complete
+Created — GICS-style manual mapping
+stock_prices
+92 / 92
+Jan 2020–Dec 2024
+Complete
+Created — simulated OHLCV
+market_cap
+92 / 92
+2019–2024
+Complete
+Created — simulated valuation
+financial_ratios
+92 / 92
+FY 2010–2024
+~93%
+Created — computed from raw files
+peer_groups
+46 / 92 (50%)
+Snapshot
+Partial
+Created — manually defined groups
+7.3 Standard Join Pattern — Python / SQL
+Scenario
+Join Logic
+P&L + Balance Sheet for one year
+SELECT p.*, b.borrowings, b.total_assets FROM profitandloss p JOIN balancesheet b USING (company_id, year)
+Full profile with sector
+SELECT c.id, c.company_name, s.broad_sector, s.sub_sector FROM companies c JOIN sectors s ON c.id = s.company_id
+CFO + Net Profit health checkSELECT p.company_id, p.year, p.net_profit, f.operating_activity FROM profitandloss p JOIN cashflow f USING (company_id, year)
+Valuation multiples with earnings
+SELECT m.*, p.net_profit, p.eps FROM market_cap m JOIN profitandloss p USING (company_id, year)
+Peer group ranking
+SELECT r.company_id, r.return_on_equity_pct, RANK() OVER (PARTITION BY pg.peer_group_name ORDER BY r.return_on_equity
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 18
+8. System Architecture
+7-Layer Data Platform
+with 12 Analytical
+Modules
+Layer
+Layer Name
+Components
+Technology
+L1
+Raw Data Ingestion
+Excel loader, URL validator, schema validator
+Python — pandas, openpyxl, requests
+L2
+ETL & Normalisation
+Year normaliser, ticker normaliser, dedup engine
+Python — pandas, custom ETL modules
+L3
+Persistent Storage
+SQLite database (10 tables) — core + supporting
+SQLite 3.x — single-file, zero-config
+L4
+Analytics Engine
+Ratio engine, screener, comparator, capital classifierPython — pandas, NumPy, scipy.stats
+L5
+Intelligence Layer
+Peer percentiles, health scorer, NLP summarizer
+Python — scikit-learn, regex, NLTK
+L6
+Reporting Layer
+PDF reports, Excel exports, chart generation
+ReportLab, openpyxl, matplotlib, Plotly
+L7
+Dashboard & API
+Streamlit app (8 screens), REST API (16 endpoints)Streamlit, FastAPI, Uvicorn
+8.1 Technology Stack
+Category
+Library / Tool
+Version
+Purpose
+Data
+pandas
+≥ 2.0
+DataFrame operations, Excel read/write, pivot tables
+Data
+NumPy
+≥ 1.24
+Vectorised KPI computation, growth rate arrays
+Data
+openpyxl
+≥ 3.1
+Read .xlsx files with header=1 for core datasets
+Database
+SQLite
+3.x
+Single-file relational store; zero server overhead
+Analytics
+scipy
+≥ 1.11
+Statistical distributions, hypothesis tests (t-test, Mann-Whitney)
+Analytics
+scikit-learn
+≥ 1.3
+KMeans clustering, percentile ranking, scaler
+Visualisation
+matplotlib
+≥ 3.7
+Static charts for PDF reports
+Visualisation
+Plotly
+≥ 5.18
+Interactive charts for Streamlit dashboard
+Dashboard
+Streamlit
+≥ 1.30
+Multi-page web dashboard — no frontend code needed
+API
+FastAPI
+≥ 0.110
+REST API server with OpenAPI docs auto-generated
+API
+Uvicorn
+≥ 0.27
+ASGI server to run FastAPI
+PDF
+ReportLab
+≥ 4.1
+PDF document generation (all reports)
+NLP
+NLTK
+≥ 3.8
+Text tokenisation for qualitative analysis + pros/cons generation
+NLP
+regex
+stdlib
+Pattern extraction from analysis.xlsx text fields
+Testing
+pytest
+≥ 7.4
+Unit tests for ETL, KPI formulas, edge cases
+Dev
+Jupyter
+≥ 7.0
+Exploratory analysis notebook (not in production path)
+Dev
+black
+≥ 24.0
+Code formatting — PEP8 compliance
+Dev
+ruff
+≥ 0.4
+Linting — style and import checks
+Dev
+pre-commit
+≥ 3.7
+Git hooks: black + ruff run before every commit
+Env
+python-dotenv
+≥ 1.0
+Config via .env file — paths, thresholds, flags
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 19
+9. Module Specifications — Modules 1–4
+Data Foundation,
+Analytics Engine,
+Screener & Peer
+Comparison
+Module 1: Data Ingestion & ETL
+Reads all 7 core + 5 supplementary Excel files, normalises fields, validates schemas, removes duplicates, and loads into a 10-table SQLite database.
+The foundation for all downstream modules.
+Sprint: Sprint 1 (Days 1–7)
+#
+Feature
+Acceptance Criterion
+Output
+1.1
+Excel file loader with header=1 support
+Loads all 7 core files with correct column headers; handles merged cells
+DataFrames
+1.2
+Ticker normaliser
+company_id.str.strip().str.upper() on all tables; FK integrity passes
+Normalised IDs
+1.3
+Year label standardiser
+Mar-23 → 2023-03 via normalize_year(); Mar / Dec FY handled
+Uniform year strings
+1.4
+Schema validator (16 rules)
+Zero schema failures on reference dataset; failures logged to CSV
+validation_log.csv
+1.5
+Deduplication engine
+No duplicate (company_id, year) pairs in time-series tables
+Clean tables
+1.6
+SQLite loader
+All 10 tables written; rowcounts match source; FK constraints enabled
+nifty100.db
+1.7
+Load audit log
+load_audit.csv: table, rows_in, rows_out, rejected, timestamp, runtime_s
+Audit file
+Output
+Detail
+nifty100.db (SQLite)
+10 tables: companies, profitandloss, balancesheet, cashflow, analysis, documents, prosandcons, sectors, market_cap, stock_pric
+load_audit.csv
+Per-table load statistics for QA review. Row count, rejection count, runtime.
+validation_failures.csv
+All DQ rule violations with company_id, year, field, issue, severity (CRITICAL/WARNING).
+Module 2: Financial Ratio Engine
+Computes 50+ KPIs for every company-year combination across all 14 available years. Handles all edge cases: division by zero, negative equity,
+debt-free companies, bank/NBFC D/E carve-out, and CAGR sign anomalies.
+Sprint: Sprint 2 (Days 8–14)
+#
+Feature / KPI
+Formula
+Edge Case
+2.1
+Net Profit Margin
+net_profit / sales × 100
+None if sales = 0
+2.2
+Operating Profit Margin
+operating_profit / sales × 100
+Cross-check vs opm_percentage
+2.3
+Return on Equity (ROE)
+net_profit / (equity + reserves) × 100
+None if equity ≤ 0
+2.4
+Return on Capital (ROCE)
+(EBIT) / (equity + reserves + borrowings) × 100Exclude NBFC/Banks from D/E flag
+2.5
+Debt-to-Equity
+borrowings / (equity + reserves)
+0 for debt-free; flag >5 for non-financials
+2.6
+Interest Coverage
+(op_profit + other_income) / interest
+None if interest = 0; 999 displayed as 'Debt Free'
+2.7
+Free Cash Flow
+CFO + CFI
+Negative allowed; flag if negative 3yr consecutive
+2.8
+CAGR (Revenue, PAT, EPS)
+((end/start)^(1/n) − 1) × 100
+Turnaround flag if base < 0 and end > 0
+2.9
+Asset Turnover
+sales / total_assets
+None if total_assets = 0
+2.10
+Capital Allocation Class
+Sign pattern of CFO/CFI/CFF
+8 patterns → labels: Reinvest, Return, Distress, etc.
+Output
+Detail
+financial_ratios table (SQLite)
+14 computed KPI columns per company-year; ~1,184 rows minimum
+capital_allocation.csv
+company_id, year, CFO_sign, CFI_sign, CFF_sign, pattern_label
+ratio_edge_cases.log
+Log of every CAGR turnaround, debt-free substitution, or division-by-zero
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 20
+Module 3: Company Screener & Filter Engine
+Multi-criteria stock screener with 15+ filterable metrics. Produces ranked result sets. Analyst configures thresholds via YAML config; no code changes
+needed to add new screening presets.
+Sprint: Sprint 3 (Days 15–21)
+#
+Feature
+Criteria / Logic
+Output
+3.1
+Preset screeners (6 templates)
+Quality: ROE>15%, D/E<1, FCF>0. Value: P/E<20, P/B<3. Growth: PAT CAGR >20% 5yr. Dividend: Yield>2
+Ranked company list
+3.2
+Custom filter builder
+Analyst defines thresholds per metric in YAML config (screener_config.yaml)
+Configurable
+3.3
+Ranking engine
+RANK() OVER sector partition on composite score (50% profitability, 30% growth, 20% valuation)
+Score 0–100
+3.4
+Sector-relative screener
+Same thresholds normalised within broad_sector; flags outliers (>2σ or bottom decile)
+Peer-adjusted rank
+3.5
+Screener export (Excel + CSV)
+Top-N results with all KPIs; sortable, formatted screener_output.xlsx
+3.6
+Multi-year trend filter
+Filter companies where metric improved consecutively for N years
+Trend table
+Output
+Detail
+screener_output.xlsx
+Top results for each preset with 20+ KPIs displayed, colour-coded by threshold
+screener_config.yaml
+All screening thresholds; analysts edit this file to create custom screens
+screener API endpoint
+GET /api/v1/screener?min_roe=15&max_de=1&sector=IT → JSON response
+Module 4: Peer Comparison Engine
+Compares companies within their peer group (from peer_groups.xlsx) across 20 metrics. Computes within-group percentile rank for every metric.
+Produces radar charts and comparison tables.
+Sprint: Sprint 3 (Days 15–21)
+#
+Feature
+Logic
+Output
+4.1
+Intra-group percentile rank
+PERCENT_RANK() OVER (PARTITION BY peer_group ORDER BY metric)
+Rank 0–1 per metric
+4.2
+Multi-metric radar chart
+8 axes: ROE, ROCE, NPM, D/E, FCF, PAT CAGR, Revenue CAGR, EPS CAGR
+Plotly radar / matplotlib polar
+4.3
+Side-by-side comparison table
+Up to 5 companies: all 14 ratios, 5-year CAGR, capital allocation pattern
+Formatted HTML + PDF
+4.4
+Benchmark gap analysis
+Metric_value vs benchmark_company in peer group; gap in absolute & pct
+Heatmap: green=above bench, red=below
+4.5
+Best-in-class detection
+Company in top quartile (≥75th pctile) for ≥6 of 10 metrics → 'Best in Class' badge
+Badge table
+4.6
+Weak company detection
+Bottom quartile (≤25th pctile) for ≥4 of 10 metrics → 'Watch List' flag
+Flag list
+Output
+Detail
+peer_comparison.xlsx
+One sheet per peer group; 20 metrics, colour-coded percentile cells
+radar_charts/
+One radar PNG per company showing performance vs peer group average
+peer_percentiles table
+SQLite: company_id, peer_group, metric, value, percentile_rank, year
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 21
+10. Module Specifications — Modules 5–8
+Dashboard, Valuation,
+Cash Flow Intelligence
+& Reports
+Module 5: Interactive Streamlit Dashboard
+8-screen web application. No authentication required for MVP. All screens load from SQLite. Deployed locally via `streamlit run app.py`. All charts are
+Plotly interactive; all tables are sortable.
+Sprint: Sprint 4 (Days 22–28)
+#
+Screen
+Key Widgets / Features
+Data Source
+5.1
+Home / Overview
+Nifty 100 summary KPIs: avg ROE, median P/E, sectors donut. Market health banner.
+companies + financial_ratios
+5.2
+Company Profile
+Search by name/ticker. Company card: logo, description, KPI tiles (6 metrics), P&L chart, BS chart, CF bar c
+All core tables
+5.3
+Financial Screener
+Sidebar sliders for 10 metrics. Live-updating results table. CSV download button.
+financial_ratios + market_cap
+5.4
+Peer Comparison
+Select peer group → radar chart + side-by-side table. Toggle between years.
+peer_groups + financial_ratios
+5.5
+Trend Analysis
+Select company + metric → 10-year sparkline + YoY % change annotation. Multi-metric overlay mode.
+profitandloss + balancesheet
+5.6
+Sector Analysis
+Sector selector → bubble chart (revenue vs ROE, size = mkt cap). Sector median KPI bar chart.
+sectors + financial_ratios + market_cap
+5.7
+Capital Allocation Map
+Treemap of 92 companies by capital pattern (8 categories). Click → drill down to company list.
+financial_ratios (CFO/CFI/CFF signs)
+5.8
+Annual Reports
+Company → year → clickable BSE PDF link. Badge for missing reports.
+documents
+Output
+Detail
+app.py + pages/
+Streamlit multi-page app. One file per screen under pages/ directory.
+dashboard_guide.md
+Analyst guide: how to navigate each screen, filter, and export data.
+Module 6: Valuation & Market Data Module
+Uses market_cap.xlsx to compute and display valuation metrics. Provides historical P/E, P/B, EV/EBITDA trends. Flags companies trading above
+historical average multiples (potentially overvalued).
+Sprint: Sprint 4 (Days 22–28)
+#
+Feature
+Logic
+Output
+6.1
+P/E Trend Chart
+Line chart of P/E ratio across 2019–2024 per company
+Plotly chart
+6.2
+P/B vs ROE Scatter
+X=P/B, Y=ROE, size=Mkt Cap, colour=sector for all 92 companies
+Scatter plot PNG
+6.3
+EV/EBITDA Comp Table
+Current EV/EBITDA vs 5yr median, vs sector median. Flag if >20% above sector.
+Formatted table
+6.4
+Dividend Yield Ranker
+Rank 92 companies by dividend yield. Filter by min yield threshold.
+Ranked list
+6.5
+FCF Yield Calculator
+FCF / Market_Cap × 100. Rank descending. High FCF yield = value signal.
+Computed column
+6.6
+Overvaluation Flag
+P/E > (sector_median × 1.5) → 'Caution' badge. P/E < (sector_median × 0.7) → 'Discount' badge.
+Badge system
+Output
+Detail
+valuation_summary.xlsx
+All 92 companies with current + 5yr median multiples, sector rank, badges
+valuation_flags.csv
+List of 'Caution' and 'Discount' flagged companies with rationale
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 22
+Module 7: Cash Flow Intelligence Module
+Deep analysis of cash flow quality, CapEx intensity, FCF generation, and capital allocation patterns. Identifies companies with strong FCF
+compounding over 5+ years.
+Sprint: Sprint 4–5 (Days 22–35)
+#
+Feature
+Logic
+Output
+7.1
+CFO Quality Score
+CFO/PAT ratio > 1.0 across 5yr avg = 'High Quality Earnings'. <0.5 = 'Accrual Risk'.
+Quality badge
+7.2
+CapEx Intensity
+CapEx / Revenue %. Light (<3%): asset-light. Heavy (>8%): capital intensive.
+Category label
+7.3
+FCF CAGR
+FCF CAGR over 5yr and 10yr. Same CAGR rules as revenue (turnaround flag).
+CAGR column
+7.4
+FCF Conversion Rate
+FCF / EBITDA. >60% = efficient. <30% = CapEx heavy.
+Ratio + tier
+7.5
+Debt Repayment Detection
+CFF < 0 AND borrowings declining YoY → 'Deleveraging' flag.
+Event flag
+7.6
+Distress Pattern
+CFO < 0 AND CFF > 0 (equity/debt raise to fund operations) → 'Distress Signal'.
+Alert badge
+7.7
+Capital Allocation Matrix
+8 CFO/CFI/CFF sign patterns → descriptive labels (Reinvestor, Shareholder Returns, etc.)
+Pattern table
+Output
+Detail
+cashflow_intelligence.xlsx
+All companies with CFO quality score, FCF CAGR, CapEx intensity, capital allocation label
+distress_alerts.csv
+Companies flagged for distress pattern with supporting data
+Module 8: Automated PDF Report Generator
+Generates company-level and portfolio-level PDF reports on demand using ReportLab. Two report types: Company Tearsheet (2 pages per company)
+and Portfolio Summary (all 92 companies, 1 page each).
+Sprint: Sprint 5 (Days 29–35)
+#
+Report Type
+Contents
+Frequency
+8.1
+Company Tearsheet (2-page)
+Page 1: KPI tiles, 10yr revenue & profit bar, ROE/ROCE trend line. Page 2: BS composition stacked bar, CF
+On-demand via API
+8.2
+Portfolio Summary (1-page/co)
+All 92 companies in one PDF: company name, sector, top 6 KPIs, trend arrow (↑ ↓ →) for 3yr direction.
+Weekly batch (Sprint 5)
+8.3
+Sector Report
+Sector header page + all companies in sector. Sector median KPI table. Best/worst in sector highlighted.
+Monthly batch
+8.4
+Screener Output Report
+Formatted PDF of screener results with charts, sorted by composite score.
+On-demand
+8.5
+Peer Group Report
+Radar charts + side-by-side table for each of 11 peer groups.
+Weekly batch
+Output
+Detail
+reports/tearsheets/
+92 PDFs — one per company. Filename: <TICKER>_tearsheet.pdf
+reports/portfolio/
+portfolio_summary_YYYYMMDD.pdf — all 92 companies in one document
+reports/sector/
+11 sector PDFs. Filename: <SECTOR>_report_YYYYMMDD.pdf
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 23
+11. Module Specifications — Modules 9–12
+NLP, Clustering, API &
+Testing
+Module 9: NLP & Qualitative Analysis Module
+Parses and enriches qualitative text fields: about_company, pros, cons, analysis strings. Auto-generates pros/cons for companies with missing records
+using KPI-threshold rules. Extracts CAGR numbers from analysis.xlsx text fields.
+Sprint: Sprint 5 (Days 29–35)
+#
+Feature
+Logic
+Output
+9.1
+Analysis text parser
+Regex r'(\d+)\s*Years?:?\s*([\d.]+)%' on compounded_sales_growth, profit_growth, CAGR fields.
+Parsed numeric table: company, period, value
+9.2
+Auto pros/cons generator
+Rule engine: 12 pro rules (ROE>20%, FCF positive 5yr, D/E=0, revenue CAGR>15%, etc.) + 12 con rules (D
+pros_cons_generated.csv
+9.3
+Business description tagger
+Classify about_company text into sector tags using keyword matching. Confirm vs sectors.xlsx.
+Tag validation report
+9.4
+Sentiment scorer
+Basic polarity scoring on pros (positive) and cons (negative) text using NLTK SentimentIntensityAnalyzer.
+Sentiment score per entry
+9.5
+CAGR cross-validator
+Compare parsed analysis.xlsx CAGR vs Ratio Engine computed CAGR. Flag >5% divergence.
+cross_validation.csv
+Output
+Detail
+pros_cons_generated.csv
+company_id, type (pro/con), rule_triggered, text, confidence_pct. Auto-fills gaps for 84 companies.
+analysis_parsed.csv
+Structured: company_id, metric_type, period_years, value_pct for all analysis.xlsx rows.
+Module 10: Statistical Analysis & Clustering Module
+Uses scikit-learn for KMeans clustering of companies by financial profile. Computes portfolio-level statistics, correlation matrices, and outlier detection.
+Provides insight into hidden company groupings.
+Sprint: Sprint 5–6 (Days 29–42)
+#
+Feature
+Logic
+Output
+10.1
+KMeans clustering (5 clusters)
+Features: ROE, D/E, Revenue CAGR, FCF CAGR, OPM. StandardScaler + KMeans(n=5). Elbow method to
+cluster_labels.csv: company_id, cluster_id, cluster_name
+10.2
+Cluster profiling
+Mean/median of each feature per cluster. Assign descriptive labels: High-Quality Growth, Defensive Dividend
+Cluster profile table
+10.3
+Correlation matrix
+Pearson correlation of 10 KPIs across all 92 companies × latest year. Heatmap output.
+correlation_heatmap.png
+10.4
+Outlier detection
+Z-score per metric per sector. |Z|>3 → 'Outlier' flag. Company-level outlier report.
+outlier_report.csv
+10.5
+Portfolio statistics
+Distribution of ROE, D/E, P/E across Nifty 100. P10/P25/P50/P75/P90 percentile table.
+portfolio_stats.csv
+Output
+Detail
+cluster_labels.csv
+company_id, cluster_id (0–4), cluster_name, distance_from_centroid
+portfolio_stats.csv
+Metric, P10, P25, P50, P75, P90, Mean, Std for all 92 companies
+outlier_report.csv
+company_id, metric, value, z_score, sector, sector_mean, sector_std
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 24
+Module 11: REST API Module
+FastAPI server exposing 16 endpoints. Auto-generates OpenAPI documentation at /docs. All responses are JSON. API is consumed by the Streamlit
+dashboard for real-time data queries.
+Sprint: Sprint 6 (Days 36–42)
+#
+Endpoint
+Method
+Description
+11.1
+  /api/v1/companies
+GET
+List all 92 companies with id, name, sector. Supports ?sector
+11.2
+  /api/v1/companies/{ticker}
+GET
+Full company profile: KPIs, pros/cons, sector, description.
+11.3
+  /api/v1/companies/{ticker}/pl
+GET
+P&L history for a company. Supports ?from_year= ?to_year=
+11.4
+  /api/v1/companies/{ticker}/bs
+GET
+Balance sheet history. Same year filters.
+11.5
+  /api/v1/companies/{ticker}/cashflow
+GET
+Cash flow history. Same year filters.
+11.6
+  /api/v1/companies/{ticker}/ratios
+GET
+All 14 pre-computed KPIs per year for one company.
+11.7
+  /api/v1/companies/{ticker}/tearsheet
+GET
+Returns pre-generated tearsheet PDF (binary download).
+11.8
+  /api/v1/screener
+GET
+Screener: ?min_roe=&max_de=&sector=&min_cagr= → rank
+11.9
+  /api/v1/sectors
+GET
+List all 11 sectors with company count and median KPIs.
+11.10
+ /api/v1/sectors/{sector}/companies
+GET
+All companies in a sector with KPI summary.
+11.11
+ /api/v1/peers/{group_name}
+GET
+All companies in a peer group with percentile ranks.
+11.12
+ /api/v1/companies/{ticker}/peers/compare
+GET
+Radar data: company vs peer group average for 8 metrics.
+11.13
+ /api/v1/market-cap/{ticker}
+GET
+Historical valuation multiples (P/E, P/B, EV/EBITDA) 2019–20
+11.14
+ /api/v1/portfolio/stats
+GET
+Portfolio-level statistics: P10–P90 for all 10 core KPIs.
+11.15
+ /api/v1/companies/{ticker}/documents
+GET
+Annual report links for a company.
+11.16
+ /api/v1/health
+GET
+Server health check. Returns DB row counts and server uptim
+Output
+Detail
+api/main.py
+FastAPI app. All routes in routers/ directory. One router file per module.
+openapi.json
+Auto-exported OpenAPI 3.0 spec. Import into Postman for API testing.
+Module 12: Testing & Quality Assurance Module
+pytest test suite with 60+ test cases covering: ETL correctness, KPI formula accuracy, API endpoint responses, data quality rule coverage. CI-style: all
+tests must pass before code is merged.
+Sprint: Sprint 6 (Days 36–45)
+#
+Test Category
+Test Cases
+Pass Criterion
+12.1
+ETL Tests
+year_normaliser (20 cases), ticker_normaliser (15 cases), dedup (5 cases), load_audit completeness (5 case
+All 45 ETL tests pass
+12.2
+KPI Formula Tests
+ROE with positive equity, ROE with negative equity (None), D/E for debt-free (0), ICR for interest=0 (None), 
+All 20 formula tests pass
+12.3
+DQ Rule Tests
+Each of 14 DQ rules triggered on crafted violation records; severity correct
+14/14 rules trigger correctly
+12.4
+API Tests
+/health returns 200; /companies returns 92 records; /screener with valid filters returns ranked list; invalid ticke
+All 10 API tests pass
+12.5
+Regression Tests
+After any schema change, run full suite. No previously-passing test should fail.
+Zero regressions
+Output
+Detail
+tests/
+pytest test directory. Structured: tests/etl/, tests/kpi/, tests/api/, tests/dq/
+pytest_report.html
+HTML report with pass/fail counts, runtime per test, failure traceback for failed tests
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 25
+12. 45-Day Sprint Plan
+6 Sprints × 7–8 Days
+— Day-by-Day Task
+Breakdown
+Sprint
+Days
+Theme
+Modules
+Exit Criteria
+Sprint 1
+Days 01–07
+Data Foundation
+Module 1
+nifty100.db built; all 10 tables loaded; load_audit.csv shows zero CRITICA
+Sprint 2
+Days 08–14
+Ratio Engine
+Module 2
+financial_ratios table populated for 92 × 14yr; 60+ KPIs computed; all 20 
+Sprint 3
+Days 15–21
+Screener & Peers
+Modules 3–4
+6 preset screeners operational; peer percentile table built for all 11 groups
+Sprint 4
+Days 22–28
+Dashboard & Valuation
+Modules 5–6
+Streamlit app running on localhost:8501; all 8 screens navigable; valuatio
+Sprint 5
+Days 29–35
+Intelligence & Reports
+Modules 7–9
+92 company tearsheet PDFs generated; pros_cons_generated.csv compl
+Sprint 6
+Days 36–45
+API, ML & QA
+Modules 10–12
+All 16 API endpoints return correct data; 60+ pytest tests pass; cluster_la
+Sprint 1 — Data Foundation (Days 1–7)
+Day
+Tasks
+Deliverable
+D01
+Set up project directory structure (data/, src/etl/, src/analytics/, src/api/, src/dashboard/, tests/, reports/). Create venv; install all dependencies; configure .en
+requirements.txt, .env.template
+D02
+Write Excel loader with header=1 support for all 7 core files. Write normalize_year() and normalize_ticker() functions. Unit tests: 20 cases each.
+etl/loader.py, tests/etl/test_normalise.py
+D03
+Implement schema validator (16 DQ rules). Run against all 7 files. Log failures to validation_failures.csv. Review with team lead.
+etl/validator.py, validation_failures.csv
+D04
+Build SQLite schema (CREATE TABLE statements for 10 tables with FK constraints). Write loader to insert normalised DataFrames.
+db/schema.sql, db/loader.py
+D05
+Load all 5 supplementary files. Run full load for all 12 files. Generate load_audit.csv. nifty100.db, load_audit.csv
+D06
+Data quality review: manually check 5 random companies across all time-series tables. Fix any loader bugs. Re-run load.
+DQ review notes in team channel
+D07
+Write 10 SQL exploratory queries (row counts, nulls, year coverage per company). Sprint retrospective. Update task board.
+exploratory_queries.sql, sprint1_retro.md
+Sprint 2 — Ratio Engine (Days 8–14)
+Day
+Tasks
+Deliverable
+D08
+Implement profitability ratios: NPM, OPM, ROE, ROCE. Edge cases: negative equity (None), zero sales (None). Cross-validate OPM vs source.
+analytics/ratios.py
+D09
+Implement leverage + efficiency ratios: D/E (bank carve-out), ICR (debt-free substitution), Asset Turnover. Write tests.
+tests/kpi/test_leverage.py
+D10
+Implement CAGR engine: Revenue CAGR, PAT CAGR, EPS CAGR for 3yr, 5yr, 10yr windows. Turnaround flag logic.
+analytics/cagr.py
+D11
+Implement cash flow KPIs: FCF, CFO Quality Score, CapEx Intensity, FCF Conversion, capital allocation pattern (8 classes).
+analytics/cashflow_kpis.py
+D12
+Populate financial_ratios table in SQLite for all 92 companies × all years. Run validation: compare sample to manual Excel calculations.
+Updated financial_ratios table
+D13
+Implement ROCE for banks/NBFCs: sector-relative approach. Cross-check vs roce_percentage in companies.xlsx. Log anomalies.
+sector_roce_notes.csv
+D14
+Run all 20 KPI formula tests. Fix failures. Write ratio_edge_cases.log. Sprint retrospective.
+All KPI tests green, sprint2_retro.md
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 26
+Sprint 3 — Screener & Peer Comparison (Days 15–21)
+Day
+Tasks
+Deliverable
+D15
+Build custom filter engine: load screener_config.yaml; apply threshold filters to financial_ratios via pandas query.
+src/screener/engine.py
+D16
+Implement 6 preset screeners. Test each preset on the full 92-company universe. Verify results make business sense.
+6 screener presets in config
+D17
+Build ranking engine: composite score (50/30/20 weights). Sector-relative normalisation. Export to screener_output.xlsx.
+screener_output.xlsx
+D18
+Build peer group module: load peer_groups.xlsx; compute PERCENT_RANK per metric per group for all 11 groups.
+analytics/peer.py, peer_percentiles table
+D19
+Generate radar chart data for each company-peer group pair. Plot Plotly radar PNG for each company.
+reports/radar_charts/ (92 PNGs)
+D20
+Generate peer_comparison.xlsx: one sheet per peer group, all metrics, colour-coded cells.
+peer_comparison.xlsx
+D21
+Run all DQ rule tests. Fix failures. Sprint retrospective.
+All tests green, sprint3_retro.md
+Sprint 4 — Dashboard & Valuation (Days 22–28)
+Day
+Tasks
+Deliverable
+D22
+Scaffold Streamlit app: main app.py + pages/ directory. Shared data loader (load_db() function). Style config (sidebar logo, colour theme).
+app.py, pages/ skeleton
+D23
+Build Home screen (5.1) and Company Profile screen (5.2): ticker search, KPI tiles, 10yr bar charts.
+pages/01_home.py, pages/02_profile.py
+D24
+Build Screener screen (5.3): sidebar sliders, live table, CSV download. Peer Comparison screen (5.4): group selector, radar.
+pages/03_screener.py, pages/04_peer.py
+D25
+Build Trend Analysis (5.5), Sector Analysis (5.6), Capital Allocation Map (5.7), Annual Reports (5.8).
+pages/05–08.py
+D26
+Build Valuation module: valuation_summary.xlsx, overvaluation flags, FCF yield column. Integrate valuation screen if time permits.
+valuation_summary.xlsx
+D27
+Dashboard integration testing: test all 8 screens with 10 random tickers. Fix chart sizing, overflow, and missing-data edge cases.
+Test log: dashboard_qa.md
+D28
+Sprint retrospective. Update README.md with app run instructions (streamlit run app.py). Record screen walkthrough video (optional).
+README.md update, sprint4_retro.md
+Sprints 5–6 — Intelligence, Reports, API & QA (Days 29–45) Summary
+Days
+Theme
+Key Daily Tasks
+Exit Gate
+D29–30
+NLP Module
+Parser for analysis.xlsx CAGR text. Auto pros/cons generator (12 pro + 12 con rules).
+pros_cons_generated.csv: 92 companies
+D31–32
+Cash Flow Intelligence
+CFO quality score, CapEx intensity, distress pattern flagging, capital allocation matrix.
+cashflow_intelligence.xlsx
+D33–35
+PDF Report Generator
+Company Tearsheet (2-page × 92). Sector reports (11). Portfolio summary. All reports in reports/ dir.
+92 tearsheets + 11 sector PDFs
+D36–37
+KMeans Clustering
+StandardScaler + KMeans(n=5). Elbow plot. Assign cluster labels. Correlation matrix heatmap.
+cluster_labels.csv, heatmap.png
+D38–40
+FastAPI Server
+16 endpoints in api/ directory. Uvicorn server. OpenAPI docs at /docs. Postman collection exported.
+openapi.json, postman_collection.json
+D41–42
+Full Test Suite
+60+ pytest tests across 4 categories. Fix failures. Generate HTML test report.
+pytest_report.html: all green
+D43
+Integration Testing
+End-to-end: API → Dashboard data flow. Load test with 10 concurrent screener queries. Fix bottlenecks.
+Load test results in perf_notes.md
+D44
+Documentation
+Update all docstrings. Write analyst_guide.pdf (how to use screener + dashboard). Review project doc.
+analyst_guide.pdf
+D45
+Final Sign-Off
+Run acceptance checklist (23 gates). Present to team lead. Archive final deliverables to output/ dir.
+Signed acceptance_checklist.pdf
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 27
+13. KPI Reference — 50+ Financial Metrics
+Formulas,
+Benchmarks, Edge
+Cases & Warning
+Flags
+KPI
+Category
+Formula
+Benchmark
+Edge Case / Warning Flag
+Net Profit Margin
+Profitability
+net_profit / sales × 100
+>10% = good; >20% = excellent
+None if sales=0. Negative allowed.
+Operating Profit Margin
+Profitability
+operating_profit / sales × 100
+>15% = good; >25% = excellent
+Cross-check vs opm_percentage field ±1%.
+EBIT Margin
+Profitability
+(operating_profit − depreciation) / sales × 100>12% preferred
+Excludes other_income to get core ops only.
+Return on Equity (ROE)
+Returns
+net_profit / (equity + reserves) × 100
+>15% = good; >20% = excellent
+None if equity+reserves ≤ 0.
+Return on Capital (ROCE)
+Returns
+EBIT / (equity + reserves + borrowings) × 100>15% = good; >25% = excellent
+Bank carve-out: use sector-relative benchmark.
+Return on Assets (ROA)
+Returns
+net_profit / total_assets × 100
+>5% = good; >10% = excellent
+None if total_assets = 0.
+Debt-to-Equity (D/E)
+Leverage
+borrowings / (equity + reserves)
+<1.0 = healthy; <0.5 = conservative
+0 = debt-free. Flag >5 for non-financials.
+Interest Coverage (ICR)
+Leverage
+(op_profit + other_income) / interest
+>3× = safe; >5× = strongNone if interest=0 → display 'Debt Free'. Flag if <1
+Net Debt
+Leverage
+borrowings − investments − cash
+< 0 = net cash positive
+investments used as liquid asset proxy.
+Net Debt / EBITDA
+Leverage
+net_debt / operating_profit
+<2× = healthy; >4× = stressed
+None if EBITDA < 0.
+Asset Turnover
+Efficiency
+sales / total_assets
+>1× = efficient. Asset-light >2×
+None if total_assets = 0.
+Fixed Asset Turnover
+Efficiency
+sales / fixed_assets
+>3× = good
+None if fixed_assets = 0 (service cos).
+Working Capital Days
+Efficiency
+(other_asset − other_liabilities) / sales × 365 Lower = better
+>180 days = slow collections flag.
+Inventory Turnover
+Efficiency
+sales / (fixed_assets proxy)
+Sector-dependent
+Proxy only — no raw inventory field.
+Revenue CAGR (3yr)
+Growth
+(sales_t / sales_{t-3})^(1/3) − 1
+>10% = healthy; >20% = fast
+Turnaround flag if base < 0.
+Revenue CAGR (5yr)
+Growth
+(sales_t / sales_{t-5})^(1/5) − 1
+>12% = healthy; >25% = strong
+Turnaround flag if base < 0.
+Revenue CAGR (10yr)
+Growth
+(sales_t / sales_{t-10})^(1/10) − 1
+>10% sustained = excellent
+Turnaround flag. None if <10yr history.
+PAT CAGR (3yr)
+Growth
+(net_profit_t / net_profit_{t-3})^(1/3) − 1
+>15% = healthy; >25% = strong
+Turnaround flag. More volatile than revenue.
+PAT CAGR (5yr)
+Growth
+(net_profit_t / net_profit_{t-5})^(1/5) − 1
+>15% = healthy; >30% = excellent
+Turnaround flag.
+EPS CAGR (5yr)
+Growth
+(eps_t / eps_{t-5})^(1/5) − 1
+>12% = healthy
+Must align with PAT CAGR unless share count ch
+Free Cash Flow
+Cash Quality
+operating_activity + investing_activity
+> 0 = generating cash
+Negative 3yr consecutive → 'FCF Concern' flag.
+CFO / PAT Ratio
+Cash Quality
+operating_activity / net_profit
+>1.0 = high quality earnings
+<0.5 = accrual risk. None if net_profit = 0.
+CapEx Intensity
+Cash Quality
+abs(investing_activity) / sales × 100
+<3% = asset-light; >8% = capital intensive
+investin_activity proxy — may include non-CapEx 
+FCF Conversion Rate
+Cash Quality
+FCF / operating_profit × 100
+>60% = efficient; <30% = heavy
+None if operating_profit = 0.
+FCF Yield
+Valuation
+FCF / market_cap_crore × 100
+>3% = attractive
+Requires market_cap table join.
+Price-to-Earnings (P/E)
+Valuation
+market_cap / net_profit
+15–25× = fair for India large caps
+None if net_profit ≤ 0. Compare within sector.
+Price-to-Book (P/B)
+Valuation
+market_cap / (equity + reserves)
+>3× = expensive for value investors
+Varies widely by sector: IT >8×, utilities <2×.
+EV/EBITDA
+Valuation
+enterprise_value / operating_profit
+12–18× = fair for Indian large caps
+None if EBITDA < 0.
+Dividend Yield
+Valuation
+dividend_yield_pct from market_cap table
+>2% = dividend-paying; >4% = high yield
+Requires market_cap table.
+Dividend Payout Ratio
+Profitability
+dividend_payout from P&L table
+30–60% = balanced
+Flag >100% (paying more than earned).
+Book Value Per Share
+Valuation
+(equity + reserves) / (equity_cap / face_value)>1 always. Rising trend = good
+Computed — cross-check vs companies.book_va
+Earnings Per Share (EPS)
+Profitability
+eps from P&L table
+Rising trend preferred
+Dilution risk if equity issuance ongoing.
+Capital Allocation: Reinvestor
+Qualitative
+CFO>0, CFI<0, CFF<0
+Ideal: paying debt + investing from ops
+Pattern: (+, −, −)
+Capital Allocation: Shareholder Returns
+Qualitative
+CFO>0, CFI<0, CFF<0 (dividends)
+Stable mature company Pattern: (+, −, −) same as above — sub-classify b
+Capital Allocation: Distress
+Qualitative
+CFO<0, CFF>0
+Raising funds to fund ops — red flag
+Pattern: (−, ?, +)
+Composite Quality Score
+Composite
+0.3×ROE_score + 0.25×FCF_score + 0.25×ROCE_score + 0.20×DE_score
+70–100 = excellent; 40–70 = moderate
+Normalised 0–100 using P10/P90 winsorisation.
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 28
+14. Data Quality Rules
+16 Validation Rules —
+Applied at ETL Load
+Time
+Rule ID
+Rule Name
+Condition
+Severity
+Action
+DQ-01
+Company PK Uniqueness
+len(companies) == companies.id.nunique()CRITICAL
+Halt load. Investigate duplicate ticker.
+DQ-02
+Annual PK Uniqueness
+No duplicate (company_id, year) in P&L, BS, CF tables
+CRITICAL
+Deduplicate: keep last occurrence. Log all duplicates.
+DQ-03
+FK Integrity
+All company_id in child tables exist in companies.id
+CRITICAL
+Reject orphan rows. Log to validation_failures.csv.
+DQ-04
+Balance Sheet Balance
+|total_assets − total_liabilities| / total_assets < 0.01
+WARNING
+Flag row. Do not reject. Analyst review required.
+DQ-05
+OPM Cross-Check
+|opm_percentage − (op_profit/sales×100)| < 1.0
+WARNING
+Flag row. Use computed OPM in Ratio Engine; keep source fo
+DQ-06
+Positive Sales
+sales > 0 for all non-bank companies
+WARNING
+Flag rows with sales ≤ 0. Exclude from growth CAGR.
+DQ-07
+Year Format
+After normalize_year(), all values match r'^\d{4}-\d{2}$'
+CRITICAL
+Reject row if unparseable. Log raw value.
+DQ-08
+Ticker Format
+company_id = company_id.strip().upper(). Length: 2–12 chars.
+CRITICAL
+Normalise silently. If length out of range, reject.
+DQ-09
+Net Cash Check
+|net_cash_flow − (CFO+CFI+CFF)| ≤ 10 (I Cr tolerance)
+WARNING
+Flag and compute net_cash_flow from components if mismatch
+DQ-10
+Non-Negative Fixed Assets
+fixed_assets ≥ 0
+WARNING
+Negative fixed_assets → coerce to 0 and log.
+DQ-11
+Tax Rate Range
+0 ≤ tax_percentage ≤ 60
+WARNING
+Flag out-of-range. Can indicate one-off deferred tax reversal.
+DQ-12
+Dividend Payout Cap
+dividend_payout ≤ 200 (pct)
+WARNING
+Flag >200% as likely data entry error. Analyst confirm.
+DQ-13
+URL Validity (documents)
+requests.head(Annual_Report).status_code == 200
+WARNING
+Log 404 URLs. Do not reject row — URL decay expected over 
+DQ-14
+EPS Sign Consistency
+eps > 0 if net_profit > 0
+WARNING
+Flag mismatch (may indicate adjustments). Use net_profit/shar
+DQ-15
+BSE/ASE Balance (ext.)
+total_liabilities == total_assets (strict, after DQ-04 flag)
+INFO
+Informational counter. Flag in load_audit only.
+DQ-16
+Coverage Check
+Each company has ≥ 5 years of P&L, BS, CF records
+WARNING
+Flag companies with < 5yr history. Exclude from CAGR if < 3yr
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 29
+15. API Specification
+16 REST Endpoints —
+FastAPI / OpenAPI 3.0
+Endpoint
+Method
+Query Params
+Response Fields
+Status Codes
+/api/v1/companies
+GET
+sector, market_cap_category, search (string)
+id, company_name, broad_sector, sub_sector, roe_pct, roce_pct
+200 OK, 400 Bad Request
+/api/v1/companies/{ticker}
+GET
+year (optional; default=latest)
+Full company object: all companies fields + latest KPIs + sector
+200 OK, 404 Not Found
+/api/v1/companies/{ticker}/pl
+GET
+from_year (YYYY-MM), to_year (YYYY-MM)
+Array of P&L rows for company. All 13 numeric fields.
+200 OK, 404 Not Found
+/api/v1/companies/{ticker}/bs
+GET
+from_year, to_year
+Array of balance sheet rows. All 11 numeric fields.
+200 OK, 404 Not Found
+/api/v1/companies/{ticker}/cashflow
+GET
+from_year, to_year
+Array of cash flow rows. CFO, CFI, CFF, net_cash_flow.
+200 OK, 404 Not Found
+/api/v1/companies/{ticker}/ratios
+GET
+year (optional; default=all)
+Array: company_id, year + 14 computed KPI fields.
+200 OK, 404 Not Found
+/api/v1/companies/{ticker}/tearsheet
+GET
+—
+Binary PDF stream (application/pdf). Triggers download.
+200 OK, 404 Not Found
+/api/v1/screener
+GET
+min_roe, max_de, min_fcf, sector, min_rev_cagr_5yr, min_pat_cagr_5yr, max_pe
+Array of matching companies: ticker, name, sector, all filter KPIs, composite score
+200 OK, 400 Bad Request
+/api/v1/sectors
+GET
+—
+Array: sector_name, company_count, median_roe, median_pe, median_de
+200 OK
+/api/v1/sectors/{sector}/companies
+GET
+year (default=latest)
+Array of companies in sector with top 8 KPIs each.
+200 OK, 404 Not Found
+/api/v1/peers/{group_name}
+GET
+year (default=latest)
+Array of companies + percentile rank for each of 10 metrics.
+200 OK, 404 Not Found
+/api/v1/companies/{ticker}/peers/compareGET
+year (default=latest)
+Radar data: 8 axis metrics for company + group average + benchmark.
+200 OK, 404 Not Found
+/api/v1/market-cap/{ticker}
+GET
+from_year, to_year
+Array: year, market_cap_crore, pe_ratio, pb_ratio, ev_ebitda, div_yield.
+200 OK, 404 Not Found
+/api/v1/portfolio/stats
+GET
+year (default=latest)
+P10–P90 table for 10 KPIs across all 92 companies.
+200 OK
+/api/v1/companies/{ticker}/documents
+GET
+from_year, to_year
+Array: year, Annual_Report URL, is_url_valid (boolean).
+200 OK, 404 Not Found
+/api/v1/health
+GET
+—
+status, db_row_counts (all 10 tables), uptime_seconds, version.
+200 OK, 503 DB Unavailable
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 30
+16. Risk Register
+12 Project Risks —
+Likelihood, Impact &
+Mitigation Plan
+Risk ID
+Risk
+Likelihood
+Impact
+Mitigation Strategy
+R-01
+Missing years of data for some companies (coverage < 5yr)
+High
+Medium
+DQ-16 flags companies with < 5yr. Exclude from CAGR. Supplement with public filings
+R-02
+BSE Annual Report URLs returning 404 (link decay)
+High
+Low
+DQ-13 validates URLs on load. Log failures. Dashboard shows 'Report unavailable' gra
+R-03
+analysis.xlsx text parsing fails for new formats
+Medium
+Medium
+Regex tested for 5 format variants. Unknown formats logged to parse_failures.csv for m
+R-04
+Bank / NBFC D/E misclassification skews screener results
+Medium
+High
+sectors.broad_sector used to carve out Financials from D/E filter. Tested on 19 financia
+R-05
+Negative equity companies breaking ROE formula
+Medium
+High
+ROE = None if equity+reserves ≤ 0. Logged. Excluded from screener ROE filter.
+R-06
+Simulated stock_prices / market_cap values cause incorrect real conclusions
+Low
+High
+All simulated datasets are clearly labelled SIMULATED in column comments and dash
+R-07
+CAGR turnaround flag not applied → misleading growth metrics
+Low
+High
+CAGR engine explicitly checks base year sign. Turnaround flag stored in ratio column a
+R-08
+ReportLab LayoutError on very long text cells overflowing frames
+Medium
+Medium
+All tables use WORDWRAP; cells > 200 chars are truncated with ellipsis. Tested on wo
+R-09
+Streamlit slows down with full 92-company dataset on low-spec hardware
+Low
+Medium
+SQLite queries are cached with @st.cache_data (TTL=600s). Max screener result set =
+R-10
+Peer group coverage is partial (46/92 companies)
+Medium
+Medium
+Peer module gracefully handles companies not in any group: returns 'No peer group as
+R-11
+pros/cons auto-generation produces low-confidence or incorrect flags
+Medium
+Low
+Confidence score displayed alongside auto-generated entries. Threshold: only show if 
+R-12
+FastAPI / Uvicorn port conflict on analyst machine
+Low
+Low
+Default port 8000. .env file contains PORT variable. README documents port change 
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 31
+17. Deliverables Checklist
+23 Mandatory
+Deliverables —
+Sign-Off Required on
+Day 45
+#
+Deliverable
+Format
+Owner Sprint
+Sign-Off Criteria
+D-01
+nifty100.db
+SQLite file
+S1
+All 10 tables populated. rowcounts match source. FK constraints pass.
+D-02
+load_audit.csv
+CSV
+S1
+All 12 files loaded. Zero CRITICAL failures.
+D-03
+validation_failures.csv
+CSV
+S1
+All DQ rule violations documented with severity.
+D-04
+exploratory_queries.sql
+SQL
+S1
+10+ queries covering coverage, nulls, year distribution.
+D-05
+financial_ratios table
+SQLite table
+S2
+14 KPI columns. 1,184+ rows. KPI formula tests pass.
+D-06
+capital_allocation.csv
+CSV
+S2
+All 92 companies × all years with pattern label.
+D-07
+screener_output.xlsx
+Excel
+S3
+6 preset screener results with composite score + 20 KPIs.
+D-08
+screener_config.yaml
+YAML
+S3
+All 15 filter thresholds defined. Analyst-editable.
+D-09
+peer_comparison.xlsx
+Excel
+S3
+11 sheets. Colour-coded percentile cells. 20 metrics.
+D-10
+radar_charts/ (92 PNGs)
+PNG files
+S3
+One radar chart per company. 8 axes. Peer avg overlay.
+D-11
+Streamlit Dashboard (app.py)
+Python app
+S4
+8 screens. All navigable. CSV export functional.
+D-12
+valuation_summary.xlsx
+Excel
+S4
+All 92 companies. P/E, P/B, EV/EBITDA, flags.
+D-13
+cashflow_intelligence.xlsx
+Excel
+S5
+CFO quality score, FCF CAGR, CapEx intensity, distress flags.
+D-14
+pros_cons_generated.csv
+CSV
+S5
+92 companies. Rule-triggered. Confidence > 60%.
+D-15
+analysis_parsed.csv
+CSV
+S5
+Structured CAGR numbers from analysis.xlsx. Cross-validated.
+D-16
+Company Tearsheets (92 PDFs)
+PDF files
+S5
+2 pages per company. All 92 companies. In reports/tearsheets/
+D-17
+Sector Reports (11 PDFs)
+PDF files
+S5
+One per broad sector. KPI table + company list.
+D-18
+Portfolio Summary PDF
+PDF
+S5
+All 92 companies, 1-page each in one document.
+D-19
+cluster_labels.csv
+CSV
+S6
+5 clusters. All 92 companies assigned. Cluster names labelled.
+D-20
+FastAPI Server (api/)
+Python app
+S6
+16 endpoints. openapi.json exported. /health returns 200.
+D-21
+pytest_report.html
+HTML
+S6
+60+ tests. All green. Runtime < 120 seconds total.
+D-22
+analyst_guide.pdf
+PDF
+S6
+Screener usage guide + dashboard navigation. 10–15 pages.
+D-23
+acceptance_checklist.pdf
+PDF
+S6
+23 deliverables reviewed and signed off. Date stamped.
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 32
+18. Acceptance Criteria
+20 Non-Negotiable
+Quality Gates — All
+Must Pass Before
+Sign-Off
+Gate
+Area
+Criterion
+Tested By
+AC-01
+Data Coverage
+92 companies present in companies table. No extra or missing tickers.
+SELECT COUNT(*) FROM companies → 92
+AC-02
+Time Coverage
+≥ 90% of companies have ≥ 10 years of P&L, BS, CF records.
+DQ coverage query in load_audit.csv
+AC-03
+Schema Integrity
+All FK relationships intact. PRAGMA foreign_key_check returns 0 rows.
+SQLite FK check command
+AC-04
+KPI Completeness
+financial_ratios table has ≥ 1,100 rows. All 14 KPI columns populated.
+SELECT COUNT(*) FROM financial_ratios
+AC-05
+CAGR Accuracy
+Revenue CAGR for 3 manually-checked companies matches hand-computed Excel value ±0.1%.
+Manual Excel spot check
+AC-06
+ROE Accuracy
+ROE for 5 companies in latest year matches companies.roe_percentage ±5% (allow for version diff).
+Manual comparison
+AC-07
+Screener Accuracy
+Quality preset screener (ROE>15, D/E<1, FCF>0) produces ≥ 10 and ≤ 50 companies.
+Screener run on full DB
+AC-08
+Dashboard Load
+Company Profile screen loads for any of 92 tickers in < 3 seconds on localhost.
+Manual stopwatch test
+AC-09
+Dashboard Export
+CSV download on Screener screen produces well-formed file with correct headers.
+Download and open test
+AC-10
+PDF Quality
+No text overflow, no overlapping pages in any generated report.
+Visual review of 5 random tearsheets
+AC-11
+API Health
+GET /api/v1/health returns HTTP 200 with db_row_counts for all 10 tables.
+curl /api/v1/health
+AC-12
+API Accuracy
+GET /api/v1/companies/TCS/ratios returns rows for ≥ 10 years.
+API response check
+AC-13
+API Screener
+GET /api/v1/screener?min_roe=15&max_de=1 returns consistent result with Module 3 output.
+Response vs Excel comparison
+AC-14
+Peer Coverage
+Peer percentile table populated for all 11 peer groups. All member tickers present.
+SELECT DISTINCT peer_group_name → 11
+AC-15
+Cluster Coverage
+All 92 companies assigned to a cluster (0–4). No nulls in cluster_id column.
+cluster_labels.csv null check
+AC-16
+NLP Coverage
+pros_cons_generated.csv has ≥ 1 pro and ≥ 1 con for every company.
+CSV null check per company_id
+AC-17
+Report Coverage
+92 tearsheet PDFs exist in reports/tearsheets/. Each is ≥ 50KB.
+ls reports/tearsheets/ | wc -l → 92
+AC-18
+Test Coverage
+pytest count shows ≥ 60 tests collected. 0 failures. 0 errors. pytest --tb=short output
+AC-19
+DQ Documentation
+validation_failures.csv exists. All rows have company_id, field, issue, severity.
+File presence + column check
+AC-20
+Documentation
+analyst_guide.pdf exists and is ≥ 10 pages. Contains screener and dashboard sections.
+File size and page count check
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 33
+19. Project Directory Structure
+Standard Layout — All
+Code, Data, Reports &
+Tests
+Path
+Type
+Contents
+data/raw/
+Directory
+7 core Excel files (READ ONLY). Never modify.
+data/supporting/
+Directory
+5 supplementary Excel files.
+data/nifty100.db
+SQLite
+Primary database. All 10 tables.
+src/etl/
+Directory
+loader.py, validator.py, normaliser.py, schema.sql
+src/analytics/
+Directory
+ratios.py, cagr.py, cashflow_kpis.py, screener/engine.py, peer.py, clustering.py
+src/nlp/
+Directory
+parser.py (analysis.xlsx), pros_cons_generator.py
+src/dashboard/
+Directory
+app.py, pages/ (01–08), utils/charts.py, utils/db.py
+src/api/
+Directory
+main.py, routers/ (companies, screener, peers, sectors, reports, health)
+src/reports/
+Directory
+tearsheet.py, sector_report.py, portfolio_report.py, screener_report.py
+tests/
+Directory
+etl/, kpi/, api/, dq/ — 60+ pytest test files
+config/
+Directory
+screener_config.yaml, .env.template, logging_config.yaml
+reports/tearsheets/
+Directory
+92 company tearsheet PDFs
+reports/sector/
+Directory
+11 sector PDFs
+reports/portfolio/
+Directory
+Portfolio summary PDFs (weekly)
+reports/radar_charts/
+Directory
+92 radar chart PNGs
+output/
+Directory
+Screener exports, ad hoc CSVs, final deliverables archive
+notebooks/
+Directory
+Exploratory Jupyter notebooks (not in production path)
+docs/
+Directory
+Project document PDF, analyst guide, openapi.json
+requirements.txt
+File
+All pip dependencies pinned to minor version
+.env
+File
+DB_PATH, PORT, LOG_LEVEL, SIMULATED_DATA_FLAG. Not committed to git.
+README.md
+File
+Project overview, setup instructions, how to run app and API
+Makefile
+File
+make load, make test, make report, make api, make dashboard
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 34
+20. Glossary
+Financial & Technical
+Terms Used
+Throughout This
+Document
+Term
+Definition
+Asset Turnover
+Sales divided by total assets. Measures how efficiently a company uses its assets to generate revenue.
+Book Value Per Share
+(Equity capital + Reserves) divided by number of shares outstanding. Represents net asset value per share.
+CAGR
+Compound Annual Growth Rate. ((End Value / Start Value)^(1/n) − 1) × 100. Annualised growth metric.
+CapEx
+Capital Expenditure. Funds used to acquire or upgrade long-term physical assets. Proxy: absolute value of investing_activity.
+Capital Allocation
+How a company distributes its generated cash between reinvestment, debt repayment, and shareholder returns.
+CFI
+Cash Flow from Investing Activities. Covers CapEx, acquisitions, and investment purchases. Typically negative.
+CFF
+Cash Flow from Financing Activities. Covers debt issuance/repayment and equity transactions including dividends.
+CFO
+Cash Flow from Operations. Cash generated by core business activities. Must be positive for a healthy business.
+CWIP
+Capital Work-In-Progress. Assets under construction not yet in use. Excluded from net fixed assets.
+D/E
+Debt-to-Equity Ratio. Total borrowings divided by total equity (capital + reserves). Measures leverage.
+Debt-Free
+Company with zero or negligible borrowings. D/E = 0. ICR displayed as 'Debt Free' instead of infinity.
+EBIT
+Earnings Before Interest and Taxes. Operating_profit minus depreciation. Core operational earnings metric.
+EBITDA
+Earnings Before Interest, Taxes, Depreciation & Amortisation. Proxy: operating_profit in this dataset.
+EPS
+Earnings Per Share. Net profit divided by number of shares. Source: eps column in profitandloss table.
+EV
+Enterprise Value. Market Cap + Net Debt. Represents total company value to all capital providers.
+EV/EBITDA
+Enterprise Value divided by EBITDA. Cross-sector valuation multiple. Lower = potentially cheaper.
+FCF
+Free Cash Flow. CFO + CFI. Cash available after maintaining/expanding asset base. Core quality metric.
+FCF Yield
+FCF divided by Market Cap × 100. Higher = better value for cash-generating companies.
+FK
+Foreign Key. A database constraint linking child table rows to parent table rows via a shared key column.
+FY
+Financial Year. In India, April 1 to March 31. FY24 = April 2023 to March 2024. Labelled 'Mar-24' in source data.
+GICS
+Global Industry Classification Standard. Tiered sector taxonomy: Sector → Industry Group → Industry → Sub-Industry.
+ICR
+Interest Coverage Ratio. (EBIT + Other Income) / Interest expense. Measures ability to service debt.
+KPI
+Key Performance Indicator. A quantifiable measure used to evaluate business performance. 50+ defined in Section 13.
+Large Cap
+Companies with market capitalisation > I20,000 Crore. All Nifty 100 companies qualify.
+Nifty 100
+NSE India index of 100 largest companies by free-float market cap. This dataset covers 92 of those companies.
+NPM
+Net Profit Margin. Net profit divided by total sales × 100. Expressed as percentage.
+NBFC
+Non-Banking Financial Company. Lender/financial services firm that is NOT a bank. High D/E structurally normal.
+NSE
+National Stock Exchange of India. Primary stock exchange. Ticker symbols used as company primary keys.
+OPM
+Operating Profit Margin. Operating profit divided by sales × 100. EBITDA margin proxy.
+P/B
+Price-to-Book Ratio. Market Cap divided by Book Value (equity + reserves). >1 means market premium to assets.
+P/E
+Price-to-Earnings Ratio. Market Cap divided by Net Profit. Standard equity valuation multiple.
+PAT
+Profit After Tax. Same as Net Profit in this dataset.
+PBT
+Profit Before Tax. Net Profit divided by (1 − tax_percentage/100). Pre-tax earnings.
+ROCE
+Return on Capital Employed. EBIT / (Equity + Borrowings) × 100. Measures returns on all capital, not just equity.
+ROE
+Return on Equity. Net Profit / (Equity + Reserves) × 100. Measures returns on shareholders' funds.
+SQLite
+Serverless, file-based relational database. Single .db file. Zero configuration. Used for this project's data store.
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 35
+Term
+Definition
+Turnaround Flag
+Applied to CAGR calculations where the base year value is negative and end year value is positive. CAGR set to None.
+UW
+Usable Width. PDF page width (21 cm) minus margins (3 cm) = 16.6 cm. All table column widths must sum to UW.
+Winsorisation
+Statistical technique: cap extreme values at P10/P90. Prevents outliers from distorting composite score normalisation.
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 36
+21. Environment Setup & Quick-Start Guide
+From Clone to
+Running App in Under
+30 Minutes
+Step
+Command / Action
+Expected Output
+1. Clone / unzip project
+unzip nifty100_project.zip -d nifty100/
+Project directory created with data/, src/, tests/, config/
+2. Create virtual environment
+python3 -m venv .venv && source .venv/bin/activate
+(.venv) prompt in terminal
+3. Install dependencies
+pip install -r requirements.txt
+All 20 libraries installed; no errors
+4. Configure environmentcp config/.env.template .env && nano .env
+Set DB_PATH=data/nifty100.db; PORT=8000; LOG_LEVEL=INFO
+5. Build database (ETL)
+python src/etl/loader.py (or: make load)
+nifty100.db created; load_audit.csv shows 12 files loaded
+6. Run KPI computation python src/analytics/ratios.py (or: make ratios) financial_ratios table populated; 1,100+ rows
+7. Run test suite
+pytest tests/ --html=reports/pytest_report.html (or: make test)
+60+ tests collected; 0 failures
+8. Generate PDF reports python src/reports/portfolio_report.py (or: make report)
+reports/tearsheets/ populated with 92 PDFs
+9. Start Streamlit dashboard
+streamlit run src/dashboard/app.py (or: make dashboard)
+Browser opens at http://localhost:8501
+10. Start REST API
+uvicorn src.api.main:app --port 8000 (or: make api)
+API running at http://localhost:8000/docs
+Makefile Target
+What it does
+When to use
+make load
+Runs ETL: loads all 12 files into nifty100.db. Re-runnable (idempotent). Day 1 and after any source file update
+make ratios
+Runs Ratio Engine: populates financial_ratios table.
+After make load. Re-run after any KPI formula change.
+make test
+Runs full pytest suite. Generates HTML report.
+Before every commit. Must be 0 failures.
+make report
+Generates all PDF reports: 92 tearsheets + 11 sector + 1 portfolio.
+Sprint 5+. Run once a week for fresh reports.
+make dashboard
+Starts Streamlit on port 8501.
+Day-to-day analytics work.
+make api
+Starts FastAPI/Uvicorn on port 8000.
+Sprint 6+. When dashboard needs live API.
+make clean
+Deletes .pyc files, __pycache__, and test artifacts (NOT the database). Before packaging final deliverables.
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 37
+22. Coding Standards & Best Practices
+Mandatory
+Conventions for All
+Submitted Code
+Area
+Standard
+Tooling / Reference
+Formatting
+Black — line length 88. No manual formatting.
+black src/ tests/ — run pre-commit
+Linting
+ruff — all default rules enabled. Zero linting errors before commit.
+ruff check src/ tests/
+Type Hints
+All function signatures must have type annotations. Return types mandatory.
+mypy (optional in S1; mandatory S4+)
+Docstrings
+One-line docstring for all public functions. No multi-paragraph docstrings.
+Example: def load_pl(path: str) -> pd.DataFrame:  """Load profitandloss Ex
+Imports
+stdlib → third-party → local. One blank line between groups. ruff enforces.
+ruff --select I (isort-compatible)
+Naming
+snake_case for functions and variables. PascalCase for classes. UPPER_CASE for module-level constants.
+Python PEP 8
+Configuration
+All thresholds in screener_config.yaml or .env. Zero hardcoded values in analytics/ or api/.
+python-dotenv + PyYAML
+Error Handling
+Wrap external I/O (file reads, URL fetches) in try/except. Log error; do not raise to user.
+logging module — see logging_config.yaml
+Logging
+Use Python logging (not print). Levels: DEBUG for ETL detail; INFO for milestones; WARNING for DQ issues; ERROR for failures.
+import logging; logger = logging.getLogger(__name__)
+Database
+Use context manager (with sqlite3.connect(DB) as conn) for all queries. Parameterised queries only — no f-string SQL.
+conn.execute('SELECT * FROM t WHERE id = ?', (ticker,))
+Testing
+One test file per source module. Test file: tests/etl/test_loader.py mirrors src/etl/loader.py.
+pytest conventions — fixtures in conftest.py
+Git
+Commit message format: [S1] feat: load P&L from Excel — sprint tag + type + description. Max 72 chars.
+No squash commits. Each commit must be a coherent unit.
+23. ETL Edge Cases — Complete Reference
+Source Field
+Raw Value
+normalize_year() Output
+Action
+year
+Mar-23
+2023-03
+Standard format — most common
+year
+Mar 23
+2023-03
+Strip space before parse
+year
+March-2023
+2023-03
+Full month name support
+year
+2023
+2023-03
+Integer year → assume March FY close
+year
+FY23
+2023-03
+FY prefix removal
+year
+Dec-22
+2022-12
+December year-end company (e.g. NESTLEIND)
+year
+Jun-23
+2023-06
+June year-end (some banks)
+year
+2023-03
+2023-03
+Already normalised — pass through
+year
+garbage
+PARSE_ERROR
+Reject row; log raw value to parse_failures.csv
+company_id
+  TCS  
+TCS
+Strip whitespace both sides
+company_id
+tcs
+TCS
+Upper-case
+company_id
+BAJAJ-AUTO
+BAJAJ-AUTO
+Hyphen preserved — valid NSE ticker
+company_id
+M&M
+M&M
+Ampersand preserved — valid NSE ticker
+company_id
+MISSING
+Reject row — no FK match possible
+23.1 CAGR Edge Case Decision Table
+Base Year Value
+End Year Value
+CAGR Result
+Flag
+Display As
+Positive (> 0)
+Positive (> 0)
+Computed normally
+—
+e.g. 18.3%
+Positive (> 0)
+Negative (< 0)
+None
+DECLINE_TO_LOSS
+N/A — turned loss
+Negative (< 0)
+Positive (> 0)
+None
+TURNAROUND
+Turnaround ↑
+Negative (< 0)
+Negative (< 0)
+None
+BOTH_NEGATIVE
+N/A — both loss
+Zero
+Any
+None
+ZERO_BASE
+N/A — base=0
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 38
+Base Year Value
+End Year Value
+CAGR Result
+Flag
+Display As
+< 3yr history
+Any
+None
+INSUFFICIENT
+N/A — < 3yr
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 39
+24. Sample SQL Queries
+Ready-to-Run Queries
+for Common Analytical
+Tasks
+Query Name
+SQL
+Purpose
+Top 10 ROE Companies (Latest Year)
+SELECT r.company_id, c.company_name, r.return_on_equity_pct FROM financial_ratios r JOIN companies c ON r.company_id=c.id WHERE r
+Identify highest ROE companies for quality screener
+Debt-Free Companies
+SELECT company_id, year, debt_to_equity FROM financial_ratios WHERE debt_to_equity = 0 AND year=(SELECT MAX(year) FROM financia
+Filter zero-debt companies for debt-free screener
+Consecutive FCF Positive (5yr) SELECT company_id, COUNT(*) AS positive_fcf_yrs FROM financial_ratios WHERE free_cash_flow_cr > 0 GROUP BY company_id HAVING 
+Identify consistently cash-generating companies
+Sector Median ROE
+SELECT s.broad_sector, ROUND(AVG(r.return_on_equity_pct),1) AS median_roe FROM financial_ratios r JOIN sectors s ON r.company_id=s
+Sector-level profitability comparison
+Capital Allocation Pattern CountSELECT pattern_label, COUNT(*) AS companies FROM capital_allocation WHERE year=(SELECT MAX(year) FROM capital_allocation) GRO
+Distribution of capital allocation patterns across Nifty 100
+Revenue CAGR > 15% (5yr)
+SELECT r.company_id, c.company_name, r.revenue_cagr_5yr FROM financial_ratios r JOIN companies c ON r.company_id=c.id WHERE r.rev
+High-growth revenue screener
+Missing Annual Reports
+SELECT c.id, c.company_name, 2024-COUNT(d.Year) AS missing_yrs FROM companies c LEFT JOIN documents d ON c.id=d.company_id A
+Identify companies with documentation gaps
+Peer Group Rankings (ROE)
+SELECT p.peer_group_name, r.company_id, r.return_on_equity_pct, RANK() OVER (PARTITION BY p.peer_group_name ORDER BY r.return
+Intra-peer ROE ranking for all 11 peer groups
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 40
+25. Screener Configuration Reference
+screener_config.yaml
+— All Threshold
+Definitions
+Preset Name
+Filters Applied
+Ranking Metric
+Expected Company Count
+Quality Compounder
+ROE > 15%, D/E < 1.0, FCF > 0, Revenue CAGR 5yr > 10%Composite Score (desc) 15–35 companies
+Value Pick
+P/E < 20, P/B < 3.0, D/E < 2.0, Dividend Yield > 1%
+FCF Yield (desc)
+10–25 companies
+Growth Accelerator
+PAT CAGR 5yr > 20%, Revenue CAGR 5yr > 15%, D/E < 2.0PAT CAGR 5yr (desc)
+8–20 companies
+Dividend Champion
+Dividend Yield > 2%, Dividend Payout < 80%, FCF > 0
+Dividend Yield (desc)
+10–20 companies
+Debt-Free Blue Chip
+D/E = 0, ROE > 12%, Revenue > 5,000 Cr
+ROE (desc)
+15–30 companies
+Turnaround Watch
+Revenue CAGR 3yr > 10%, FCF improving (positive latest yr), D/E declining
+Revenue CAGR 3yr (desc)5–15 companies
+25.1 Composite Score Weights
+Dimension
+Weight
+Inputs
+Normalisation
+Profitability
+35%
+ROE (15%), ROCE (10%), NPM (10%)
+Winsorise P10–P90; scale 0–100 per metric; weighted avg
+Cash Quality
+30%
+FCF CAGR 5yr (15%), CFO/PAT ratio (10%), FCF > 0 flag (5%)
+Same; FCF flag = 100 if positive, 0 if negative
+Growth
+20%
+Revenue CAGR 5yr (10%), PAT CAGR 5yr (10%) Same; CAGR flags (Turnaround) → score = 0
+Leverage
+15%
+D/E score (10%), ICR score (5%)
+D/E: 0=100, 0.5=85, 1=70, 2=50, >5=0. ICR: >10=100, 5=75, 3=50, <1.5=0
+26. Dashboard Screen Specifications
+Screen
+URL Path
+Key Data Queries
+Interactive Elements
+Export
+Home / Overview
+/
+SELECT from companies + financial_ratios (latest year). Sector donut data.
+Sector filter chips, year selector (2019–2024)
+—
+Company Profile
+/company
+All tables for selected ticker. Union P&L + BS + CF.
+Ticker search box, year range slider
+PDF tearsheet download link
+Financial Screener
+/screener
+SELECT from financial_ratios + market_cap with WHERE clauses.
+10 metric sliders in sidebar, preset dropdown
+CSV download, Excel download
+Peer Comparison
+/peers
+SELECT from peer_percentiles + financial_ratios for group.
+Peer group dropdown, metric axis selector (8 axes)
+PNG chart save, Excel table
+Trend Analysis
+/trends
+SELECT time-series from financial_ratios for ticker + metric.
+Ticker search, metric multi-select (overlay up to 3)
+CSV download
+Sector Analysis
+/sectors
+SELECT with JOIN sectors. Bubble chart data + KPI table.
+Sector dropdown, year slider, metric selector for axes
+PNG chart save
+Capital Allocation Map /capital
+SELECT capital_allocation by year.
+Year slider, click on pattern category → company list
+CSV download
+Annual Reports
+/documents
+SELECT from documents WHERE company_id = ticker.
+Ticker search, year filter
+—
+27. Testing Framework — Test Case Reference
+Test File
+Test Name
+Input
+Expected Output
+tests/etl/test_normalise.py
+test_year_mar23
+Mar-23
+2023-03
+tests/etl/test_normalise.py
+test_year_fy24
+FY24
+2024-03
+tests/etl/test_normalise.py
+test_year_dec22
+Dec-22
+2022-12
+tests/etl/test_normalise.py
+test_year_garbage
+xyz
+PARSE_ERROR
+tests/etl/test_normalise.py
+test_ticker_strip
+  TCS  
+TCS
+tests/etl/test_normalise.py
+test_ticker_lower
+tcs
+TCS
+tests/kpi/test_ratios.py
+test_roe_positive
+net_profit=100, equity=500
+ROE = 20.0
+tests/kpi/test_ratios.py
+test_roe_neg_equity
+net_profit=100, equity=-50
+ROE = None
+tests/kpi/test_ratios.py
+test_de_debtfree
+borrowings=0, equity=500
+D/E = 0
+tests/kpi/test_ratios.py
+test_icr_debtfree
+interest=0
+ICR = None (display 'Debt Free')
+tests/kpi/test_ratios.py
+test_cagr_turnaround
+base=-100, end=200
+CAGR = None, flag='TURNAROUND'
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 41
+Test File
+Test Name
+Input
+Expected Output
+tests/kpi/test_ratios.py
+test_cagr_normal
+base=100, end=161, n=5
+CAGR ≈ 10.0%
+tests/dq/test_rules.py
+test_dq04_bs_balance
+assets=1000, liab=1020
+DQ-04 WARNING triggered
+tests/dq/test_rules.py
+test_dq06_zero_sales
+sales=0
+DQ-06 WARNING triggered
+tests/api/test_health.py
+test_health_200
+GET /api/v1/health
+HTTP 200, status='ok'
+tests/api/test_api.py
+test_companies_count
+GET /api/v1/companies
+92 records returned
+tests/api/test_api.py
+test_invalid_ticker
+GET /api/v1/companies/INVALIDHTTP 404
+tests/api/test_api.py
+test_screener_filter
+GET /api/v1/screener?min_roe=15
+All results have ROE ≥ 15
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 42
+28. Sector Benchmarks & Expected Metric Ranges
+Context for Anomaly
+Detection & Relative
+Scoring
+Sector
+ROE Range
+D/E Range
+OPM Range
+P/E Range
+Notes
+Financials (Banks)
+12–22%
+> 5× (normal)
+25–45% NIM proxy
+12–25×
+D/E structurally high — use NIM + ROA for banks instead
+Financials (NBFC)
+12–20%
+3–8× (normal)
+30–55% NIM proxy
+15–30×
+Higher ROA and ROE expected for consumer finance vs
+Information Technology
+25–50%
+0–0.3×
+20–35%
+22–40×
+Asset-light; high ROE; low D/E; premium P/E for growth
+Consumer Staples (FMCG)
+20–45%
+0–0.5×
+15–28%
+40–70×
+Very high P/E; brand moat; consistent margins; low debt
+Healthcare / Pharma
+15–30%
+0–0.8×
+15–25%
+25–45×
+Moderate debt; R&D adds intangible assets; premium for
+Energy (Oil & Gas)
+10–18%
+0.5–2×
+8–18%
+8–15×
+Capital intensive; commodity-linked margins; PSU majori
+Energy (Power)
+8–15%
+1–4×
+25–40%
+12–20×
+High D/E normal for regulated utilities; stable margin
+Consumer Discretionary
+10–25%
+0.3–1.5×
+10–20%
+25–50×
+Wide range; auto OEMs have lower OPM than consumer
+Materials (Steel)
+10–25%
+0.3–1×
+12–22%
+8–18×
+Cyclical; margins volatile with commodity prices
+Materials (Cement)
+12–22%
+0.3–1×
+18–28%
+18–35×
+Oligopoly; regional pricing power; moderate debt
+Industrials
+12–22%
+0.3–1.5×
+10–20%
+20–35×
+Capital goods order-book driven; L&T sets benchmark
+Conglomerates
+10–20%
+0.5–2×
+8–18%
+15–30×
+Diverse revenue streams; holding company discount app
+Usage: For relative scoring, normalise KPIs against these sector ranges rather than the universal Nifty 100 range. A D/E of 4× is a CRITICAL flag for
+an IT company but completely normal for a bank. The Ratio Engine uses sectors.broad_sector to select the appropriate benchmark range for each
+metric.
+29. Week-by-Week Communication & Review Plan
+Milestone Reviews,
+Deliverable Handoffs
+& Sign-Off Schedule
+Week
+Days
+Review Meeting
+Deliverables to Share
+Go / No-Go Criteria
+Week 1
+D01–07
+End of D07 — Sprint 1 Review (30 min)
+nifty100.db, load_audit.csv, validation_failures.csv, exploratory_queries.sql
+All 10 tables loaded. Zero CRITICAL DQ failures. Covera
+Week 2
+D08–14
+End of D14 — Sprint 2 Review (45 min)
+financial_ratios table (SQLite export), ratio_edge_cases.log, all KPI tests green
+1,100+ rows in financial_ratios. Formula spot-checks pas
+Week 3
+D15–21
+End of D21 — Sprint 3 Review (45 min)
+screener_output.xlsx (6 presets), peer_comparison.xlsx (11 groups), radar chart samples
+6 screeners operational. 11 peer groups populated. All D
+Week 4
+D22–28
+End of D28 — Sprint 4 Demo (60 min)
+Live Streamlit dashboard demo, valuation_summary.xlsx
+All 8 screens load without errors. Screener returns correc
+Week 5
+D29–35
+End of D35 — Sprint 5 Review (45 min)
+Sample tearsheets (3 companies), pros_cons_generated.csv, cashflow_intelligence.xlsx
+5 tearsheets reviewed: no overflow. NLP coverage > 90%
+Week 6
+D36–42
+End of D42 — Sprint 6 Review (60 min)
+API demo (Postman), pytest_report.html, cluster_labels.csv
+16 endpoints live. 60+ tests pass. Cluster labels make bu
+Final
+D43–45
+D45 — Project Sign-Off (90 min) All 23 deliverables, acceptance_checklist.pdf signed
+All 20 acceptance gates pass. Lead signs acceptance_ch
+29.1 Daily Stand-Up Format (5 minutes per person)
+Question
+Guidance
+Max Time
+What did I complete yesterday?
+Name the specific deliverable or sub-task completed. Reference the sprint task board item.
+90 seconds
+What will I complete today?
+Commit to a specific deliverable — not vague ('work on module X'). Name the file/function.
+90 seconds
+What is blocking me?
+Only blockers that cannot self-resolve within 2 hours. Escalate to team lead after 2 hours.
+60 seconds
+Anything to share?
+Optional: share a finding, risk spotted, or cross-team dependency discovered. Keep it brief.
+60 seconds
+NIFTY 100 FINANCIAL INTELLIGENCE PLATFORM
+PROJECT EXECUTION PLAN  v1.0  ·  CONFIDENTIAL
+DATA ANALYTICS DIVISION  ·  INTERNAL USE ONLY
+Page 43
+Appendix A — Dataset File Checksums & Version Control
+File Integrity
+Reference for Source
+Data
+File
+Size (approx)
+Rows
+SHA-256 (run at project start)
+Notes
+companies.xlsx
+~50 KB
+92
+Run: sha256sum data/raw/companies.xlsx
+Core reference — never modify
+profitandloss.xlsx
+~180 KB
+1,276
+Run: sha256sum data/raw/profitandloss.xlsx
+Core time-series — never modify
+balancesheet.xlsx
+~190 KB
+1,312
+Run: sha256sum data/raw/balancesheet.xlsx
+Core time-series — never modify
+cashflow.xlsx
+~130 KB
+1,187
+Run: sha256sum data/raw/cashflow.xlsx
+Core time-series — never modify
+analysis.xlsx
+~20 KB
+20
+Run: sha256sum data/raw/analysis.xlsx
+Partial coverage — never modify
+documents.xlsx
+~200 KB
+1,585
+Run: sha256sum data/raw/documents.xlsx
+URL repository — never modify
+prosandcons.xlsx
+~15 KB
+16
+Run: sha256sum data/raw/prosandcons.xlsx
+Partial coverage — never modify
+sectors.xlsx
+~20 KB
+92
+Run: sha256sum data/supporting/sectors.xlsx Created — update if sector changes
+stock_prices.xlsx
+~400 KB
+5,520
+Run: sha256sum data/supporting/stock_prices.xlsx
+Simulated — label in dashboard
+market_cap.xlsx
+~60 KB
+552
+Run: sha256sum data/supporting/market_cap.xlsx
+Simulated — label in dashboard
+financial_ratios.xlsx
+~160 KB
+1,184
+Run: sha256sum data/supporting/financial_ratios.xlsx
+Computed — regenerate from DB
+peer_groups.xlsx
+~15 KB
+56
+Run: sha256sum data/supporting/peer_groups.xlsx
+Created — update if groups change
+Appendix B — Contact & Escalation Matrix
+Role
+Responsibility
+Response SLA
+Escalation Path
+Team Lead / Project ManagerSprint planning, risk decisions, final sign-off on all deliverables
+Same day
+—
+Data Engineer
+ETL module (Module 1), database schema, DQ rules, pipeline reliability
+4 hours for CRITICAL DQ failures
+Escalate to Team Lead after 2hr block
+Analytics Engineer
+Ratio Engine (Module 2), Screener (Module 3), Peer Engine (Module 4)
+Same sprint day
+Escalate to Team Lead for business logic decisions
+Dashboard Developer
+Streamlit app (Module 5), chart design, UX
+Same sprint day
+Escalate for data availability issues → Data Engineer
+API Developer
+FastAPI server (Module 11), OpenAPI docs, Postman collection
+Same sprint day
+Escalate for DB access issues → Data Engineer
+QA / Testing
+Test suite (Module 12), acceptance criteria verification, sign-off checklist
+24hr for test failures
+Escalate to Team Lead for acceptance gate failures
+Document Sign-Off
+Role
+Name
+Signature
+Date
+Project Manager / Team Lead
+_________________________
+_____________
+Data Engineering Lead
+_________________________
+_____________
+Analytics Lead
+_________________________
+_____________
+QA Lead
+_________________________
+_____________
+This document is CONFIDENTIAL and intended solely for the internal project team. No part of this document may be reproduced or shared externally without
+written approval from the Project Manager. Version 1.0 | Prepared for: Data Analytics Platform Initiative | 45-Day Execution Plan | All monetary figures in I Crore
+unless otherwise stated.

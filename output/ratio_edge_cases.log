@@ -85,4 +85,19 @@ SPECIAL CASE ? TCS
 ----------------------------------------------------------------------
 TCS 2024: Engine ROE=50.9443%, Source ROE=0.5200%. The source value appears anomalous and is retained only for display/reference. Engine ROE is used for analytics.
 
+DAY 13 IMPLEMENTATION NOTES
+----------------------------------------------------------------------
+Financials sector classification: 23 companies found in sectors.xlsx (project specification references 19). The implementation uses the supplied sectors.xlsx classification without removing companies.
+
+Financials D/E carve-out: validated. 142 Financials company-year rows have D/E > 5; 0 have high_leverage_flag=True. High leverage warnings are therefore suppressed for Financials companies.
+
+ROCE formula: EBIT / (equity_capital + reserves + borrowings) x 100. The computed ROCE is retained for analytics because it follows the Sprint formula and is reproducible from the supplied financial statement inputs.
+
+ROCE bank/Financials benchmark: the project specification requires a sector-relative benchmark but does not define a specific statistical method (median, percentile, etc.). No arbitrary benchmark formula was introduced.
+
+ROCE source comparison: companies.xlsx contains one company-level reference roce_percentage, while the ratio engine calculates annual company-year ROCE. Differences are therefore documented as version/source-definition differences unless a specific formula discrepancy is independently demonstrated.
+
+ROE source comparison: companies.xlsx contains company-level reference ROE values. The ratio engine value is retained for analytics. BEL 2024 engine ROE=4744.0476%, matching financial_ratios.xlsx (4744.05%), while companies.xlsx reports 26.30%; this is documented as a source/reference discrepancy.
+
+
 END OF EDGE CASE LOG
