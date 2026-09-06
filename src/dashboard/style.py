@@ -1,14 +1,13 @@
-import streamlit as st
+﻿import streamlit as st
 
 
 def configure_page() -> None:
-    """Apply common Streamlit page configuration."""
-    st.set_page_config(
-        page_title="N100 Financial Intelligence",
-        page_icon="??",
-        layout="wide",
-        initial_sidebar_state="expanded",
-    )
+    """Compatibility hook for pages using the shared dashboard style.
+
+    Page configuration is handled once by src/dashboard/app.py
+    because the dashboard uses Streamlit's multipage navigation.
+    """
+    return None
 
 
 def apply_styles() -> None:

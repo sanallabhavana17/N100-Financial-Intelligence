@@ -6,110 +6,180 @@ import pandas as pd
 from src.dashboard.data_loader import load_db
 
 
-OUTPUT_DIR = Path("output")
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+# ============================================================
+# OUTPUT DIRECTORY
+# ============================================================
 
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+OUTPUT_DIR = PROJECT_ROOT / "output"
+
+OUTPUT_DIR.mkdir(
+    parents=True,
+    exist_ok=True,
+)
+
+
+# ============================================================
+# HELPERS
+# ============================================================
 
 def safe_numeric(series):
-    return pd.to_numeric(series, errors="coerce")
+    return pd.to_numeric(
+        series,
+        errors="coerce",
+    )
 
+
+# ============================================================
+# BUILD VALUATION SUMMARY
+# ============================================================
 
 def build_valuation_summary():
+
     query = """
     SELECT
         m.company_id,
         c.company_name,
-        s.broad_sector,
+        s.broad_sector AS sector,
         m.year,
         m.market_cap_crore,
-        m.enterprise_value_crore,
         m.pe_ratio,
         m.pb_ratio,
         m.ev_ebitda,
-        m.dividend_yield_pct,
         r.free_cash_flow_cr
     FROM market_cap m
+
     LEFT JOIN companies c
         ON m.company_id = c.id
+
     LEFT JOIN sectors s
         ON m.company_id = s.company_id
+
     LEFT JOIN financial_ratios r
         ON m.company_id = r.company_id
         AND m.year = r.year
-    ORDER BY m.company_id, m.year
+
+    ORDER BY
+        m.company_id,
+        m.year
     """
 
     df = load_db(query)
 
     if df.empty:
-        raise ValueError("No valuation data found.")
+        raise ValueError(
+            "No valuation data found in the database."
+        )
+
+
+    # ========================================================
+    # NUMERIC CONVERSION
+    # ========================================================
 
     numeric_columns = [
         "year",
         "market_cap_crore",
-        "enterprise_value_crore",
         "pe_ratio",
         "pb_ratio",
         "ev_ebitda",
-        "dividend_yield_pct",
         "free_cash_flow_cr",
     ]
 
     for column in numeric_columns:
-        df[column] = safe_numeric(df[column])
 
-    # ---------------------------------------------------------
-    # Remove invalid valuation multiples
-    # ---------------------------------------------------------
+        df[column] = safe_numeric(
+            df[column]
+        )
 
-    for column in ["pe_ratio", "pb_ratio", "ev_ebitda"]:
-        df.loc[df[column] <= 0, column] = np.nan
 
-    # ---------------------------------------------------------
-    # Current/latest valuation observation per company
-    # ---------------------------------------------------------
+    # ========================================================
+    # INVALID VALUATION MULTIPLES
+    # ========================================================
+
+    for column in [
+        "pe_ratio",
+        "pb_ratio",
+        "ev_ebitda",
+    ]:
+
+        df.loc[
+            df[column] <= 0,
+            column,
+        ] = np.nan
+
+
+    # ========================================================
+    # LATEST VALUATION YEAR FOR EACH COMPANY
+    # ========================================================
 
     current = (
-        df.sort_values(["company_id", "year"])
-        .groupby("company_id", as_index=False)
+        df
+        .sort_values(
+            [
+                "company_id",
+                "year",
+            ]
+        )
+        .groupby(
+            "company_id",
+            as_index=False,
+        )
         .tail(1)
         .copy()
     )
 
-    current = current.rename(
-        columns={
-            "year": "current_year",
-            "pe_ratio": "current_pe",
-            "pb_ratio": "current_pb",
-            "ev_ebitda": "current_ev_ebitda",
-            "market_cap_crore": "current_market_cap_crore",
-            "enterprise_value_crore": "current_enterprise_value_crore",
-            "dividend_yield_pct": "current_dividend_yield_pct",
-            "free_cash_flow_cr": "current_fcf_cr",
-        }
+
+    current = current[
+        [
+            "company_id",
+            "company_name",
+            "sector",
+            "year",
+            "market_cap_crore",
+            "pe_ratio",
+            "pb_ratio",
+            "ev_ebitda",
+            "free_cash_flow_cr",
+        ]
+    ]
+
+
+    # ========================================================
+    # FIVE-YEAR MEDIAN P/E
+    # ========================================================
+
+    five_year_medians = []
+
+    for company_id, company_df in df.groupby(
+        "company_id"
+    ):
+
+        company_df = (
+            company_df
+            .sort_values("year")
+            .tail(5)
+        )
+
+        five_year_medians.append(
+            {
+                "company_id": company_id,
+                "5yr_median_PE":
+                    company_df[
+                        "pe_ratio"
+                    ].median(),
+            }
+        )
+
+
+    historical = pd.DataFrame(
+        five_year_medians
     )
 
-    # ---------------------------------------------------------
-    # Five-year historical medians
-    # ---------------------------------------------------------
 
-    five_year_rows = []
-
-    for company_id, company_df in df.groupby("company_id"):
-        company_df = company_df.sort_values("year")
-
-        recent = company_df.tail(5)
-
-        row = {
-            "company_id": company_id,
-            "pe_5yr_median": recent["pe_ratio"].median(),
-            "pb_5yr_median": recent["pb_ratio"].median(),
-            "ev_ebitda_5yr_median": recent["ev_ebitda"].median(),
-        }
-
-        five_year_rows.append(row)
-
-    historical = pd.DataFrame(five_year_rows)
+    # ========================================================
+    # MERGE FIVE-YEAR MEDIAN
+    # ========================================================
 
     result = current.merge(
         historical,
@@ -117,304 +187,443 @@ def build_valuation_summary():
         how="left",
     )
 
-    # ---------------------------------------------------------
-    # Sector medians
-    # ---------------------------------------------------------
 
-    sector_current = (
-        df.sort_values(["company_id", "year"])
-        .groupby("company_id", as_index=False)
-        .tail(1)
-        .copy()
-    )
+    # ========================================================
+    # SECTOR MEDIAN P/E
+    #
+    # Latest P/E observation of each company
+    # is used to calculate the sector median.
+    # ========================================================
 
     sector_medians = (
-        sector_current
-        .groupby("broad_sector", dropna=False)
+        current
+        .groupby(
+            "sector",
+            dropna=False,
+        )
         .agg(
-            sector_median_pe=("pe_ratio", "median"),
-            sector_median_pb=("pb_ratio", "median"),
-            sector_median_ev_ebitda=("ev_ebitda", "median"),
+            sector_median_PE=(
+                "pe_ratio",
+                "median",
+            )
         )
         .reset_index()
     )
 
+
     result = result.merge(
         sector_medians,
-        on="broad_sector",
+        on="sector",
         how="left",
     )
 
-    # ---------------------------------------------------------
-    # Sector P/E rank
-    # ---------------------------------------------------------
 
-    result["sector_pe_rank"] = (
-        result.groupby("broad_sector")["current_pe"]
-        .rank(
-            method="min",
-            ascending=True,
-            na_option="bottom",
-        )
-    )
-
-    result["sector_company_count"] = (
-        result.groupby("broad_sector")["company_id"]
-        .transform("count")
-    )
-
-    # ---------------------------------------------------------
-    # P/E valuation flag
-    # ---------------------------------------------------------
-
-    result["pe_valuation_flag"] = "Neutral"
-
-    caution_mask = (
-        result["current_pe"].notna()
-        & result["sector_median_pe"].notna()
-        & (
-            result["current_pe"]
-            > result["sector_median_pe"] * 1.5
-        )
-    )
-
-    discount_mask = (
-        result["current_pe"].notna()
-        & result["sector_median_pe"].notna()
-        & (
-            result["current_pe"]
-            < result["sector_median_pe"] * 0.7
-        )
-    )
-
-    result.loc[caution_mask, "pe_valuation_flag"] = "Caution"
-    result.loc[discount_mask, "pe_valuation_flag"] = "Discount"
-
-    # ---------------------------------------------------------
-    # Historical P/E comparison
-    # ---------------------------------------------------------
-
-    result["pe_vs_5yr_median_pct"] = (
-        (
-            result["current_pe"]
-            / result["pe_5yr_median"]
-        ) - 1
-    ) * 100
-
-    result["pb_vs_5yr_median_pct"] = (
-        (
-            result["current_pb"]
-            / result["pb_5yr_median"]
-        ) - 1
-    ) * 100
-
-    result["ev_ebitda_vs_5yr_median_pct"] = (
-        (
-            result["current_ev_ebitda"]
-            / result["ev_ebitda_5yr_median"]
-        ) - 1
-    ) * 100
-
-    # ---------------------------------------------------------
-    # EV/EBITDA sector flag
-    # ---------------------------------------------------------
-
-    result["ev_ebitda_flag"] = "Normal"
-
-    ev_caution_mask = (
-        result["current_ev_ebitda"].notna()
-        & result["sector_median_ev_ebitda"].notna()
-        & (
-            result["current_ev_ebitda"]
-            > result["sector_median_ev_ebitda"] * 1.20
-        )
-    )
-
-    result.loc[
-        ev_caution_mask,
-        "ev_ebitda_flag",
-    ] = "Above Sector +20%"
-
-    # ---------------------------------------------------------
-    # FCF Yield
-    # Definition:
+    # ========================================================
+    # FCF YIELD
+    #
+    # FCF Yield =
     # FCF / Market Cap * 100
-    # ---------------------------------------------------------
+    # ========================================================
 
-    result["fcf_yield_pct"] = np.where(
-        (result["current_market_cap_crore"] > 0)
-        & result["current_fcf_cr"].notna(),
+    result["FCF_yield_pct"] = np.where(
+
         (
-            result["current_fcf_cr"]
-            / result["current_market_cap_crore"]
+            result[
+                "market_cap_crore"
+            ] > 0
+        )
+        &
+        result[
+            "free_cash_flow_cr"
+        ].notna(),
+
+        (
+            result[
+                "free_cash_flow_cr"
+            ]
+            /
+            result[
+                "market_cap_crore"
+            ]
         ) * 100,
+
         np.nan,
     )
 
-    # ---------------------------------------------------------
-    # Dividend Yield Rank
-    # Higher dividend yield = better rank
-    # ---------------------------------------------------------
 
-    result["dividend_yield_rank"] = (
-        result["current_dividend_yield_pct"]
-        .rank(
-            method="min",
-            ascending=False,
-            na_option="bottom",
+    # ========================================================
+    # P/E VS SECTOR MEDIAN
+    #
+    # PE_vs_sector_median_pct =
+    # ((Company PE / Sector Median PE) - 1) * 100
+    # ========================================================
+
+    result[
+        "PE_vs_sector_median_pct"
+    ] = np.where(
+
+        result[
+            "pe_ratio"
+        ].notna()
+        &
+        result[
+            "sector_median_PE"
+        ].notna()
+        &
+        (
+            result[
+                "sector_median_PE"
+            ] > 0
+        ),
+
+        (
+            (
+                result[
+                    "pe_ratio"
+                ]
+                /
+                result[
+                    "sector_median_PE"
+                ]
+            )
+            - 1
+        ) * 100,
+
+        np.nan,
+    )
+
+
+    # ========================================================
+    # VALUATION FLAG
+    #
+    # > 150% of sector median = Caution
+    # < 70% of sector median = Discount
+    # Otherwise = Fair
+    # ========================================================
+
+    result["flag"] = "Fair"
+
+
+    caution_mask = (
+        result[
+            "pe_ratio"
+        ].notna()
+        &
+        result[
+            "sector_median_PE"
+        ].notna()
+        &
+        (
+            result[
+                "pe_ratio"
+            ]
+            >
+            result[
+                "sector_median_PE"
+            ] * 1.5
         )
     )
 
-    # ---------------------------------------------------------
-    # Overall valuation badge
-    # ---------------------------------------------------------
 
-    result["valuation_badge"] = "Neutral"
+    discount_mask = (
+        result[
+            "pe_ratio"
+        ].notna()
+        &
+        result[
+            "sector_median_PE"
+        ].notna()
+        &
+        (
+            result[
+                "pe_ratio"
+            ]
+            <
+            result[
+                "sector_median_PE"
+            ] * 0.7
+        )
+    )
+
 
     result.loc[
-        result["pe_valuation_flag"] == "Caution",
-        "valuation_badge",
+        caution_mask,
+        "flag",
     ] = "Caution"
 
+
     result.loc[
-        result["pe_valuation_flag"] == "Discount",
-        "valuation_badge",
+        discount_mask,
+        "flag",
     ] = "Discount"
 
-    # If EV/EBITDA is significantly above sector,
-    # mark as Caution unless already Discount.
-    result.loc[
-        (
-            result["ev_ebitda_flag"] == "Above Sector +20%"
-        )
-        & (
-            result["valuation_badge"] != "Discount"
-        ),
-        "valuation_badge",
-    ] = "Caution"
 
-    # ---------------------------------------------------------
-    # Rationale
-    # ---------------------------------------------------------
+    # ========================================================
+    # FINAL REQUIRED COLUMNS
+    # ========================================================
 
-    def make_rationale(row):
-        reasons = []
-
-        if row["pe_valuation_flag"] == "Caution":
-            reasons.append(
-                "P/E is above 1.5x sector median"
-            )
-
-        elif row["pe_valuation_flag"] == "Discount":
-            reasons.append(
-                "P/E is below 0.7x sector median"
-            )
-
-        if row["ev_ebitda_flag"] == "Above Sector +20%":
-            reasons.append(
-                "EV/EBITDA is more than 20% above sector median"
-            )
-
-        if not reasons:
-            return "No valuation threshold breached"
-
-        return "; ".join(reasons)
-
-    result["valuation_rationale"] = result.apply(
-        make_rationale,
-        axis=1,
+    result = result.rename(
+        columns={
+            "pe_ratio": "P/E",
+            "pb_ratio": "P/B",
+            "ev_ebitda": "EV/EBITDA",
+        }
     )
 
-    # ---------------------------------------------------------
-    # Final columns
-    # ---------------------------------------------------------
 
-    columns = [
+    required_columns = [
         "company_id",
         "company_name",
-        "broad_sector",
-        "current_year",
-        "current_market_cap_crore",
-        "current_enterprise_value_crore",
-        "current_pe",
-        "pe_5yr_median",
-        "pe_vs_5yr_median_pct",
-        "sector_median_pe",
-        "sector_pe_rank",
-        "sector_company_count",
-        "current_pb",
-        "pb_5yr_median",
-        "pb_vs_5yr_median_pct",
-        "sector_median_pb",
-        "current_ev_ebitda",
-        "ev_ebitda_5yr_median",
-        "ev_ebitda_vs_5yr_median_pct",
-        "sector_median_ev_ebitda",
-        "ev_ebitda_flag",
-        "current_fcf_cr",
-        "fcf_yield_pct",
-        "current_dividend_yield_pct",
-        "dividend_yield_rank",
-        "pe_valuation_flag",
-        "valuation_badge",
-        "valuation_rationale",
+        "sector",
+        "P/E",
+        "P/B",
+        "EV/EBITDA",
+        "FCF_yield_pct",
+        "5yr_median_PE",
+        "PE_vs_sector_median_pct",
+        "flag",
     ]
 
-    result = result[columns].sort_values(
-        ["valuation_badge", "company_name"],
-        ascending=[True, True],
+
+    result = result[
+        required_columns
+    ].copy()
+
+
+    # ========================================================
+    # SORT
+    # ========================================================
+
+    result = (
+        result
+        .sort_values(
+            [
+                "flag",
+                "company_name",
+            ]
+        )
+        .reset_index(drop=True)
     )
+
 
     return result
 
 
+# ============================================================
+# WRITE OUTPUT FILES
+# ============================================================
+
 def main():
+
     result = build_valuation_summary()
 
-    xlsx_path = OUTPUT_DIR / "valuation_summary.xlsx"
-    flags_path = OUTPUT_DIR / "valuation_flags.csv"
+
+    # ========================================================
+    # VALIDATE 92-COMPANY REQUIREMENT
+    # ========================================================
+
+    company_count = (
+        result[
+            "company_id"
+        ]
+        .nunique()
+    )
+
+
+    if company_count != 92:
+
+        raise ValueError(
+            "Valuation summary must contain "
+            f"92 companies, but found "
+            f"{company_count}."
+        )
+
+
+    # ========================================================
+    # VALIDATE REQUIRED COLUMNS
+    # ========================================================
+
+    required_columns = [
+        "company_id",
+        "company_name",
+        "sector",
+        "P/E",
+        "P/B",
+        "EV/EBITDA",
+        "FCF_yield_pct",
+        "5yr_median_PE",
+        "PE_vs_sector_median_pct",
+        "flag",
+    ]
+
+
+    missing_columns = [
+        column
+        for column in required_columns
+        if column not in result.columns
+    ]
+
+
+    if missing_columns:
+
+        raise ValueError(
+            "Missing required columns: "
+            + ", ".join(
+                missing_columns
+            )
+        )
+
+
+    # ========================================================
+    # VALIDATE FLAGS
+    # ========================================================
+
+    valid_flags = {
+        "Caution",
+        "Discount",
+        "Fair",
+    }
+
+
+    invalid_flags = set(
+        result[
+            "flag"
+        ]
+        .dropna()
+        .unique()
+    ) - valid_flags
+
+
+    if invalid_flags:
+
+        raise ValueError(
+            "Invalid valuation flags: "
+            + ", ".join(
+                sorted(
+                    invalid_flags
+                )
+            )
+        )
+
+
+    # ========================================================
+    # VALUATION SUMMARY EXCEL
+    # ========================================================
+
+    summary_path = (
+        OUTPUT_DIR
+        / "valuation_summary.xlsx"
+    )
+
 
     result.to_excel(
-        xlsx_path,
+        summary_path,
         index=False,
     )
 
+
+    # ========================================================
+    # FLAGGED COMPANIES ONLY
+    # ========================================================
+
     flags = result[
-        result["valuation_badge"].isin(
-            ["Caution", "Discount"]
+        result[
+            "flag"
+        ].isin(
+            [
+                "Caution",
+                "Discount",
+            ]
         )
     ].copy()
+
+
+    flags_path = (
+        OUTPUT_DIR
+        / "valuation_flags.csv"
+    )
+
 
     flags.to_csv(
         flags_path,
         index=False,
     )
 
-    print("VALUATION SUMMARY")
-    print("=" * 60)
-    print(f"Companies: {len(result)}")
-    print(f"Summary:   {xlsx_path}")
-    print(f"Flags:     {flags_path}")
+
+    # ========================================================
+    # CONSOLE OUTPUT
+    # ========================================================
+
     print()
-    print("BADGES:")
     print(
-        result["valuation_badge"]
+        "N100 VALUATION ENGINE"
+    )
+    print(
+        "=" * 60
+    )
+
+    print(
+        f"Companies: {company_count}"
+    )
+
+    print(
+        f"Summary file: {summary_path}"
+    )
+
+    print(
+        f"Flags file:   {flags_path}"
+    )
+
+    print()
+
+    print(
+        "Required columns:"
+    )
+
+    print(
+        result.columns.tolist()
+    )
+
+    print()
+
+    print(
+        "Valuation flags:"
+    )
+
+    print(
+        result[
+            "flag"
+        ]
         .value_counts()
         .to_string()
     )
+
     print()
-    print("FLAGGED COMPANIES:")
+
+    print(
+        "Flagged companies:"
+    )
+
     print(
         flags[
             [
                 "company_id",
                 "company_name",
-                "valuation_badge",
-                "valuation_rationale",
+                "sector",
+                "P/E",
+                "FCF_yield_pct",
+                "PE_vs_sector_median_pct",
+                "flag",
             ]
-        ].to_string(index=False)
+        ].to_string(
+            index=False
+        )
     )
 
+
+# ============================================================
+# ENTRY POINT
+# ============================================================
 
 if __name__ == "__main__":
     main()
