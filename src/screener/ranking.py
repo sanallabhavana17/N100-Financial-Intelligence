@@ -1,13 +1,14 @@
-"""
+﻿"""
 N100 Financial Intelligence Platform
-Sprint 3 — Screener Ranking Engine
+Sprint 3 â€” Screener Ranking Engine
 
 Provides:
 1. Configured single-metric ranking
 2. Composite ranking:
-   - 50% Profitability
-   - 30% Growth
-   - 20% Valuation
+   - 35% Profitability
+   - 30% Cash Quality
+   - 20% Growth
+   - 15% Leverage
 3. Sector-relative normalization
 4. Peer-adjusted ranking
 5. CSV and Excel export
@@ -18,9 +19,10 @@ import sqlite3
 
 import pandas as pd
 import yaml
+from openpyxl.styles import PatternFill
 
 
-CONFIG_PATH = Path("screener_config.yaml")
+CONFIG_PATH = Path("config/screener_config.yaml")
 DATA_PATH = Path("output/final_financial_ratios.csv")
 MARKET_DATA_PATH = Path("data/raw/market_cap.xlsx")
 PL_DATA_PATH = Path("data/processed/profitandloss_cleaned.csv")
@@ -325,13 +327,13 @@ def rank_latest_year(
 
 
 # ------------------------------------------------------------------
-# D17 — COMPOSITE RANKING ENGINE
+# D17 â€” COMPOSITE RANKING ENGINE
 # ------------------------------------------------------------------
 
 
 def _percentile_score(series, higher_is_better=True):
     """
-    Convert a metric into a 0–100 percentile score.
+    Convert a metric into a 0â€“100 percentile score.
 
     Higher values receive higher scores when higher_is_better=True.
     Missing values remain missing.
@@ -386,146 +388,511 @@ def _mean_available_scores(df, columns):
     )
 
 
+def _winsorize_p10_p90(series):
+    """Winsorize numeric values at the 10th and 90th percentiles."""
+    numeric = pd.to_numeric(series, errors="coerce")
+
+    valid = numeric.dropna()
+    if valid.empty:
+        return numeric
+
+    lower = valid.quantile(0.10)
+    upper = valid.quantile(0.90)
+
+    return numeric.clip(lower=lower, upper=upper)
+
+
+def _calculate_historical_fcf_cagr(df):
+    """
+    Calculate 5-year FCF CAGR for each company.
+
+    CAGR is calculated only when both the starting and ending
+    FCF values are positive.
+    """
+
+    required = {
+        "company_id",
+        "year",
+        "free_cash_flow_cr",
+    }
+
+    if not required.issubset(df.columns):
+        return pd.Series(
+            float("nan"),
+            index=df.index,
+            dtype="float64",
+        )
+
+    history = df[
+        ["company_id", "year", "free_cash_flow_cr"]
+    ].copy()
+
+    history["year"] = pd.to_numeric(
+        history["year"],
+        errors="coerce",
+    )
+
+    history["free_cash_flow_cr"] = pd.to_numeric(
+        history["free_cash_flow_cr"],
+        errors="coerce",
+    )
+
+    history = history.dropna(
+        subset=[
+            "company_id",
+            "year",
+            "free_cash_flow_cr",
+        ]
+    )
+
+    history = history.drop_duplicates(
+        subset=["company_id", "year"],
+        keep="last",
+    )
+
+    latest = (
+        history.sort_values(
+            ["company_id", "year"]
+        )
+        .groupby("company_id", as_index=False)
+        .tail(1)
+        .rename(
+            columns={
+                "year": "latest_year",
+                "free_cash_flow_cr": "latest_fcf",
+            }
+        )
+    )
+
+    base = history.rename(
+        columns={
+            "year": "base_year",
+            "free_cash_flow_cr": "base_fcf",
+        }
+    )
+
+    latest = latest[
+        [
+            "company_id",
+            "latest_year",
+            "latest_fcf",
+        ]
+    ].copy()
+
+    latest["base_year"] = (
+        latest["latest_year"] - 5
+    )
+
+    latest = latest.merge(
+        base[
+            [
+                "company_id",
+                "base_year",
+                "base_fcf",
+            ]
+        ],
+        on=[
+            "company_id",
+            "base_year",
+        ],
+        how="left",
+    )
+
+    valid = (
+        latest["latest_fcf"].gt(0)
+        & latest["base_fcf"].gt(0)
+    )
+
+    latest["fcf_cagr_5yr"] = float("nan")
+
+    latest.loc[
+        valid,
+        "fcf_cagr_5yr",
+    ] = (
+        (
+            latest.loc[valid, "latest_fcf"]
+            / latest.loc[valid, "base_fcf"]
+        )
+        ** (1 / 5)
+        - 1
+    ) * 100
+
+    lookup = latest.set_index(
+        "company_id"
+    )["fcf_cagr_5yr"]
+
+    return df["company_id"].map(lookup)
+
+
 def calculate_composite_score(df):
     """
-    Calculate the Sprint 3 composite score.
+    Calculate Sprint 3 Day 17 composite quality score.
 
-    Weighting:
-        Profitability = 50%
-        Growth        = 30%
-        Valuation     = 20%
+    Profitability = 35%
+        ROE  15%
+        ROCE 10%
+        NPM  10%
 
-    The resulting composite score is on a 0–100 scale.
+    Cash Quality = 30%
+        FCF CAGR       15%
+        CFO/PAT        10%
+        FCF positive     5%
+
+    Growth = 20%
+        Revenue CAGR 5yr 10%
+        PAT CAGR 5yr     10%
+
+    Leverage = 15%
+        D/E  10%
+        ICR   5%
+
+    Numeric metrics are winsorized at P10/P90
+    before percentile scoring.
+
+    Final score is between 0 and 100.
     """
 
     result = df.copy()
 
     # --------------------------------------------------------------
-    # Profitability: 50%
+    # Profitability: 35%
     # --------------------------------------------------------------
 
-    result["profitability_roe_score"] = _percentile_score(
-        result["return_on_equity_pct"],
-        higher_is_better=True,
+    roe = _winsorize_p10_p90(
+        result["return_on_equity_pct"]
     )
 
-    result["profitability_roce_score"] = _percentile_score(
-        result["return_on_capital_employed_pct"],
-        higher_is_better=True,
+    roce = _winsorize_p10_p90(
+        result["return_on_capital_employed_pct"]
     )
 
-    result["profitability_margin_score"] = _percentile_score(
-        result["net_profit_margin_pct"],
-        higher_is_better=True,
+    npm = _winsorize_p10_p90(
+        result["net_profit_margin_pct"]
     )
 
-    result["profitability_score"] = _mean_available_scores(
-        result,
-        [
-            "profitability_roe_score",
-            "profitability_roce_score",
-            "profitability_margin_score",
-        ],
+    result["profitability_roe_score"] = (
+        _percentile_score(
+            roe,
+            higher_is_better=True,
+        )
+    )
+
+    result["profitability_roce_score"] = (
+        _percentile_score(
+            roce,
+            higher_is_better=True,
+        )
+    )
+
+    result["profitability_margin_score"] = (
+        _percentile_score(
+            npm,
+            higher_is_better=True,
+        )
+    )
+
+    result["profitability_score"] = (
+        result["profitability_roe_score"] * 15
+        + result["profitability_roce_score"] * 10
+        + result["profitability_margin_score"] * 10
+    ) / 35
+
+    # --------------------------------------------------------------
+    # Cash Quality: 30%
+    # --------------------------------------------------------------
+
+    # FCF CAGR is supplied from the full historical dataset by rank_screener_composite().
+    if "fcf_cagr_5yr" not in result.columns:
+        result["fcf_cagr_5yr"] = float("nan")
+    fcf_cagr = _winsorize_p10_p90(
+        result["fcf_cagr_5yr"]
+    )
+
+    result["cashflow_fcf_cagr_score"] = (
+        _percentile_score(
+            fcf_cagr,
+            higher_is_better=True,
+        )
+    )
+
+    pat = pd.to_numeric(
+        result["net_profit"],
+        errors="coerce",
+    )
+
+    cfo = pd.to_numeric(
+        result["cash_from_operations_cr"],
+        errors="coerce",
+    )
+
+    cfo_pat = pd.Series(
+        float("nan"),
+        index=result.index,
+        dtype="float64",
+    )
+
+    valid_pat = (
+        pat.notna()
+        & pat.ne(0)
+        & cfo.notna()
+    )
+
+    cfo_pat.loc[valid_pat] = (
+        cfo.loc[valid_pat]
+        / pat.loc[valid_pat]
+    )
+
+    result["cfo_pat_ratio"] = cfo_pat
+
+    cfo_pat_winsorized = _winsorize_p10_p90(
+        result["cfo_pat_ratio"]
+    )
+
+    result["cashflow_cfo_pat_score"] = (
+        _percentile_score(
+            cfo_pat_winsorized,
+            higher_is_better=True,
+        )
+    )
+
+    fcf_numeric = pd.to_numeric(
+        result["free_cash_flow_cr"],
+        errors="coerce",
+    )
+
+    result["fcf_positive_flag"] = (
+        fcf_numeric.gt(0)
+        .astype("float64")
+        .where(fcf_numeric.notna())
+    )
+
+    result["cashflow_fcf_positive_score"] = (
+        result["fcf_positive_flag"] * 100
+    )
+
+    cash_components = pd.DataFrame(
+        {
+            "fcf_cagr": result[
+                "cashflow_fcf_cagr_score"
+            ],
+            "cfo_pat": result[
+                "cashflow_cfo_pat_score"
+            ],
+            "fcf_positive": result[
+                "cashflow_fcf_positive_score"
+            ],
+        },
+        index=result.index,
+    )
+
+    cash_weights = pd.Series(
+        {
+            "fcf_cagr": 15,
+            "cfo_pat": 10,
+            "fcf_positive": 5,
+        }
+    )
+
+    cash_weighted = (
+        cash_components * cash_weights
+    )
+
+    cash_available = (
+        cash_components.notna()
+        * cash_weights
+    ).sum(axis=1)
+
+    result["cash_quality_score"] = (
+        cash_weighted.sum(axis=1)
+        / cash_available
+    ).where(
+        cash_available.gt(0),
+        float("nan"),
+    )
+
+    # Existing name retained for compatibility.
+    result["cashflow_score"] = (
+        result["cash_quality_score"]
     )
 
     # --------------------------------------------------------------
-    # Growth: 30%
+    # Growth: 20%
     # --------------------------------------------------------------
 
-    result["growth_revenue_score"] = _percentile_score(
-        result["revenue_cagr_5yr"],
-        higher_is_better=True,
+    revenue_growth = _winsorize_p10_p90(
+        result["revenue_cagr_5yr"]
     )
 
-    result["growth_pat_score"] = _percentile_score(
-        result["pat_cagr_5yr"],
-        higher_is_better=True,
+    pat_growth = _winsorize_p10_p90(
+        result["pat_cagr_5yr"]
     )
 
-    result["growth_score"] = _mean_available_scores(
-        result,
-        [
-            "growth_revenue_score",
-            "growth_pat_score",
-        ],
+    result["growth_revenue_score"] = (
+        _percentile_score(
+            revenue_growth,
+            higher_is_better=True,
+        )
+    )
+
+    result["growth_pat_score"] = (
+        _percentile_score(
+            pat_growth,
+            higher_is_better=True,
+        )
+    )
+
+    growth_components = pd.DataFrame(
+        {
+            "revenue": result[
+                "growth_revenue_score"
+            ],
+            "pat": result[
+                "growth_pat_score"
+            ],
+        },
+        index=result.index,
+    )
+
+    growth_weights = pd.Series(
+        {
+            "revenue": 10,
+            "pat": 10,
+        }
+    )
+
+    growth_weighted = (
+        growth_components * growth_weights
+    )
+
+    growth_available = (
+        growth_components.notna()
+        * growth_weights
+    ).sum(axis=1)
+
+    result["growth_score"] = (
+        growth_weighted.sum(axis=1)
+        / growth_available
+    ).where(
+        growth_available.gt(0),
+        float("nan"),
     )
 
     # --------------------------------------------------------------
-    # Valuation: 20%
-    #
-    # Lower P/E, P/B and EV/EBITDA are considered better.
+    # Leverage: 15%
     # --------------------------------------------------------------
 
-    result["valuation_pe_score"] = _percentile_score(
-        result["pe_ratio"],
-        higher_is_better=False,
+    debt_to_equity = _winsorize_p10_p90(
+        result["debt_to_equity"]
     )
 
-    result["valuation_pb_score"] = _percentile_score(
-        result["pb_ratio"],
-        higher_is_better=False,
+    interest_coverage = _winsorize_p10_p90(
+        result["interest_coverage"]
     )
 
-    result["valuation_ev_ebitda_score"] = _percentile_score(
-        result["ev_ebitda"],
-        higher_is_better=False,
+    result["leverage_de_score"] = (
+        _percentile_score(
+            debt_to_equity,
+            higher_is_better=False,
+        )
     )
 
-    result["valuation_score"] = _mean_available_scores(
-        result,
-        [
-            "valuation_pe_score",
-            "valuation_pb_score",
-            "valuation_ev_ebitda_score",
-        ],
+    result["leverage_icr_score"] = (
+        _percentile_score(
+            interest_coverage,
+            higher_is_better=True,
+        )
+    )
+
+    leverage_components = pd.DataFrame(
+        {
+            "de": result[
+                "leverage_de_score"
+            ],
+            "icr": result[
+                "leverage_icr_score"
+            ],
+        },
+        index=result.index,
+    )
+
+    leverage_weights = pd.Series(
+        {
+            "de": 10,
+            "icr": 5,
+        }
+    )
+
+    leverage_weighted = (
+        leverage_components * leverage_weights
+    )
+
+    leverage_available = (
+        leverage_components.notna()
+        * leverage_weights
+    ).sum(axis=1)
+
+    result["leverage_score"] = (
+        leverage_weighted.sum(axis=1)
+        / leverage_available
+    ).where(
+        leverage_available.gt(0),
+        float("nan"),
     )
 
     # --------------------------------------------------------------
-    # Final weighted score.
+    # Final weighted score: 100%
     # --------------------------------------------------------------
 
-    components = [
-        "profitability_score",
-        "growth_score",
-        "valuation_score",
-    ]
-
-    weighted_values = result[components].copy()
-
-    weights = {
-        "profitability_score": 0.50,
-        "growth_score": 0.30,
-        "valuation_score": 0.20,
-    }
-
-    weighted_sum = sum(
-        weighted_values[column] * weight
-        for column, weight in weights.items()
+    components = pd.DataFrame(
+        {
+            "profitability": result[
+                "profitability_score"
+            ],
+            "cash_quality": result[
+                "cash_quality_score"
+            ],
+            "growth": result[
+                "growth_score"
+            ],
+            "leverage": result[
+                "leverage_score"
+            ],
+        },
+        index=result.index,
     )
 
-    available_weight = sum(
-        weights[column]
-        * weighted_values[column].notna()
-        for column in components
+    weights = pd.Series(
+        {
+            "profitability": 35,
+            "cash_quality": 30,
+            "growth": 20,
+            "leverage": 15,
+        }
     )
+
+    weighted = components * weights
+
+    available_weight = (
+        components.notna() * weights
+    ).sum(axis=1)
 
     result["composite_score"] = (
-        weighted_sum
+        weighted.sum(axis=1)
         / available_weight
     ).where(
         available_weight.gt(0),
-        pd.NA,
+        float("nan"),
     )
 
-    result["composite_score"] = result[
-        "composite_score"
-    ].clip(
-        lower=0,
-        upper=100,
+    result["composite_score"] = (
+        result["composite_score"]
+        .clip(
+            lower=0,
+            upper=100,
+        )
     )
 
     return result
-
 
 def add_sector_relative_scores(df):
     """
@@ -669,16 +1036,23 @@ def rank_screener_composite(
     if results.empty:
         return results
 
-    # Attach sector information.
-    sectors = load_sector_data()
+        # Attach sector information only when it is not already present.
+    if "broad_sector" not in results.columns:
+        sectors = load_sector_data()
 
-    results = results.merge(
-        sectors,
-        on="company_id",
-        how="left",
-        validate="many_to_one",
-    )
-
+        results = results.merge(
+            sectors,
+            on="company_id",
+            how="left",
+            validate="many_to_one",
+        )
+    # Calculate historical 5-year FCF CAGR from the full dataset before composite scoring.
+    historical = load_data(data_path=data_path)
+    historical_fcf_cagr = _calculate_historical_fcf_cagr(historical)
+    historical_with_cagr = historical[["company_id"]].copy()
+    historical_with_cagr["fcf_cagr_5yr"] = historical_fcf_cagr.to_numpy()
+    company_fcf_cagr = historical_with_cagr.dropna(subset=["fcf_cagr_5yr"]).groupby("company_id")["fcf_cagr_5yr"].first()
+    results["fcf_cagr_5yr"] = results["company_id"].map(company_fcf_cagr)
     # Composite score.
     results = calculate_composite_score(
         results
@@ -744,7 +1118,7 @@ def rank_screener_latest_composite(
 
 
 # ------------------------------------------------------------------
-# D17 — EXPORT
+# D17 â€” EXPORT
 # ------------------------------------------------------------------
 
 
@@ -893,17 +1267,31 @@ def export_all_screeners(
             config = load_config(
                 config_path
             )
-
             expected_range = config[
                 "screeners"
             ][name].get(
-                "expected_count_range",
-                [10, 25],
+                "expected_company_count",
+                "10-25",
             )
+
+            # Config stores expected counts as "minimum-maximum".
+            if isinstance(expected_range, str):
+                parts = expected_range.split("-")
+                if len(parts) != 2:
+                    raise ValueError(
+                        f"Invalid expected_company_count for '{name}': "
+                        f"{expected_range}"
+                    )
+
+                min_count = int(parts[0].strip())
+                max_count = int(parts[1].strip())
+            else:
+                min_count = int(expected_range[0])
+                max_count = int(expected_range[1])
 
             top_n = max(
                 20,
-                int(expected_range[1]),
+                max_count,
             )
 
             results = results.head(
@@ -953,6 +1341,65 @@ def export_all_screeners(
             worksheet.auto_filter.ref = (
                 worksheet.dimensions
             )
+
+            # Colour-code cells according to the preset thresholds.
+            green_fill = PatternFill(
+                fill_type="solid",
+                fgColor="C6EFCE",
+            )
+            red_fill = PatternFill(
+                fill_type="solid",
+                fgColor="FFC7CE",
+            )
+
+            filter_config = config["screeners"][name].get(
+                "filters",
+                [],
+            )
+
+            header_map = {
+                cell.value: cell.column
+                for cell in worksheet[1]
+            }
+
+            for item in filter_config:
+                metric = item["metric"]
+                operator = item["operator"]
+                threshold = item["value"]
+
+                if metric not in header_map:
+                    continue
+
+                column = header_map[metric]
+
+                for row in range(2, worksheet.max_row + 1):
+                    cell = worksheet.cell(
+                        row=row,
+                        column=column,
+                    )
+
+                    if cell.value is None:
+                        continue
+
+                    try:
+                        actual = float(cell.value)
+                        expected = float(threshold)
+                    except (TypeError, ValueError):
+                        continue
+
+                    passed = {
+                        ">": actual > expected,
+                        ">=": actual >= expected,
+                        "<": actual < expected,
+                        "<=": actual <= expected,
+                        "==": actual == expected,
+                        "!=": actual != expected,
+                    }.get(operator)
+
+                    if passed is True:
+                        cell.fill = green_fill
+                    elif passed is False:
+                        cell.fill = red_fill
 
             for column_cells in worksheet.columns:
 
@@ -1090,3 +1537,5 @@ if __name__ == "__main__":
         print(
             f"EXPORT ERROR: {exc}"
         )
+
+

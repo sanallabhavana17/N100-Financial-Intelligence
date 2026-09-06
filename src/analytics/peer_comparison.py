@@ -26,9 +26,9 @@ Requirements:
 from pathlib import Path
 
 import pandas as pd
+import sqlite3
 from openpyxl import load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-from openpyxl.formatting.rule import ColorScaleRule
 from openpyxl.utils import get_column_letter
 
 
@@ -65,6 +65,7 @@ MAX_EXCEL_SHEET_NAME_LENGTH = 31
 DISPLAY_COLUMNS = [
     "peer_group_name",
     "company_id",
+    "company_name",
     "year",
     "is_benchmark",
     "peer_rank",
@@ -75,35 +76,29 @@ DISPLAY_COLUMNS = [
     "vs_benchmark_percentile",
     "above_benchmark",
 
-    # Financial metrics
+    # Required 10 financial metrics
     "return_on_equity_pct",
     "return_on_capital_employed_pct",
-    "return_on_assets_pct",
     "net_profit_margin_pct",
-    "operating_profit_margin_pct",
     "debt_to_equity",
-    "interest_coverage",
-    "revenue_cagr_5yr",
-    "pat_cagr_5yr",
-    "eps_cagr_5yr",
     "free_cash_flow_cr",
+    "pat_cagr_5yr",
+    "revenue_cagr_5yr",
+    "eps_cagr_5yr",
+    "interest_coverage",
     "asset_turnover",
-    "composite_quality_score",
 
-    # Percentile metrics
+    # Required 10 percentile metrics
     "return_on_equity_pct_percentile",
     "return_on_capital_employed_pct_percentile",
-    "return_on_assets_pct_percentile",
     "net_profit_margin_pct_percentile",
-    "operating_profit_margin_pct_percentile",
     "debt_to_equity_percentile",
-    "interest_coverage_percentile",
-    "revenue_cagr_5yr_percentile",
-    "pat_cagr_5yr_percentile",
-    "eps_cagr_5yr_percentile",
     "free_cash_flow_cr_percentile",
+    "pat_cagr_5yr_percentile",
+    "revenue_cagr_5yr_percentile",
+    "eps_cagr_5yr_percentile",
+    "interest_coverage_percentile",
     "asset_turnover_percentile",
-    "composite_quality_score_percentile",
 ]
 
 
@@ -142,6 +137,40 @@ THIN_BORDER = Border(
         color="D9E1F2"
     )
 )
+
+
+# ============================================================
+# COMPANY NAMES
+# ============================================================
+
+def add_company_names(df):
+    """Add company names from the SQLite companies table."""
+
+    db_file = BASE_DIR / "data" / "nifty100.db"
+
+    with sqlite3.connect(db_file) as conn:
+        companies = pd.read_sql_query(
+            """
+            SELECT id AS company_id, company_name
+            FROM companies
+            """,
+            conn,
+        )
+
+    result = df.merge(
+        companies,
+        on="company_id",
+        how="left",
+    )
+
+    result["company_name"] = (
+        result["company_name"]
+        .fillna(result["company_id"])
+        .astype(str)
+        .str.strip()
+    )
+
+    return result
 
 
 # ============================================================
@@ -333,6 +362,43 @@ def write_peer_sheet(
             ascending=ascending
         )
 
+    # Add a median row for the peer group.
+    numeric_columns = [
+        column
+        for column in sheet_df.columns
+        if column not in {
+            "peer_group_name",
+            "company_id",
+            "company_name",
+            "is_benchmark",
+            "benchmark_company_id",
+            "above_benchmark",
+        }
+    ]
+
+    median_row = {
+        column: ""
+        for column in sheet_df.columns
+    }
+
+    median_row["peer_group_name"] = peer_group
+    median_row["company_id"] = "MEDIAN"
+    median_row["company_name"] = "Peer Group Median"
+
+    for column in numeric_columns:
+        median_row[column] = pd.to_numeric(
+            sheet_df[column],
+            errors="coerce",
+        ).median()
+
+    sheet_df = pd.concat(
+        [
+            sheet_df,
+            pd.DataFrame([median_row]),
+        ],
+        ignore_index=True,
+    )
+
     # Write data starting at row 4.
     sheet_df.to_excel(
         writer,
@@ -522,8 +588,12 @@ def format_workbook(
                         ).fill = BENCHMARK_FILL
 
         # ----------------------------------------------------
-        # Conditional formatting for percentile columns
+        # Exact percentile bands
         # ----------------------------------------------------
+
+        from openpyxl.formatting.rule import (
+            CellIsRule,
+        )
 
         percentile_columns = []
 
@@ -538,31 +608,76 @@ def format_workbook(
                     cell.column
                 )
 
+        green_fill = PatternFill(
+            fill_type="solid",
+            fgColor="C6EFCE",
+        )
+
+        yellow_fill = PatternFill(
+            fill_type="solid",
+            fgColor="FFEB9C",
+        )
+
+        red_fill = PatternFill(
+            fill_type="solid",
+            fgColor="FFC7CE",
+        )
+
+        green_font = Font(
+            color="006100",
+        )
+
+        yellow_font = Font(
+            color="9C6500",
+        )
+
+        red_font = Font(
+            color="9C0006",
+        )
+
+        # Exclude the final median row from conditional formatting.
+        last_company_row = ws.max_row - 1
+
         for column_number in percentile_columns:
 
-            column_letter = (
-                get_column_letter(
-                    column_number
-                )
+            column_letter = get_column_letter(
+                column_number
             )
 
             cell_range = (
                 f"{column_letter}"
                 f"{header_row + 1}:"
                 f"{column_letter}"
-                f"{ws.max_row}"
+                f"{last_company_row}"
             )
 
             ws.conditional_formatting.add(
                 cell_range,
-                ColorScaleRule(
-                    start_type="min",
-                    start_color="F8696B",
-                    mid_type="percentile",
-                    mid_value=50,
-                    mid_color="FFEB84",
-                    end_type="max",
-                    end_color="63BE7B"
+                CellIsRule(
+                    operator="greaterThanOrEqual",
+                    formula=["75"],
+                    fill=green_fill,
+                    font=green_font,
+                )
+            )
+
+            ws.conditional_formatting.add(
+                cell_range,
+                CellIsRule(
+                    operator="between",
+                    formula=["25", "74.999999"],
+                    fill=yellow_fill,
+                    font=yellow_font,
+                )
+            )
+
+            ws.conditional_formatting.add(
+                cell_range,
+                CellIsRule(
+                    operator="lessThanOrEqual",
+                    formula=["25"],
+                    fill=red_fill,
+                    font=red_font,
                 )
             )
 
@@ -693,6 +808,9 @@ def main():
     # --------------------------------------------------------
 
     df = load_peer_data()
+
+    # Add company names from the master company table.
+    df = add_company_names(df)
 
     # --------------------------------------------------------
     # 2. Prepare data

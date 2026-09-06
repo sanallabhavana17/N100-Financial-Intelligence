@@ -396,6 +396,116 @@ def add_benchmark_comparison(df):
 
 
 # ============================================================
+# SQLITE PERSISTENCE
+# ============================================================
+
+def save_percentiles_to_sqlite(df):
+    """
+    Save the 10 required peer metrics and their percentile ranks
+    into the Sprint 3 peer_percentiles SQLite table.
+    """
+
+    required_metrics = [
+        "return_on_equity_pct",
+        "return_on_capital_employed_pct",
+        "net_profit_margin_pct",
+        "debt_to_equity",
+        "free_cash_flow_cr",
+        "pat_cagr_5yr",
+        "revenue_cagr_5yr",
+        "eps_cagr_5yr",
+        "interest_coverage",
+        "asset_turnover",
+    ]
+
+    rows = []
+
+    for metric in required_metrics:
+        percentile_column = f"{metric}_percentile"
+
+        metric_rows = df[
+            [
+                "company_id",
+                "peer_group_name",
+                "year",
+                metric,
+                percentile_column,
+            ]
+        ].copy()
+
+        metric_rows = metric_rows.rename(
+            columns={
+                metric: "value",
+                percentile_column: "percentile_rank",
+            }
+        )
+
+        metric_rows["metric"] = metric
+
+        rows.append(
+            metric_rows[
+                [
+                    "company_id",
+                    "peer_group_name",
+                    "metric",
+                    "value",
+                    "percentile_rank",
+                    "year",
+                ]
+            ]
+        )
+
+    sqlite_output = pd.concat(
+        rows,
+        ignore_index=True,
+    )
+
+    sqlite_output = sqlite_output.dropna(
+        subset=["company_id", "peer_group_name", "year"]
+    )
+
+    with sqlite3.connect(DB_PATH) as conn:
+
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS peer_percentiles (
+                company_id TEXT NOT NULL,
+                peer_group_name TEXT NOT NULL,
+                metric TEXT NOT NULL,
+                value REAL,
+                percentile_rank REAL,
+                year INTEGER NOT NULL
+            )
+            """
+        )
+
+        conn.execute(
+            "DELETE FROM peer_percentiles"
+        )
+
+        sqlite_output.to_sql(
+            "peer_percentiles",
+            conn,
+            if_exists="append",
+            index=False,
+        )
+
+        conn.execute(
+            """
+            CREATE INDEX IF NOT EXISTS
+            idx_peer_percentiles_lookup
+            ON peer_percentiles
+            (company_id, peer_group_name, metric, year)
+            """
+        )
+
+    print(
+        f"SQLite peer_percentiles rows saved: "
+        f"{len(sqlite_output)}"
+    )
+
+
+# ============================================================
 # OUTPUT FORMATTING
 # ============================================================
 
@@ -666,6 +776,9 @@ def main():
         OUTPUT_FILE,
         index=False,
     )
+
+    # Save required peer percentile metrics to SQLite.
+    save_percentiles_to_sqlite(df)
 
     # --------------------------------------------------------
     # Final summary

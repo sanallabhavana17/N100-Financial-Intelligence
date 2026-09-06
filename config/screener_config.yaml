@@ -1,0 +1,106 @@
+﻿# N100 Financial Intelligence Platform
+# Sprint 3 — Screener Configuration
+
+screeners:
+
+  quality_compounder:
+    description: "High profitability, low leverage, positive FCF and consistent revenue growth"
+    ranking_metric: composite_quality_score
+    ranking_order: desc
+    expected_company_count: "15-35"
+    filters:
+      - metric: return_on_equity_pct
+        operator: ">"
+        value: 15
+      - metric: debt_to_equity
+        operator: "<"
+        value: 1.0
+      - metric: free_cash_flow_cr
+        operator: ">"
+        value: 0
+      - metric: revenue_cagr_5yr
+        operator: ">"
+        value: 10
+
+  value_pick:
+    description: "Reasonable valuation with moderate leverage and dividend yield"
+    ranking_metric: fcf_yield
+    ranking_order: desc
+    expected_company_count: "10-25"
+    filters:
+      - metric: pe_ratio
+        operator: "<"
+        value: 20
+      - metric: pb_ratio
+        operator: "<"
+        value: 3.0
+      - metric: debt_to_equity
+        operator: "<"
+        value: 2.0
+      - metric: dividend_yield_pct
+        operator: ">"
+        value: 1
+
+  growth_accelerator:
+    description: "Strong five-year profit and revenue growth with controlled leverage"
+    ranking_metric: pat_cagr_5yr
+    ranking_order: desc
+    expected_company_count: "8-20"
+    filters:
+      - metric: pat_cagr_5yr
+        operator: ">"
+        value: 20
+      - metric: revenue_cagr_5yr
+        operator: ">"
+        value: 15
+      - metric: debt_to_equity
+        operator: "<"
+        value: 2.0
+
+  dividend_champion:
+    description: "Strong dividend yield, sustainable payout and positive free cash flow"
+    ranking_metric: dividend_yield_pct
+    ranking_order: desc
+    expected_company_count: "10-20"
+    filters:
+      - metric: dividend_yield_pct
+        operator: ">"
+        value: 2
+      - metric: dividend_payout_ratio_pct
+        operator: "<"
+        value: 80
+      - metric: free_cash_flow_cr
+        operator: ">"
+        value: 0
+
+  debt_free_blue_chip:
+    description: "Debt-free companies with strong ROE and substantial revenue"
+    ranking_metric: return_on_equity_pct
+    ranking_order: desc
+    expected_company_count: "15-30"
+    filters:
+      - metric: debt_to_equity
+        operator: "=="
+        value: 0
+      - metric: return_on_equity_pct
+        operator: ">"
+        value: 12
+      - metric: revenue_cr
+        operator: ">"
+        value: 5000
+
+  turnaround_watch:
+    description: "Companies showing revenue growth, positive latest FCF and improving leverage"
+    ranking_metric: revenue_cagr_3yr
+    ranking_order: desc
+    expected_company_count: "5-15"
+    filters:
+      - metric: revenue_cagr_3yr
+        operator: ">"
+        value: 10
+      - metric: free_cash_flow_cr
+        operator: ">"
+        value: 0
+
+custom:
+  filters: []

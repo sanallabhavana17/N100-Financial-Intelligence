@@ -1,4 +1,5 @@
-from pathlib import Path
+﻿from pathlib import Path
+import sqlite3
 
 import pandas as pd
 import pytest
@@ -13,6 +14,8 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 
 PEER_CSV = BASE_DIR / "output" / "peer_percentile_table.csv"
 PEER_XLSX = BASE_DIR / "output" / "peer_comparison.xlsx"
+DB_FILE = BASE_DIR / "data" / "nifty100.db"
+RADAR_DIR = BASE_DIR / "reports" / "radar_charts"
 
 
 # ============================================================
@@ -21,6 +24,7 @@ PEER_XLSX = BASE_DIR / "output" / "peer_comparison.xlsx"
 
 EXPECTED_PEER_GROUPS = 11
 EXPECTED_ROWS = 659
+EXPECTED_RADAR_CHARTS = 92
 
 EXPECTED_PEER_GROUP_NAMES = {
     "Automobiles",
@@ -34,6 +38,19 @@ EXPECTED_PEER_GROUP_NAMES = {
     "Private Banks",
     "Public Sector Banks",
     "Steel",
+}
+
+EXPECTED_PEER_METRICS = {
+    "return_on_equity_pct",
+    "return_on_capital_employed_pct",
+    "net_profit_margin_pct",
+    "debt_to_equity",
+    "free_cash_flow_cr",
+    "pat_cagr_5yr",
+    "revenue_cagr_5yr",
+    "eps_cagr_5yr",
+    "interest_coverage",
+    "asset_turnover",
 }
 
 
@@ -100,11 +117,10 @@ def test_peer_csv_required_columns(peer_data):
 
 def test_peer_percentiles_are_valid(peer_data):
     """
-    Validate genuine percentile columns.
+    Genuine percentile columns must remain within 0-100.
 
-    vs_benchmark_percentile is intentionally excluded because
-    it represents the difference versus the benchmark and can
-    legitimately contain negative values.
+    vs_benchmark_percentile is excluded because it represents
+    difference versus benchmark and may legitimately be negative.
     """
 
     percentile_columns = [
@@ -179,7 +195,6 @@ def test_peer_excel_has_11_sheets():
 
     try:
         assert len(workbook.sheetnames) == EXPECTED_PEER_GROUPS
-
         assert set(workbook.sheetnames) == EXPECTED_PEER_GROUP_NAMES
     finally:
         workbook.close()
@@ -200,14 +215,176 @@ def test_peer_excel_has_659_data_rows():
             worksheet = workbook[sheet_name]
 
             # Row 4 contains the header.
+            # The final median row is intentionally excluded.
             data_rows = max(
-                worksheet.max_row - 4,
+                worksheet.max_row - 5,
                 0,
             )
 
             total_rows += data_rows
 
         assert total_rows == EXPECTED_ROWS
+
+    finally:
+        workbook.close()
+
+
+# ============================================================
+# ADDITIONAL SPRINT 3 DQ TESTS
+# ============================================================
+
+def test_sqlite_peer_percentiles_has_required_metrics():
+    assert DB_FILE.exists()
+
+    connection = sqlite3.connect(DB_FILE)
+
+    try:
+        rows = connection.execute(
+            """
+            SELECT DISTINCT metric
+            FROM peer_percentiles
+            ORDER BY metric
+            """
+        ).fetchall()
+
+        metrics = {row[0] for row in rows}
+
+        assert metrics == EXPECTED_PEER_METRICS
+        assert len(metrics) == 10
+
+    finally:
+        connection.close()
+
+
+def test_sqlite_peer_percentiles_integrity():
+    assert DB_FILE.exists()
+
+    connection = sqlite3.connect(DB_FILE)
+
+    try:
+        total_rows = connection.execute(
+            "SELECT COUNT(*) FROM peer_percentiles"
+        ).fetchone()[0]
+
+        peer_groups = connection.execute(
+            "SELECT COUNT(DISTINCT peer_group_name) FROM peer_percentiles"
+        ).fetchone()[0]
+
+        companies = connection.execute(
+            "SELECT COUNT(DISTINCT company_id) FROM peer_percentiles"
+        ).fetchone()[0]
+
+        years = connection.execute(
+            "SELECT COUNT(DISTINCT year) FROM peer_percentiles"
+        ).fetchone()[0]
+
+        invalid_percentiles = connection.execute(
+            """
+            SELECT COUNT(*)
+            FROM peer_percentiles
+            WHERE percentile_rank IS NOT NULL
+              AND (
+                    percentile_rank < 0
+                    OR percentile_rank > 100
+                  )
+            """
+        ).fetchone()[0]
+
+        assert total_rows == 6590
+        assert peer_groups == 11
+        assert companies == 56
+        assert years >= 1
+        assert invalid_percentiles == 0
+
+    finally:
+        connection.close()
+
+
+def test_radar_chart_outputs():
+    assert RADAR_DIR.exists(), (
+        f"Radar chart directory not found: {RADAR_DIR}"
+    )
+
+    radar_files = list(
+        RADAR_DIR.glob("*_radar.png")
+    )
+
+    assert len(radar_files) == EXPECTED_RADAR_CHARTS
+
+    company_ids = {
+        file.stem.removesuffix("_radar")
+        for file in radar_files
+    }
+
+    assert len(company_ids) == EXPECTED_RADAR_CHARTS
+
+
+def test_peer_excel_required_metrics_and_median_rows():
+    assert PEER_XLSX.exists()
+
+    workbook = load_workbook(
+        PEER_XLSX,
+        read_only=True,
+        data_only=True,
+    )
+
+    try:
+        required_metric_columns = EXPECTED_PEER_METRICS
+        found_median_rows = 0
+
+        for sheet_name in workbook.sheetnames:
+            worksheet = workbook[sheet_name]
+
+            headers = [
+                cell.value
+                for cell in worksheet[4]
+            ]
+
+            header_set = set(headers)
+
+            missing_metrics = (
+                required_metric_columns - header_set
+            )
+
+            assert not missing_metrics, (
+                f"{sheet_name}: missing metrics "
+                f"{sorted(missing_metrics)}"
+            )
+
+            percentile_metric_columns = {
+                header
+                for header in headers
+                if isinstance(header, str)
+                and header.endswith("_percentile")
+                and header.replace(
+                    "_percentile",
+                    "",
+                ) in required_metric_columns
+            }
+
+            assert len(percentile_metric_columns) == 10, (
+                f"{sheet_name}: expected 10 metric percentile "
+                f"columns, found {len(percentile_metric_columns)}"
+            )
+
+            median_found = False
+
+            for row in worksheet.iter_rows(
+                min_row=5,
+                values_only=True,
+            ):
+                if len(row) >= 2 and row[1] == "MEDIAN":
+                    median_found = True
+                    assert row[2] == "Peer Group Median"
+                    break
+
+            assert median_found, (
+                f"{sheet_name}: median row not found"
+            )
+
+            found_median_rows += 1
+
+        assert found_median_rows == EXPECTED_PEER_GROUPS
 
     finally:
         workbook.close()

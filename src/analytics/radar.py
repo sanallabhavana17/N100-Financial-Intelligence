@@ -1,4 +1,4 @@
-"""
+﻿"""
 NIFTY100 FINANCIAL INTELLIGENCE
 SPRINT 3 - DAY 19
 RADAR CHART MODULE
@@ -54,7 +54,7 @@ INPUT_FILE = BASE_DIR / "output" / "final_financial_ratios.csv"
 PEER_FILE = BASE_DIR / "output" / "peer_percentile_table.csv"
 
 RADAR_DATA_FILE = BASE_DIR / "output" / "radar_chart_data.csv"
-RADAR_DIR = BASE_DIR / "output" / "radar_charts"
+RADAR_DIR = BASE_DIR / "reports" / "radar_charts"
 
 
 # ============================================================
