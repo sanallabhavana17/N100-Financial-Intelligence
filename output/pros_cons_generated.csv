@@ -1,0 +1,758 @@
+company_id,type,rule_id,text,confidence_pct
+ABB,Con,CON_12,"Revenue CAGR is the weakest among the available core financial metrics, at 9.72%. This deserves monitoring.",65
+ABB,Pro,PRO_05,ROCE of 38.4% indicates efficient deployment of operating capital.,98
+ABB,Pro,PRO_04,ROE of 32.5% indicates efficient use of shareholder capital.,96
+ABB,Pro,PRO_06,ROA of 23.1% indicates productive use of the company's asset base.,95
+ABB,Pro,PRO_08,Interest coverage of 141.75x provides a strong buffer for interest payments.,95
+ABB,Pro,PRO_07,Low debt-to-equity of 0.02 indicates a relatively conservative capital structure.,94
+ABB,Pro,PRO_02,Strong 5-year profit growth of 21.7% shows good earnings expansion.,87
+ABB,Pro,PRO_03,"EPS grew at 21.7% over 5 years, supporting improving shareholder earnings.",87
+ABB,Pro,PRO_09,"CFO/PAT ratio of 1.01x is classified as High Quality, indicating strong cash backing for earnings.",78
+ADANIENSOL,Con,CON_10,CapEx intensity of 29.8% indicates a capital-intensive business model.,95
+ADANIENSOL,Con,CON_06,Debt-to-equity of 2.93 indicates higher financial leverage.,90
+ADANIENSOL,Con,CON_04,"ROE of 9.5% is relatively low, indicating weaker returns on shareholder capital.",73
+ADANIENSOL,Pro,PRO_09,"CFO/PAT ratio of 5.05x is classified as High Quality, indicating strong cash backing for earnings.",98
+ADANIENSOL,Pro,PRO_01,Strong 5-year revenue growth of 17.9% indicates healthy business expansion.,83
+ADANIENSOL,Pro,PRO_02,Strong 5-year profit growth of 16.4% shows good earnings expansion.,81
+ADANIENT,Con,CON_09,"Free cash flow is negative at -8455.00 crore, which can constrain internally generated funding.",86
+ADANIENT,Con,CON_10,CapEx intensity of 19.5% indicates a capital-intensive business model.,86
+ADANIENT,Con,CON_06,Debt-to-equity of 1.67 indicates higher financial leverage.,83
+ADANIENT,Con,CON_04,"ROE of 8.5% is relatively low, indicating weaker returns on shareholder capital.",75
+ADANIENT,Pro,PRO_02,Strong 5-year profit growth of 45.8% shows good earnings expansion.,98
+ADANIENT,Pro,PRO_09,"CFO/PAT ratio of 3.09x is classified as High Quality, indicating strong cash backing for earnings.",98
+ADANIENT,Pro,PRO_03,"EPS grew at 32.0% over 5 years, supporting improving shareholder earnings.",97
+ADANIENT,Pro,PRO_01,Strong 5-year revenue growth of 19.0% indicates healthy business expansion.,84
+ADANIGREEN,Con,CON_06,Debt-to-equity of 6.60 indicates higher financial leverage.,95
+ADANIGREEN,Con,CON_10,CapEx intensity of 228.4% indicates a capital-intensive business model.,95
+ADANIGREEN,Con,CON_11,"The company is flagged for high leverage, which increases financial risk.",92
+ADANIGREEN,Con,CON_09,"Free cash flow is negative at -13347.00 crore, which can constrain internally generated funding.",86
+ADANIGREEN,Con,CON_07,Interest coverage of 1.71x provides a limited buffer for interest payments.,82
+ADANIGREEN,Con,CON_05,"ROCE of 9.8% is relatively low, indicating weaker capital efficiency.",72
+ADANIGREEN,Pro,PRO_01,Strong 5-year revenue growth of 35.0% indicates healthy business expansion.,98
+ADANIGREEN,Pro,PRO_09,"CFO/PAT ratio of 6.12x is classified as High Quality, indicating strong cash backing for earnings.",98
+ADANIPORTS,Con,CON_10,CapEx intensity of 25.3% indicates a capital-intensive business model.,92
+ADANIPORTS,Pro,PRO_09,"CFO/PAT ratio of 1.85x is classified as High Quality, indicating strong cash backing for earnings.",87
+ADANIPORTS,Pro,PRO_01,Strong 5-year revenue growth of 19.6% indicates healthy business expansion.,85
+ADANIPORTS,Pro,PRO_08,Interest coverage of 5.95x provides a strong buffer for interest payments.,81
+ADANIPORTS,Pro,PRO_11,Dividend payout of 16.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+ADANIPORTS,Pro,PRO_04,ROE of 15.4% indicates efficient use of shareholder capital.,71
+ADANIPORTS,Pro,PRO_05,ROCE of 15.2% indicates efficient deployment of operating capital.,70
+ADANIPOWER,Con,CON_12,"Revenue CAGR is the weakest among the available core financial metrics, at 16.09%. This deserves monitoring.",65
+ADANIPOWER,Pro,PRO_04,ROE of 48.3% indicates efficient use of shareholder capital.,98
+ADANIPOWER,Pro,PRO_06,ROA of 22.6% indicates productive use of the company's asset base.,95
+ADANIPOWER,Pro,PRO_05,ROCE of 23.4% indicates efficient deployment of operating capital.,83
+ADANIPOWER,Pro,PRO_08,Interest coverage of 8.30x provides a strong buffer for interest payments.,83
+ADANIPOWER,Pro,PRO_01,Strong 5-year revenue growth of 16.1% indicates healthy business expansion.,81
+ADANIPOWER,Pro,PRO_10,FCF conversion of 96.8% indicates good conversion of operating profit into free cash flow.,78
+AMBUJACEM,Con,CON_10,CapEx intensity of 27.0% indicates a capital-intensive business model.,94
+AMBUJACEM,Con,CON_09,"Free cash flow is negative at -3295.00 crore, which can constrain internally generated funding.",86
+AMBUJACEM,Con,CON_01,"5-year revenue growth is only 4.1%, indicating weak business expansion.",78
+AMBUJACEM,Pro,PRO_08,Interest coverage of 28.26x provides a strong buffer for interest payments.,95
+AMBUJACEM,Pro,PRO_07,Low debt-to-equity of 0.02 indicates a relatively conservative capital structure.,94
+AMBUJACEM,Pro,PRO_09,"CFO/PAT ratio of 1.19x is classified as High Quality, indicating strong cash backing for earnings.",80
+AMBUJACEM,Pro,PRO_11,Dividend payout of 12.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+AMBUJACEM,Pro,PRO_05,ROCE of 15.2% indicates efficient deployment of operating capital.,70
+APOLLOHOSP,Con,CON_10,CapEx intensity of 8.1% indicates a capital-intensive business model.,75
+APOLLOHOSP,Pro,PRO_02,Strong 5-year profit growth of 36.1% shows good earnings expansion.,98
+APOLLOHOSP,Pro,PRO_03,"EPS grew at 30.0% over 5 years, supporting improving shareholder earnings.",95
+APOLLOHOSP,Pro,PRO_09,"CFO/PAT ratio of 2.05x is classified as High Quality, indicating strong cash backing for earnings.",89
+APOLLOHOSP,Pro,PRO_08,Interest coverage of 5.57x provides a strong buffer for interest payments.,81
+APOLLOHOSP,Pro,PRO_05,ROCE of 19.5% indicates efficient deployment of operating capital.,77
+APOLLOHOSP,Pro,PRO_11,Dividend payout of 26.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+ASIANPAINT,Con,CON_12,"Revenue CAGR is the weakest among the available core financial metrics, at 13.03%. This deserves monitoring.",65
+ASIANPAINT,Pro,PRO_05,ROCE of 35.8% indicates efficient deployment of operating capital.,98
+ASIANPAINT,Pro,PRO_08,Interest coverage of 41.00x provides a strong buffer for interest payments.,95
+ASIANPAINT,Pro,PRO_04,ROE of 29.7% indicates efficient use of shareholder capital.,92
+ASIANPAINT,Pro,PRO_06,ROA of 18.6% indicates productive use of the company's asset base.,91
+ASIANPAINT,Pro,PRO_07,Low debt-to-equity of 0.13 indicates a relatively conservative capital structure.,91
+ASIANPAINT,Pro,PRO_03,"EPS grew at 21.0% over 5 years, supporting improving shareholder earnings.",86
+ASIANPAINT,Pro,PRO_02,Strong 5-year profit growth of 20.3% shows good earnings expansion.,85
+ASIANPAINT,Pro,PRO_09,"CFO/PAT ratio of 1.10x is classified as High Quality, indicating strong cash backing for earnings.",79
+ASIANPAINT,Pro,PRO_11,Dividend payout of 58.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+ATGL,Con,CON_10,CapEx intensity of 16.8% indicates a capital-intensive business model.,84
+ATGL,Pro,PRO_03,"EPS grew at 24.6% over 5 years, supporting improving shareholder earnings.",90
+ATGL,Pro,PRO_02,Strong 5-year profit growth of 23.9% shows good earnings expansion.,89
+ATGL,Pro,PRO_01,Strong 5-year revenue growth of 21.1% indicates healthy business expansion.,86
+ATGL,Pro,PRO_08,Interest coverage of 10.50x provides a strong buffer for interest payments.,86
+ATGL,Pro,PRO_07,Low debt-to-equity of 0.43 indicates a relatively conservative capital structure.,82
+ATGL,Pro,PRO_09,"CFO/PAT ratio of 1.43x is classified as High Quality, indicating strong cash backing for earnings.",82
+ATGL,Pro,PRO_05,ROCE of 21.5% indicates efficient deployment of operating capital.,80
+ATGL,Pro,PRO_04,ROE of 18.7% indicates efficient use of shareholder capital.,75
+ATGL,Pro,PRO_06,ROA of 10.1% indicates productive use of the company's asset base.,74
+AXISBANK,Con,CON_06,Debt-to-equity of 8.25 indicates higher financial leverage.,95
+AXISBANK,Con,CON_12,"Capital allocation is classified as 'Growth Funded by Debt', which warrants closer monitoring of cash-flow quality and funding requirements.",90
+AXISBANK,Con,CON_08,"CFO/PAT ratio of -0.22x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+AXISBANK,Con,CON_05,"ROCE of 2.6% is relatively low, indicating weaker capital efficiency.",87
+AXISBANK,Con,CON_09,"Free cash flow is negative at -14556.00 crore, which can constrain internally generated funding.",86
+AXISBANK,Con,CON_07,Interest coverage of 1.69x provides a limited buffer for interest payments.,82
+AXISBANK,Con,CON_10,CapEx intensity of 8.2% indicates a capital-intensive business model.,75
+AXISBANK,Pro,PRO_02,Strong 5-year profit growth of 39.7% shows good earnings expansion.,98
+AXISBANK,Pro,PRO_03,"EPS grew at 35.1% over 5 years, supporting improving shareholder earnings.",97
+AXISBANK,Pro,PRO_04,ROE of 15.8% indicates efficient use of shareholder capital.,71
+BAJAJ-AUTO,Con,CON_12,"Revenue CAGR is the weakest among the available core financial metrics, at 8.13%. This deserves monitoring.",65
+BAJAJ-AUTO,Pro,PRO_08,Interest coverage of 174.42x provides a strong buffer for interest payments.,95
+BAJAJ-AUTO,Pro,PRO_06,ROA of 19.6% indicates productive use of the company's asset base.,93
+BAJAJ-AUTO,Pro,PRO_07,Low debt-to-equity of 0.07 indicates a relatively conservative capital structure.,93
+BAJAJ-AUTO,Pro,PRO_05,ROCE of 28.4% indicates efficient deployment of operating capital.,90
+BAJAJ-AUTO,Pro,PRO_04,ROE of 26.6% indicates efficient use of shareholder capital.,87
+BAJAJ-AUTO,Pro,PRO_12,CapEx intensity of 0.2% indicates an asset-light business model.,75
+BAJAJ-AUTO,Pro,PRO_11,Dividend payout of 29.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+BAJAJFINSV,Con,CON_06,Debt-to-equity of 4.79 indicates higher financial leverage.,95
+BAJAJFINSV,Con,CON_12,"Capital allocation is classified as 'Growth Funded by Debt', which warrants closer monitoring of cash-flow quality and funding requirements.",90
+BAJAJFINSV,Con,CON_08,"CFO/PAT ratio of -4.40x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+BAJAJFINSV,Con,CON_09,"Free cash flow is negative at -79634.00 crore, which can constrain internally generated funding.",86
+BAJAJFINSV,Con,CON_10,CapEx intensity of 9.9% indicates a capital-intensive business model.,77
+BAJAJFINSV,Pro,PRO_02,Strong 5-year profit growth of 23.7% shows good earnings expansion.,89
+BAJAJFINSV,Pro,PRO_01,Strong 5-year revenue growth of 21.0% indicates healthy business expansion.,86
+BAJAJFINSV,Pro,PRO_03,"EPS grew at 20.6% over 5 years, supporting improving shareholder earnings.",86
+BAJAJFINSV,Pro,PRO_04,ROE of 25.9% indicates efficient use of shareholder capital.,86
+BAJAJHLDNG,Con,CON_10,CapEx intensity of 27.7% indicates a capital-intensive business model.,95
+BAJAJHLDNG,Con,CON_08,"CFO/PAT ratio of 0.26x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+BAJAJHLDNG,Con,CON_05,"ROCE of 2.9% is relatively low, indicating weaker capital efficiency.",86
+BAJAJHLDNG,Pro,PRO_01,Strong 5-year revenue growth of 31.6% indicates healthy business expansion.,97
+BAJAJHLDNG,Pro,PRO_07,Low debt-to-equity of 0.00 indicates a relatively conservative capital structure.,95
+BAJAJHLDNG,Pro,PRO_08,Interest coverage of 3764.50x provides a strong buffer for interest payments.,95
+BAJAJHLDNG,Pro,PRO_02,Strong 5-year profit growth of 19.3% shows good earnings expansion.,84
+BAJAJHLDNG,Pro,PRO_03,"EPS grew at 19.0% over 5 years, supporting improving shareholder earnings.",84
+BAJAJHLDNG,Pro,PRO_06,ROA of 11.3% indicates productive use of the company's asset base.,77
+BAJAJHLDNG,Pro,PRO_10,FCF conversion of 94.0% indicates good conversion of operating profit into free cash flow.,77
+BAJAJHLDNG,Pro,PRO_11,Dividend payout of 20.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+BAJFINANCE,Con,CON_06,Debt-to-equity of 3.82 indicates higher financial leverage.,94
+BAJFINANCE,Con,CON_12,"Capital allocation is classified as 'Growth Funded by Debt', which warrants closer monitoring of cash-flow quality and funding requirements.",90
+BAJFINANCE,Con,CON_08,"CFO/PAT ratio of -5.03x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+BAJFINANCE,Con,CON_09,"Free cash flow is negative at -79931.00 crore, which can constrain internally generated funding.",86
+BAJFINANCE,Con,CON_05,"ROCE of 4.4% is relatively low, indicating weaker capital efficiency.",83
+BAJFINANCE,Con,CON_10,CapEx intensity of 13.0% indicates a capital-intensive business model.,80
+BAJFINANCE,Pro,PRO_08,Interest coverage of 2689.17x provides a strong buffer for interest payments.,95
+BAJFINANCE,Pro,PRO_02,Strong 5-year profit growth of 29.3% shows good earnings expansion.,94
+BAJFINANCE,Pro,PRO_03,"EPS grew at 27.6% over 5 years, supporting improving shareholder earnings.",93
+BAJFINANCE,Pro,PRO_01,Strong 5-year revenue growth of 24.4% indicates healthy business expansion.,89
+BAJFINANCE,Pro,PRO_04,ROE of 18.8% indicates efficient use of shareholder capital.,76
+BAJFINANCE,Pro,PRO_11,Dividend payout of 15.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+BANKBARODA,Con,CON_06,Debt-to-equity of 12.14 indicates higher financial leverage.,95
+BANKBARODA,Con,CON_12,"Capital allocation is classified as 'Growth Funded by Debt', which warrants closer monitoring of cash-flow quality and funding requirements.",90
+BANKBARODA,Con,CON_08,"CFO/PAT ratio of -0.33x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+BANKBARODA,Con,CON_05,"ROCE of 2.8% is relatively low, indicating weaker capital efficiency.",86
+BANKBARODA,Con,CON_09,"Free cash flow is negative at -7559.00 crore, which can constrain internally generated funding.",86
+BANKBARODA,Con,CON_07,Interest coverage of 1.90x provides a limited buffer for interest payments.,81
+BANKBARODA,Pro,PRO_02,Strong 5-year profit growth of 74.5% shows good earnings expansion.,98
+BANKBARODA,Pro,PRO_03,"EPS grew at 55.2% over 5 years, supporting improving shareholder earnings.",97
+BANKBARODA,Pro,PRO_01,Strong 5-year revenue growth of 17.5% indicates healthy business expansion.,82
+BANKBARODA,Pro,PRO_12,CapEx intensity of 1.1% indicates an asset-light business model.,75
+BANKBARODA,Pro,PRO_11,Dividend payout of 21.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+BANKBARODA,Pro,PRO_04,ROE of 15.8% indicates efficient use of shareholder capital.,71
+BEL,Con,CON_10,CapEx intensity of 29.2% indicates a capital-intensive business model.,95
+BEL,Con,CON_09,"Free cash flow is negative at -1265.00 crore, which can constrain internally generated funding.",86
+BEL,Pro,PRO_04,ROE of 4744.0% indicates efficient use of shareholder capital.,98
+BEL,Pro,PRO_05,ROCE of 3977.2% indicates efficient deployment of operating capital.,98
+BEL,Pro,PRO_06,ROA of 2475.2% indicates productive use of the company's asset base.,95
+BEL,Pro,PRO_08,Interest coverage of 476.75x provides a strong buffer for interest payments.,95
+BEL,Pro,PRO_02,Strong 5-year profit growth of 16.1% shows good earnings expansion.,81
+BEL,Pro,PRO_09,"CFO/PAT ratio of 1.17x is classified as High Quality, indicating strong cash backing for earnings.",80
+BEL,Pro,PRO_11,Dividend payout of 40.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+BHARTIARTL,Con,CON_10,CapEx intensity of 34.1% indicates a capital-intensive business model.,95
+BHARTIARTL,Con,CON_06,Debt-to-equity of 2.61 indicates higher financial leverage.,88
+BHARTIARTL,Pro,PRO_02,Strong 5-year profit growth of 38.4% shows good earnings expansion.,98
+BHARTIARTL,Pro,PRO_09,"CFO/PAT ratio of 9.22x is classified as High Quality, indicating strong cash backing for earnings.",98
+BHARTIARTL,Pro,PRO_03,"EPS grew at 67.0% over 5 years, supporting improving shareholder earnings.",97
+BHARTIARTL,Pro,PRO_05,ROCE of 26.3% indicates efficient deployment of operating capital.,87
+BHEL,Con,CON_02,"5-year profit growth is only -22.4%, showing limited earnings growth.",96
+BHEL,Con,CON_03,"5-year EPS growth is only -19.7%, which may limit shareholder earnings growth.",95
+BHEL,Con,CON_04,"ROE of 1.2% is relatively low, indicating weaker returns on shareholder capital.",90
+BHEL,Con,CON_12,"Capital allocation is classified as 'Distress Signal', which warrants closer monitoring of cash-flow quality and funding requirements.",90
+BHEL,Con,CON_05,"ROCE of 2.1% is relatively low, indicating weaker capital efficiency.",88
+BHEL,Con,CON_08,"CFO/PAT ratio of -13.17x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+BHEL,Con,CON_09,"Free cash flow is negative at -2382.00 crore, which can constrain internally generated funding.",86
+BHEL,Con,CON_07,Interest coverage of 1.59x provides a limited buffer for interest payments.,83
+BHEL,Con,CON_01,"5-year revenue growth is only -4.7%, indicating weak business expansion.",79
+BHEL,Pro,PRO_07,Low debt-to-equity of 0.36 indicates a relatively conservative capital structure.,84
+BHEL,Pro,PRO_11,Dividend payout of 31.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+BOSCHLTD,Con,CON_12,"Revenue CAGR is the weakest among the available core financial metrics, at 6.72%. This deserves monitoring.",65
+BOSCHLTD,Pro,PRO_07,Low debt-to-equity of 0.00 indicates a relatively conservative capital structure.,95
+BOSCHLTD,Pro,PRO_08,Interest coverage of 71.78x provides a strong buffer for interest payments.,95
+BOSCHLTD,Pro,PRO_06,ROA of 14.3% indicates productive use of the company's asset base.,83
+BOSCHLTD,Pro,PRO_04,ROE of 20.6% indicates efficient use of shareholder capital.,78
+BOSCHLTD,Pro,PRO_12,CapEx intensity of 1.7% indicates an asset-light business model.,75
+BOSCHLTD,Pro,PRO_05,ROCE of 17.3% indicates efficient deployment of operating capital.,73
+BOSCHLTD,Pro,PRO_11,Dividend payout of 44.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+BPCL,Con,CON_12,"Revenue CAGR is the weakest among the available core financial metrics, at 8.48%. This deserves monitoring.",65
+BPCL,Pro,PRO_04,ROE of 35.5% indicates efficient use of shareholder capital.,98
+BPCL,Pro,PRO_05,ROCE of 33.8% indicates efficient deployment of operating capital.,98
+BPCL,Pro,PRO_03,"EPS grew at 28.1% over 5 years, supporting improving shareholder earnings.",93
+BPCL,Pro,PRO_02,Strong 5-year profit growth of 25.8% shows good earnings expansion.,91
+BPCL,Pro,PRO_08,Interest coverage of 11.36x provides a strong buffer for interest payments.,86
+BPCL,Pro,PRO_06,ROA of 13.3% indicates productive use of the company's asset base.,81
+BPCL,Pro,PRO_09,"CFO/PAT ratio of 1.34x is classified as High Quality, indicating strong cash backing for earnings.",81
+BPCL,Pro,PRO_12,CapEx intensity of 2.3% indicates an asset-light business model.,75
+BPCL,Pro,PRO_11,Dividend payout of 33.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+BRITANNIA,Con,CON_12,"Revenue CAGR is the weakest among the available core financial metrics, at 8.69%. This deserves monitoring.",65
+BRITANNIA,Pro,PRO_04,ROE of 54.1% indicates efficient use of shareholder capital.,98
+BRITANNIA,Pro,PRO_05,ROCE of 52.7% indicates efficient deployment of operating capital.,98
+BRITANNIA,Pro,PRO_06,ROA of 23.5% indicates productive use of the company's asset base.,95
+BRITANNIA,Pro,PRO_08,Interest coverage of 20.60x provides a strong buffer for interest payments.,95
+BRITANNIA,Pro,PRO_09,"CFO/PAT ratio of 1.21x is classified as High Quality, indicating strong cash backing for earnings.",80
+BRITANNIA,Pro,PRO_10,FCF conversion of 96.3% indicates good conversion of operating profit into free cash flow.,78
+BRITANNIA,Pro,PRO_12,CapEx intensity of 2.8% indicates an asset-light business model.,75
+CANBK,Con,CON_06,Debt-to-equity of 14.87 indicates higher financial leverage.,95
+CANBK,Con,CON_05,"ROCE of 3.2% is relatively low, indicating weaker capital efficiency.",86
+CANBK,Con,CON_07,Interest coverage of 1.61x provides a limited buffer for interest payments.,83
+CANBK,Pro,PRO_02,Strong 5-year profit growth of 85.8% shows good earnings expansion.,98
+CANBK,Pro,PRO_03,"EPS grew at 53.4% over 5 years, supporting improving shareholder earnings.",97
+CANBK,Pro,PRO_01,Strong 5-year revenue growth of 18.2% indicates healthy business expansion.,83
+CANBK,Pro,PRO_12,CapEx intensity of 1.6% indicates an asset-light business model.,75
+CANBK,Pro,PRO_04,ROE of 16.7% indicates efficient use of shareholder capital.,73
+CANBK,Pro,PRO_11,Dividend payout of 19.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+CHOLAFIN,Con,CON_06,Debt-to-equity of 6.86 indicates higher financial leverage.,95
+CHOLAFIN,Con,CON_12,"Capital allocation is classified as 'Growth Funded by Debt', which warrants closer monitoring of cash-flow quality and funding requirements.",90
+CHOLAFIN,Con,CON_08,"CFO/PAT ratio of -10.43x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+CHOLAFIN,Con,CON_09,"Free cash flow is negative at -38538.00 crore, which can constrain internally generated funding.",86
+CHOLAFIN,Con,CON_05,"ROCE of 3.5% is relatively low, indicating weaker capital efficiency.",85
+CHOLAFIN,Con,CON_10,CapEx intensity of 14.9% indicates a capital-intensive business model.,82
+CHOLAFIN,Pro,PRO_08,Interest coverage of 21.21x provides a strong buffer for interest payments.,95
+CHOLAFIN,Pro,PRO_02,Strong 5-year profit growth of 23.4% shows good earnings expansion.,88
+CHOLAFIN,Pro,PRO_01,Strong 5-year revenue growth of 21.9% indicates healthy business expansion.,87
+CHOLAFIN,Pro,PRO_03,"EPS grew at 22.3% over 5 years, supporting improving shareholder earnings.",87
+CHOLAFIN,Pro,PRO_04,ROE of 17.5% indicates efficient use of shareholder capital.,74
+CIPLA,Con,CON_10,CapEx intensity of 11.6% indicates a capital-intensive business model.,79
+CIPLA,Pro,PRO_05,ROCE of 71.5% indicates efficient deployment of operating capital.,98
+CIPLA,Pro,PRO_08,Interest coverage of 35.34x provides a strong buffer for interest payments.,95
+CIPLA,Pro,PRO_07,Low debt-to-equity of 0.02 indicates a relatively conservative capital structure.,94
+CIPLA,Pro,PRO_02,Strong 5-year profit growth of 22.7% shows good earnings expansion.,88
+CIPLA,Pro,PRO_03,"EPS grew at 21.8% over 5 years, supporting improving shareholder earnings.",87
+CIPLA,Pro,PRO_06,ROA of 12.8% indicates productive use of the company's asset base.,80
+CIPLA,Pro,PRO_11,Dividend payout of 25.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+CIPLA,Pro,PRO_04,ROE of 15.6% indicates efficient use of shareholder capital.,71
+COALINDIA,Con,CON_08,"CFO/PAT ratio of 0.48x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+COALINDIA,Pro,PRO_04,ROE of 45.2% indicates efficient use of shareholder capital.,98
+COALINDIA,Pro,PRO_05,ROCE of 105.7% indicates efficient deployment of operating capital.,98
+COALINDIA,Pro,PRO_07,Low debt-to-equity of 0.08 indicates a relatively conservative capital structure.,93
+COALINDIA,Pro,PRO_06,ROA of 15.8% indicates productive use of the company's asset base.,86
+COALINDIA,Pro,PRO_08,Interest coverage of 11.24x provides a strong buffer for interest payments.,86
+COALINDIA,Pro,PRO_03,"EPS grew at 16.9% over 5 years, supporting improving shareholder earnings.",82
+COALINDIA,Pro,PRO_02,Strong 5-year profit growth of 16.4% shows good earnings expansion.,81
+COALINDIA,Pro,PRO_11,Dividend payout of 42.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+DABUR,Con,CON_02,"5-year profit growth is only 4.6%, showing limited earnings growth.",79
+DABUR,Con,CON_03,"5-year EPS growth is only 4.6%, which may limit shareholder earnings growth.",79
+DABUR,Pro,PRO_08,Interest coverage of 23.24x provides a strong buffer for interest payments.,95
+DABUR,Pro,PRO_07,Low debt-to-equity of 0.14 indicates a relatively conservative capital structure.,91
+DABUR,Pro,PRO_05,ROCE of 21.4% indicates efficient deployment of operating capital.,80
+DABUR,Pro,PRO_09,"CFO/PAT ratio of 1.11x is classified as High Quality, indicating strong cash backing for earnings.",79
+DABUR,Pro,PRO_06,ROA of 12.0% indicates productive use of the company's asset base.,78
+DABUR,Pro,PRO_04,ROE of 18.4% indicates efficient use of shareholder capital.,75
+DABUR,Pro,PRO_11,Dividend payout of 53.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+DIVISLAB,Con,CON_02,"5-year profit growth is only 3.4%, showing limited earnings growth.",77
+DIVISLAB,Con,CON_03,"5-year EPS growth is only 3.3%, which may limit shareholder earnings growth.",77
+DIVISLAB,Pro,PRO_07,Low debt-to-equity of 0.00 indicates a relatively conservative capital structure.,95
+DIVISLAB,Pro,PRO_08,Interest coverage of 636.25x provides a strong buffer for interest payments.,95
+DIVISLAB,Pro,PRO_06,ROA of 10.3% indicates productive use of the company's asset base.,75
+DIVISLAB,Pro,PRO_05,ROCE of 16.3% indicates efficient deployment of operating capital.,72
+DIVISLAB,Pro,PRO_11,Dividend payout of 50.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+DLF,Con,CON_10,CapEx intensity of 23.8% indicates a capital-intensive business model.,91
+DLF,Con,CON_05,"ROCE of 4.8% is relatively low, indicating weaker capital efficiency.",82
+DLF,Con,CON_01,"5-year revenue growth is only -5.1%, indicating weak business expansion.",80
+DLF,Con,CON_04,"ROE of 6.9% is relatively low, indicating weaker returns on shareholder capital.",78
+DLF,Pro,PRO_07,Low debt-to-equity of 0.12 indicates a relatively conservative capital structure.,91
+DLF,Pro,PRO_08,Interest coverage of 7.46x provides a strong buffer for interest payments.,82
+DLF,Pro,PRO_02,Strong 5-year profit growth of 15.7% shows good earnings expansion.,81
+DLF,Pro,PRO_11,Dividend payout of 45.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+DMART,Con,CON_12,"ROE is the weakest among the available core financial metrics, at 13.56%. This deserves monitoring.",65
+DMART,Pro,PRO_08,Interest coverage of 73.29x provides a strong buffer for interest payments.,95
+DMART,Pro,PRO_07,Low debt-to-equity of 0.03 indicates a relatively conservative capital structure.,94
+DMART,Pro,PRO_02,Strong 5-year profit growth of 23.0% shows good earnings expansion.,88
+DMART,Pro,PRO_03,"EPS grew at 22.7% over 5 years, supporting improving shareholder earnings.",88
+DMART,Pro,PRO_01,Strong 5-year revenue growth of 20.5% indicates healthy business expansion.,85
+DMART,Pro,PRO_05,ROCE of 21.3% indicates efficient deployment of operating capital.,79
+DMART,Pro,PRO_09,"CFO/PAT ratio of 1.08x is classified as High Quality, indicating strong cash backing for earnings.",79
+DMART,Pro,PRO_06,ROA of 12.0% indicates productive use of the company's asset base.,78
+DRREDDY,Con,CON_10,CapEx intensity of 14.4% indicates a capital-intensive business model.,81
+DRREDDY,Pro,PRO_08,Interest coverage of 51.71x provides a strong buffer for interest payments.,95
+DRREDDY,Pro,PRO_07,Low debt-to-equity of 0.07 indicates a relatively conservative capital structure.,93
+DRREDDY,Pro,PRO_03,"EPS grew at 23.8% over 5 years, supporting improving shareholder earnings.",89
+DRREDDY,Pro,PRO_02,Strong 5-year profit growth of 23.4% shows good earnings expansion.,88
+DRREDDY,Pro,PRO_05,ROCE of 26.2% indicates efficient deployment of operating capital.,87
+DRREDDY,Pro,PRO_06,ROA of 14.4% indicates productive use of the company's asset base.,83
+DRREDDY,Pro,PRO_04,ROE of 19.7% indicates efficient use of shareholder capital.,77
+DRREDDY,Pro,PRO_11,Dividend payout of 12.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+EICHERMOT,Con,CON_10,CapEx intensity of 17.1% indicates a capital-intensive business model.,84
+EICHERMOT,Pro,PRO_08,Interest coverage of 114.71x provides a strong buffer for interest payments.,95
+EICHERMOT,Pro,PRO_07,Low debt-to-equity of 0.02 indicates a relatively conservative capital structure.,94
+EICHERMOT,Pro,PRO_06,ROA of 17.3% indicates productive use of the company's asset base.,89
+EICHERMOT,Pro,PRO_05,ROCE of 23.4% indicates efficient deployment of operating capital.,83
+EICHERMOT,Pro,PRO_04,ROE of 22.2% indicates efficient use of shareholder capital.,81
+EICHERMOT,Pro,PRO_11,Dividend payout of 35.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+GAIL,Con,CON_12,"EPS CAGR is the weakest among the available core financial metrics, at 8.45%. This deserves monitoring.",65
+GAIL,Pro,PRO_08,Interest coverage of 23.62x provides a strong buffer for interest payments.,95
+GAIL,Pro,PRO_07,Low debt-to-equity of 0.28 indicates a relatively conservative capital structure.,87
+GAIL,Pro,PRO_09,"CFO/PAT ratio of 1.27x is classified as High Quality, indicating strong cash backing for earnings.",81
+GAIL,Pro,PRO_11,Dividend payout of 37.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+GODREJCP,Con,CON_04,"ROE of -4.5% is relatively low, indicating weaker returns on shareholder capital.",95
+GODREJCP,Con,CON_10,CapEx intensity of 24.4% indicates a capital-intensive business model.,91
+GODREJCP,Con,CON_08,"CFO/PAT ratio of -3.69x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+GODREJCP,Con,CON_09,"Free cash flow is negative at -1365.00 crore, which can constrain internally generated funding.",86
+GODREJCP,Pro,PRO_07,Low debt-to-equity of 0.26 indicates a relatively conservative capital structure.,87
+GODREJCP,Pro,PRO_05,ROCE of 18.7% indicates efficient deployment of operating capital.,76
+GRASIM,Con,CON_12,"Capital allocation is classified as 'Growth Funded by Debt', which warrants closer monitoring of cash-flow quality and funding requirements.",90
+GRASIM,Con,CON_08,"CFO/PAT ratio of -1.08x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+GRASIM,Con,CON_09,"Free cash flow is negative at -33833.00 crore, which can constrain internally generated funding.",86
+GRASIM,Con,CON_10,CapEx intensity of 17.6% indicates a capital-intensive business model.,85
+GRASIM,Con,CON_06,Debt-to-equity of 1.55 indicates higher financial leverage.,83
+GRASIM,Pro,PRO_02,Strong 5-year profit growth of 29.3% shows good earnings expansion.,94
+GRASIM,Pro,PRO_03,"EPS grew at 27.7% over 5 years, supporting improving shareholder earnings.",93
+GRASIM,Pro,PRO_11,Dividend payout of 12.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+HAL,Con,CON_10,CapEx intensity of 21.1% indicates a capital-intensive business model.,88
+HAL,Pro,PRO_04,ROE of 3816.6% indicates efficient use of shareholder capital.,98
+HAL,Pro,PRO_05,ROCE of 3027.6% indicates efficient deployment of operating capital.,98
+HAL,Pro,PRO_06,ROA of 1687.8% indicates productive use of the company's asset base.,95
+HAL,Pro,PRO_08,Interest coverage of 270.88x provides a strong buffer for interest payments.,95
+HAL,Pro,PRO_03,"EPS grew at 26.6% over 5 years, supporting improving shareholder earnings.",92
+HAL,Pro,PRO_02,Strong 5-year profit growth of 26.5% shows good earnings expansion.,91
+HAL,Pro,PRO_09,"CFO/PAT ratio of 1.08x is classified as High Quality, indicating strong cash backing for earnings.",79
+HAL,Pro,PRO_11,Dividend payout of 31.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+HAVELLS,Con,CON_10,CapEx intensity of 8.7% indicates a capital-intensive business model.,76
+HAVELLS,Pro,PRO_08,Interest coverage of 25.36x provides a strong buffer for interest payments.,95
+HAVELLS,Pro,PRO_07,Low debt-to-equity of 0.04 indicates a relatively conservative capital structure.,94
+HAVELLS,Pro,PRO_05,ROCE of 24.3% indicates efficient deployment of operating capital.,84
+HAVELLS,Pro,PRO_09,"CFO/PAT ratio of 1.54x is classified as High Quality, indicating strong cash backing for earnings.",83
+HAVELLS,Pro,PRO_06,ROA of 10.2% indicates productive use of the company's asset base.,74
+HAVELLS,Pro,PRO_04,ROE of 17.1% indicates efficient use of shareholder capital.,73
+HAVELLS,Pro,PRO_11,Dividend payout of 44.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+HCLTECH,Con,CON_12,"Profit CAGR is the weakest among the available core financial metrics, at 9.19%. This deserves monitoring.",65
+HCLTECH,Pro,PRO_05,ROCE of 32.7% indicates efficient deployment of operating capital.,97
+HCLTECH,Pro,PRO_08,Interest coverage of 46.46x provides a strong buffer for interest payments.,95
+HCLTECH,Pro,PRO_07,Low debt-to-equity of 0.08 indicates a relatively conservative capital structure.,92
+HCLTECH,Pro,PRO_06,ROA of 15.9% indicates productive use of the company's asset base.,86
+HCLTECH,Pro,PRO_04,ROE of 23.0% indicates efficient use of shareholder capital.,82
+HCLTECH,Pro,PRO_09,"CFO/PAT ratio of 1.43x is classified as High Quality, indicating strong cash backing for earnings.",82
+HDFCBANK,Con,CON_06,Debt-to-equity of 6.81 indicates higher financial leverage.,95
+HDFCBANK,Con,CON_08,"CFO/PAT ratio of 0.29x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+HDFCBANK,Con,CON_07,Interest coverage of 1.40x provides a limited buffer for interest payments.,85
+HDFCBANK,Con,CON_05,"ROCE of 4.9% is relatively low, indicating weaker capital efficiency.",82
+HDFCBANK,Pro,PRO_02,Strong 5-year profit growth of 23.9% shows good earnings expansion.,89
+HDFCBANK,Pro,PRO_01,Strong 5-year revenue growth of 22.0% indicates healthy business expansion.,87
+HDFCBANK,Pro,PRO_03,"EPS grew at 15.4% over 5 years, supporting improving shareholder earnings.",80
+HDFCBANK,Pro,PRO_11,Dividend payout of 23.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+HDFCLIFE,Con,CON_09,"Free cash flow is negative at -2893.00 crore, which can constrain internally generated funding.",86
+HDFCLIFE,Con,CON_10,CapEx intensity of 13.4% indicates a capital-intensive business model.,80
+HDFCLIFE,Con,CON_02,"5-year profit growth is only 4.3%, showing limited earnings growth.",79
+HDFCLIFE,Con,CON_03,"5-year EPS growth is only 3.1%, which may limit shareholder earnings growth.",76
+HDFCLIFE,Pro,PRO_05,ROCE of 646.5% indicates efficient deployment of operating capital.,98
+HDFCLIFE,Pro,PRO_09,"CFO/PAT ratio of 6.81x is classified as High Quality, indicating strong cash backing for earnings.",98
+HDFCLIFE,Pro,PRO_08,Interest coverage of 192.29x provides a strong buffer for interest payments.,95
+HDFCLIFE,Pro,PRO_07,Low debt-to-equity of 0.06 indicates a relatively conservative capital structure.,93
+HDFCLIFE,Pro,PRO_01,Strong 5-year revenue growth of 21.2% indicates healthy business expansion.,86
+HDFCLIFE,Pro,PRO_11,Dividend payout of 27.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+HEROMOTOCO,Con,CON_01,"5-year revenue growth is only 2.2%, indicating weak business expansion.",74
+HEROMOTOCO,Con,CON_02,"5-year profit growth is only 1.5%, showing limited earnings growth.",73
+HEROMOTOCO,Con,CON_03,"5-year EPS growth is only 1.7%, which may limit shareholder earnings growth.",73
+HEROMOTOCO,Pro,PRO_05,ROCE of 177.8% indicates efficient deployment of operating capital.,98
+HEROMOTOCO,Pro,PRO_08,Interest coverage of 47.27x provides a strong buffer for interest payments.,95
+HEROMOTOCO,Pro,PRO_07,Low debt-to-equity of 0.03 indicates a relatively conservative capital structure.,94
+HEROMOTOCO,Pro,PRO_06,ROA of 14.3% indicates productive use of the company's asset base.,83
+HEROMOTOCO,Pro,PRO_09,"CFO/PAT ratio of 1.32x is classified as High Quality, indicating strong cash backing for earnings.",81
+HEROMOTOCO,Pro,PRO_04,ROE of 21.1% indicates efficient use of shareholder capital.,79
+HINDALCO,Con,CON_04,"ROE of 9.6% is relatively low, indicating weaker returns on shareholder capital.",73
+HINDALCO,Pro,PRO_05,ROCE of 118.2% indicates efficient deployment of operating capital.,98
+HINDALCO,Pro,PRO_08,Interest coverage of 126.47x provides a strong buffer for interest payments.,95
+HINDALCO,Pro,PRO_09,"CFO/PAT ratio of 2.37x is classified as High Quality, indicating strong cash backing for earnings.",92
+HINDUNILVR,Con,CON_10,CapEx intensity of 8.6% indicates a capital-intensive business model.,76
+HINDUNILVR,Pro,PRO_05,ROCE of 89.6% indicates efficient deployment of operating capital.,98
+HINDUNILVR,Pro,PRO_08,Interest coverage of 57.85x provides a strong buffer for interest payments.,95
+HINDUNILVR,Pro,PRO_07,Low debt-to-equity of 0.03 indicates a relatively conservative capital structure.,94
+HINDUNILVR,Pro,PRO_09,"CFO/PAT ratio of 1.50x is classified as High Quality, indicating strong cash backing for earnings.",83
+HINDUNILVR,Pro,PRO_06,ROA of 13.1% indicates productive use of the company's asset base.,80
+HINDUNILVR,Pro,PRO_04,ROE of 20.1% indicates efficient use of shareholder capital.,78
+ICICIBANK,Con,CON_06,Debt-to-equity of 6.45 indicates higher financial leverage.,95
+ICICIBANK,Con,CON_10,CapEx intensity of 90.7% indicates a capital-intensive business model.,95
+ICICIBANK,Con,CON_07,Interest coverage of 1.30x provides a limited buffer for interest payments.,86
+ICICIBANK,Con,CON_05,"ROCE of 5.2% is relatively low, indicating weaker capital efficiency.",82
+ICICIBANK,Pro,PRO_02,Strong 5-year profit growth of 51.9% shows good earnings expansion.,98
+ICICIBANK,Pro,PRO_09,"CFO/PAT ratio of 3.41x is classified as High Quality, indicating strong cash backing for earnings.",98
+ICICIBANK,Pro,PRO_03,"EPS grew at 55.2% over 5 years, supporting improving shareholder earnings.",97
+ICICIBANK,Pro,PRO_01,Strong 5-year revenue growth of 17.3% indicates healthy business expansion.,82
+ICICIBANK,Pro,PRO_04,ROE of 18.0% indicates efficient use of shareholder capital.,74
+ICICIBANK,Pro,PRO_11,Dividend payout of 16.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+ICICIGI,Con,CON_10,CapEx intensity of 9.4% indicates a capital-intensive business model.,76
+ICICIGI,Pro,PRO_05,ROCE of 146.3% indicates efficient deployment of operating capital.,98
+ICICIGI,Pro,PRO_07,Low debt-to-equity of 0.00 indicates a relatively conservative capital structure.,95
+ICICIGI,Pro,PRO_08,Interest coverage of 160.03x provides a strong buffer for interest payments.,95
+ICICIGI,Pro,PRO_09,"CFO/PAT ratio of 1.25x is classified as High Quality, indicating strong cash backing for earnings.",81
+ICICIGI,Pro,PRO_11,Dividend payout of 28.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+ICICIGI,Pro,PRO_04,ROE of 15.7% indicates efficient use of shareholder capital.,71
+ICICIPRULI,Con,CON_08,"CFO/PAT ratio of -8.60x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+ICICIPRULI,Con,CON_02,"5-year profit growth is only -5.7%, showing limited earnings growth.",81
+ICICIPRULI,Con,CON_03,"5-year EPS growth is only -5.6%, which may limit shareholder earnings growth.",81
+ICICIPRULI,Con,CON_04,"ROE of 7.7% is relatively low, indicating weaker returns on shareholder capital.",77
+ICICIPRULI,Con,CON_10,CapEx intensity of 8.2% indicates a capital-intensive business model.,75
+ICICIPRULI,Pro,PRO_05,ROCE of 754.9% indicates efficient deployment of operating capital.,98
+ICICIPRULI,Pro,PRO_08,Interest coverage of 31.02x provides a strong buffer for interest payments.,95
+ICICIPRULI,Pro,PRO_07,Low debt-to-equity of 0.11 indicates a relatively conservative capital structure.,92
+ICICIPRULI,Pro,PRO_01,Strong 5-year revenue growth of 16.8% indicates healthy business expansion.,82
+ICICIPRULI,Pro,PRO_11,Dividend payout of 10.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+INDIGO,Con,CON_10,CapEx intensity of 17.1% indicates a capital-intensive business model.,84
+INDIGO,Pro,PRO_02,Strong 5-year profit growth of 120.7% shows good earnings expansion.,98
+INDIGO,Pro,PRO_04,ROE of 892.6% indicates efficient use of shareholder capital.,98
+INDIGO,Pro,PRO_05,ROCE of 5640.9% indicates efficient deployment of operating capital.,98
+INDIGO,Pro,PRO_03,"EPS grew at 121.2% over 5 years, supporting improving shareholder earnings.",97
+INDIGO,Pro,PRO_06,ROA of 668.3% indicates productive use of the company's asset base.,95
+INDIGO,Pro,PRO_08,Interest coverage of 22.61x provides a strong buffer for interest payments.,95
+INDIGO,Pro,PRO_07,Low debt-to-equity of 0.02 indicates a relatively conservative capital structure.,94
+INDIGO,Pro,PRO_09,"CFO/PAT ratio of 2.59x is classified as High Quality, indicating strong cash backing for earnings.",94
+INDIGO,Pro,PRO_01,Strong 5-year revenue growth of 19.3% indicates healthy business expansion.,84
+INDUSINDBK,Con,CON_06,Debt-to-equity of 6.89 indicates higher financial leverage.,95
+INDUSINDBK,Con,CON_08,"CFO/PAT ratio of -1.88x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+INDUSINDBK,Con,CON_09,"Free cash flow is negative at -17468.00 crore, which can constrain internally generated funding.",86
+INDUSINDBK,Con,CON_05,"ROCE of 3.6% is relatively low, indicating weaker capital efficiency.",85
+INDUSINDBK,Con,CON_07,Interest coverage of 1.88x provides a limited buffer for interest payments.,81
+INDUSINDBK,Pro,PRO_02,Strong 5-year profit growth of 22.1% shows good earnings expansion.,87
+INDUSINDBK,Pro,PRO_03,"EPS grew at 15.9% over 5 years, supporting improving shareholder earnings.",81
+INDUSINDBK,Pro,PRO_01,Strong 5-year revenue growth of 15.5% indicates healthy business expansion.,80
+INDUSINDBK,Pro,PRO_12,CapEx intensity of 1.4% indicates an asset-light business model.,75
+INDUSINDBK,Pro,PRO_11,Dividend payout of 14.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+INFY,Con,CON_12,"Profit CAGR is the weakest among the available core financial metrics, at 11.24%. This deserves monitoring.",65
+INFY,Pro,PRO_05,ROCE of 37.8% indicates efficient deployment of operating capital.,98
+INFY,Pro,PRO_08,Interest coverage of 87.52x provides a strong buffer for interest payments.,95
+INFY,Pro,PRO_06,ROA of 19.3% indicates productive use of the company's asset base.,93
+INFY,Pro,PRO_04,ROE of 29.8% indicates efficient use of shareholder capital.,92
+INFY,Pro,PRO_07,Low debt-to-equity of 0.09 indicates a relatively conservative capital structure.,92
+IOC,Con,CON_12,"Revenue CAGR is the weakest among the available core financial metrics, at 8.01%. This deserves monitoring.",65
+IOC,Pro,PRO_02,Strong 5-year profit growth of 20.1% shows good earnings expansion.,85
+IOC,Pro,PRO_03,"EPS grew at 20.1% over 5 years, supporting improving shareholder earnings.",85
+IOC,Pro,PRO_08,Interest coverage of 10.28x provides a strong buffer for interest payments.,85
+IOC,Pro,PRO_09,"CFO/PAT ratio of 1.65x is classified as High Quality, indicating strong cash backing for earnings.",84
+IOC,Pro,PRO_04,ROE of 23.5% indicates efficient use of shareholder capital.,83
+IOC,Pro,PRO_05,ROCE of 23.9% indicates efficient deployment of operating capital.,83
+IOC,Pro,PRO_06,ROA of 8.9% indicates productive use of the company's asset base.,72
+IOC,Pro,PRO_11,Dividend payout of 40.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+IRCTC,Con,CON_12,"Revenue CAGR is the weakest among the available core financial metrics, at 17.96%. This deserves monitoring.",65
+IRCTC,Pro,PRO_04,ROE of 34.4% indicates efficient use of shareholder capital.,98
+IRCTC,Pro,PRO_05,ROCE of 44.6% indicates efficient deployment of operating capital.,98
+IRCTC,Pro,PRO_08,Interest coverage of 82.74x provides a strong buffer for interest payments.,95
+IRCTC,Pro,PRO_02,Strong 5-year profit growth of 29.2% shows good earnings expansion.,94
+IRCTC,Pro,PRO_07,Low debt-to-equity of 0.02 indicates a relatively conservative capital structure.,94
+IRCTC,Pro,PRO_03,"EPS grew at 28.5% over 5 years, supporting improving shareholder earnings.",93
+IRCTC,Pro,PRO_06,ROA of 18.2% indicates productive use of the company's asset base.,90
+IRCTC,Pro,PRO_01,Strong 5-year revenue growth of 18.0% indicates healthy business expansion.,83
+IRCTC,Pro,PRO_11,Dividend payout of 47.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+IRFC,Con,CON_06,Debt-to-equity of 8.38 indicates higher financial leverage.,95
+IRFC,Con,CON_07,Interest coverage of 1.32x provides a limited buffer for interest payments.,85
+IRFC,Con,CON_05,"ROCE of 5.7% is relatively low, indicating weaker capital efficiency.",81
+IRFC,Pro,PRO_02,Strong 5-year profit growth of 23.2% shows good earnings expansion.,88
+IRFC,Pro,PRO_03,"EPS grew at 20.1% over 5 years, supporting improving shareholder earnings.",85
+IRFC,Pro,PRO_01,Strong 5-year revenue growth of 19.1% indicates healthy business expansion.,84
+IRFC,Pro,PRO_09,"CFO/PAT ratio of 1.23x is classified as High Quality, indicating strong cash backing for earnings.",80
+IRFC,Pro,PRO_12,CapEx intensity of 0.0% indicates an asset-light business model.,75
+IRFC,Pro,PRO_11,Dividend payout of 31.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+ITC,Con,CON_12,"Revenue CAGR is the weakest among the available core financial metrics, at 7.95%. This deserves monitoring.",65
+ITC,Pro,PRO_05,ROCE of 35.1% indicates efficient deployment of operating capital.,98
+ITC,Pro,PRO_06,ROA of 22.6% indicates productive use of the company's asset base.,95
+ITC,Pro,PRO_07,Low debt-to-equity of 0.00 indicates a relatively conservative capital structure.,95
+ITC,Pro,PRO_08,Interest coverage of 362.96x provides a strong buffer for interest payments.,95
+ITC,Pro,PRO_04,ROE of 27.9% indicates efficient use of shareholder capital.,89
+ITC,Pro,PRO_12,CapEx intensity of 2.2% indicates an asset-light business model.,75
+JINDALSTEL,Con,CON_09,"Free cash flow is negative at -2336.00 crore, which can constrain internally generated funding.",86
+JINDALSTEL,Con,CON_10,CapEx intensity of 16.6% indicates a capital-intensive business model.,84
+JINDALSTEL,Con,CON_01,"5-year revenue growth is only 1.4%, indicating weak business expansion.",73
+JINDALSTEL,Pro,PRO_07,Low debt-to-equity of 0.37 indicates a relatively conservative capital structure.,84
+JINDALSTEL,Pro,PRO_08,Interest coverage of 8.00x provides a strong buffer for interest payments.,83
+JINDALSTEL,Pro,PRO_09,"CFO/PAT ratio of 1.01x is classified as High Quality, indicating strong cash backing for earnings.",78
+JINDALSTEL,Pro,PRO_05,ROCE of 16.8% indicates efficient deployment of operating capital.,73
+JIOFIN,Con,CON_10,CapEx intensity of 77.7% indicates a capital-intensive business model.,95
+JIOFIN,Con,CON_04,"ROE of 1.2% is relatively low, indicating weaker returns on shareholder capital.",90
+JIOFIN,Con,CON_05,"ROCE of 1.1% is relatively low, indicating weaker capital efficiency.",90
+JIOFIN,Con,CON_08,"CFO/PAT ratio of -0.42x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+JIOFIN,Pro,PRO_07,Low debt-to-equity of 0.00 indicates a relatively conservative capital structure.,95
+JIOFIN,Pro,PRO_08,Interest coverage of 198.80x provides a strong buffer for interest payments.,95
+JSWENERGY,Con,CON_10,CapEx intensity of 71.4% indicates a capital-intensive business model.,95
+JSWENERGY,Con,CON_09,"Free cash flow is negative at -1963.00 crore, which can constrain internally generated funding.",86
+JSWENERGY,Con,CON_06,Debt-to-equity of 1.52 indicates higher financial leverage.,83
+JSWENERGY,Con,CON_01,"5-year revenue growth is only 4.7%, indicating weak business expansion.",79
+JSWENERGY,Con,CON_04,"ROE of 8.3% is relatively low, indicating weaker returns on shareholder capital.",75
+JSWENERGY,Pro,PRO_09,"CFO/PAT ratio of 3.61x is classified as High Quality, indicating strong cash backing for earnings.",98
+JSWENERGY,Pro,PRO_02,Strong 5-year profit growth of 20.3% shows good earnings expansion.,85
+JSWENERGY,Pro,PRO_03,"EPS grew at 20.1% over 5 years, supporting improving shareholder earnings.",85
+JSWENERGY,Pro,PRO_11,Dividend payout of 19.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+JSWSTEEL,Con,CON_09,"Free cash flow is negative at -2389.00 crore, which can constrain internally generated funding.",86
+JSWSTEEL,Con,CON_06,Debt-to-equity of 1.13 indicates higher financial leverage.,81
+JSWSTEEL,Con,CON_02,"5-year profit growth is only 3.6%, showing limited earnings growth.",77
+JSWSTEEL,Con,CON_03,"5-year EPS growth is only 2.4%, which may limit shareholder earnings growth.",75
+JSWSTEEL,Con,CON_10,CapEx intensity of 8.3% indicates a capital-intensive business model.,75
+JSWSTEEL,Pro,PRO_01,Strong 5-year revenue growth of 15.6% indicates healthy business expansion.,81
+JSWSTEEL,Pro,PRO_09,"CFO/PAT ratio of 1.35x is classified as High Quality, indicating strong cash backing for earnings.",81
+JSWSTEEL,Pro,PRO_05,ROCE of 17.0% indicates efficient deployment of operating capital.,73
+JSWSTEEL,Pro,PRO_11,Dividend payout of 25.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+KOTAKBANK,Con,CON_06,Debt-to-equity of 4.00 indicates higher financial leverage.,95
+KOTAKBANK,Con,CON_07,Interest coverage of 1.24x provides a limited buffer for interest payments.,86
+KOTAKBANK,Con,CON_10,CapEx intensity of 15.9% indicates a capital-intensive business model.,83
+KOTAKBANK,Con,CON_05,"ROCE of 7.2% is relatively low, indicating weaker capital efficiency.",78
+KOTAKBANK,Pro,PRO_02,Strong 5-year profit growth of 20.4% shows good earnings expansion.,85
+KOTAKBANK,Pro,PRO_03,"EPS grew at 19.3% over 5 years, supporting improving shareholder earnings.",84
+LICI,Con,CON_12,"Revenue CAGR is the weakest among the available core financial metrics, at 8.16%. This deserves monitoring.",65
+LICI,Pro,PRO_02,Strong 5-year profit growth of 73.2% shows good earnings expansion.,98
+LICI,Pro,PRO_04,ROE of 49.4% indicates efficient use of shareholder capital.,98
+LICI,Pro,PRO_05,ROCE of 39.6% indicates efficient deployment of operating capital.,98
+LICI,Pro,PRO_07,Low debt-to-equity of 0.00 indicates a relatively conservative capital structure.,95
+LICI,Pro,PRO_08,Interest coverage of 371.94x provides a strong buffer for interest payments.,95
+LICI,Pro,PRO_12,CapEx intensity of 3.0% indicates an asset-light business model.,75
+LICI,Pro,PRO_11,Dividend payout of 15.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+LODHA,Con,CON_10,CapEx intensity of 28.6% indicates a capital-intensive business model.,95
+LODHA,Con,CON_09,"Free cash flow is negative at -435.00 crore, which can constrain internally generated funding.",86
+LODHA,Con,CON_03,"5-year EPS growth is only -5.3%, which may limit shareholder earnings growth.",81
+LODHA,Con,CON_01,"5-year revenue growth is only -2.8%, indicating weak business expansion.",76
+LODHA,Con,CON_04,"ROE of 8.9% is relatively low, indicating weaker returns on shareholder capital.",74
+LODHA,Con,CON_02,"5-year profit growth is only -1.1%, showing limited earnings growth.",72
+LODHA,Pro,PRO_09,"CFO/PAT ratio of 1.62x is classified as High Quality, indicating strong cash backing for earnings.",84
+LODHA,Pro,PRO_07,Low debt-to-equity of 0.44 indicates a relatively conservative capital structure.,82
+LODHA,Pro,PRO_08,Interest coverage of 5.63x provides a strong buffer for interest payments.,81
+LT,Con,CON_12,"EPS CAGR is the weakest among the available core financial metrics, at 8.56%. This deserves monitoring.",65
+LT,Pro,PRO_04,ROE of 77.7% indicates efficient use of shareholder capital.,98
+LT,Pro,PRO_05,ROCE of 135.2% indicates efficient deployment of operating capital.,98
+LT,Pro,PRO_06,ROA of 56.4% indicates productive use of the company's asset base.,95
+LT,Pro,PRO_07,Low debt-to-equity of 0.10 indicates a relatively conservative capital structure.,92
+LT,Pro,PRO_09,"CFO/PAT ratio of 1.17x is classified as High Quality, indicating strong cash backing for earnings.",80
+LT,Pro,PRO_12,CapEx intensity of 1.0% indicates an asset-light business model.,75
+LT,Pro,PRO_11,Dividend payout of 36.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+LTIM,Con,CON_10,CapEx intensity of 11.0% indicates a capital-intensive business model.,78
+LTIM,Pro,PRO_01,Strong 5-year revenue growth of 30.3% indicates healthy business expansion.,95
+LTIM,Pro,PRO_08,Interest coverage of 31.93x provides a strong buffer for interest payments.,95
+LTIM,Pro,PRO_07,Low debt-to-equity of 0.10 indicates a relatively conservative capital structure.,92
+LTIM,Pro,PRO_05,ROCE of 28.9% indicates efficient deployment of operating capital.,91
+LTIM,Pro,PRO_02,Strong 5-year profit growth of 24.8% shows good earnings expansion.,90
+LTIM,Pro,PRO_06,ROA of 16.6% indicates productive use of the company's asset base.,87
+LTIM,Pro,PRO_04,ROE of 22.9% indicates efficient use of shareholder capital.,82
+LTIM,Pro,PRO_09,"CFO/PAT ratio of 1.24x is classified as High Quality, indicating strong cash backing for earnings.",80
+LTIM,Pro,PRO_11,Dividend payout of 42.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+M&M,Con,CON_12,"Capital allocation is classified as 'Growth Funded by Debt', which warrants closer monitoring of cash-flow quality and funding requirements.",90
+M&M,Con,CON_08,"CFO/PAT ratio of -0.46x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+M&M,Con,CON_09,"Free cash flow is negative at -11245.00 crore, which can constrain internally generated funding.",86
+M&M,Con,CON_06,Debt-to-equity of 1.64 indicates higher financial leverage.,83
+M&M,Pro,PRO_03,"EPS grew at 16.2% over 5 years, supporting improving shareholder earnings.",81
+M&M,Pro,PRO_02,Strong 5-year profit growth of 15.3% shows good earnings expansion.,80
+M&M,Pro,PRO_04,ROE of 18.5% indicates efficient use of shareholder capital.,75
+M&M,Pro,PRO_11,Dividend payout of 21.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+MARUTI,Con,CON_10,CapEx intensity of 8.4% indicates a capital-intensive business model.,75
+MARUTI,Pro,PRO_07,Low debt-to-equity of 0.00 indicates a relatively conservative capital structure.,95
+MARUTI,Pro,PRO_08,Interest coverage of 117.91x provides a strong buffer for interest payments.,95
+MARUTI,Pro,PRO_05,ROCE of 21.7% indicates efficient deployment of operating capital.,80
+MARUTI,Pro,PRO_09,"CFO/PAT ratio of 1.25x is classified as High Quality, indicating strong cash backing for earnings.",80
+MARUTI,Pro,PRO_06,ROA of 11.7% indicates productive use of the company's asset base.,77
+MARUTI,Pro,PRO_11,Dividend payout of 29.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+MARUTI,Pro,PRO_04,ROE of 15.8% indicates efficient use of shareholder capital.,71
+MOTHERSON,Con,CON_12,"EPS CAGR is the weakest among the available core financial metrics, at 5.92%. This deserves monitoring.",65
+MOTHERSON,Pro,PRO_09,"CFO/PAT ratio of 2.51x is classified as High Quality, indicating strong cash backing for earnings.",93
+MOTHERSON,Pro,PRO_08,Interest coverage of 5.22x provides a strong buffer for interest payments.,80
+MOTHERSON,Pro,PRO_05,ROCE of 20.2% indicates efficient deployment of operating capital.,78
+MOTHERSON,Pro,PRO_11,Dividend payout of 20.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+NAUKRI,Con,CON_10,CapEx intensity of 33.6% indicates a capital-intensive business model.,95
+NAUKRI,Con,CON_04,"ROE of 2.0% is relatively low, indicating weaker returns on shareholder capital.",88
+NAUKRI,Con,CON_05,"ROCE of 2.3% is relatively low, indicating weaker capital efficiency.",87
+NAUKRI,Con,CON_09,"Free cash flow is negative at -150.00 crore, which can constrain internally generated funding.",86
+NAUKRI,Con,CON_03,"5-year EPS growth is only -2.1%, which may limit shareholder earnings growth.",74
+NAUKRI,Con,CON_02,"5-year profit growth is only 0.1%, showing limited earnings growth.",70
+NAUKRI,Pro,PRO_07,Low debt-to-equity of 0.01 indicates a relatively conservative capital structure.,95
+NAUKRI,Pro,PRO_08,Interest coverage of 28.97x provides a strong buffer for interest payments.,95
+NAUKRI,Pro,PRO_01,Strong 5-year revenue growth of 17.1% indicates healthy business expansion.,82
+NAUKRI,Pro,PRO_09,"CFO/PAT ratio of 1.18x is classified as High Quality, indicating strong cash backing for earnings.",80
+NAUKRI,Pro,PRO_11,Dividend payout of 49.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+NESTLEIND,Con,CON_12,"Revenue CAGR is the weakest among the available core financial metrics, at 14.55%. This deserves monitoring.",65
+NESTLEIND,Pro,PRO_04,ROE of 117.8% indicates efficient use of shareholder capital.,98
+NESTLEIND,Pro,PRO_05,ROCE of 157.7% indicates efficient deployment of operating capital.,98
+NESTLEIND,Pro,PRO_06,ROA of 37.4% indicates productive use of the company's asset base.,95
+NESTLEIND,Pro,PRO_08,Interest coverage of 41.19x provides a strong buffer for interest payments.,95
+NESTLEIND,Pro,PRO_07,Low debt-to-equity of 0.10 indicates a relatively conservative capital structure.,92
+NESTLEIND,Pro,PRO_03,"EPS grew at 15.4% over 5 years, supporting improving shareholder earnings.",80
+NESTLEIND,Pro,PRO_09,"CFO/PAT ratio of 1.06x is classified as High Quality, indicating strong cash backing for earnings.",79
+NHPC,Con,CON_10,CapEx intensity of 62.0% indicates a capital-intensive business model.,95
+NHPC,Con,CON_05,"ROCE of 6.7% is relatively low, indicating weaker capital efficiency.",79
+NHPC,Con,CON_01,"5-year revenue growth is only 1.4%, indicating weak business expansion.",73
+NHPC,Pro,PRO_08,Interest coverage of 11.24x provides a strong buffer for interest payments.,86
+NHPC,Pro,PRO_09,"CFO/PAT ratio of 1.72x is classified as High Quality, indicating strong cash backing for earnings.",85
+NHPC,Pro,PRO_11,Dividend payout of 53.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+NTPC,Con,CON_10,CapEx intensity of 18.0% indicates a capital-intensive business model.,85
+NTPC,Con,CON_06,Debt-to-equity of 1.48 indicates higher financial leverage.,82
+NTPC,Pro,PRO_09,"CFO/PAT ratio of 1.91x is classified as High Quality, indicating strong cash backing for earnings.",87
+NTPC,Pro,PRO_11,Dividend payout of 36.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+ONGC,Con,CON_10,CapEx intensity of 9.7% indicates a capital-intensive business model.,77
+ONGC,Pro,PRO_08,Interest coverage of 11.36x provides a strong buffer for interest payments.,86
+ONGC,Pro,PRO_09,"CFO/PAT ratio of 1.74x is classified as High Quality, indicating strong cash backing for earnings.",85
+ONGC,Pro,PRO_07,Low debt-to-equity of 0.45 indicates a relatively conservative capital structure.,81
+ONGC,Pro,PRO_05,ROCE of 21.0% indicates efficient deployment of operating capital.,79
+ONGC,Pro,PRO_04,ROE of 16.9% indicates efficient use of shareholder capital.,73
+ONGC,Pro,PRO_11,Dividend payout of 31.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+ONGC,Pro,PRO_06,ROA of 8.0% indicates productive use of the company's asset base.,70
+PFC,Con,CON_06,Debt-to-equity of 8.52 indicates higher financial leverage.,95
+PFC,Con,CON_07,Interest coverage of 0.58x provides a limited buffer for interest payments.,91
+PFC,Con,CON_12,"Capital allocation is classified as 'Growth Funded by Debt', which warrants closer monitoring of cash-flow quality and funding requirements.",90
+PFC,Con,CON_08,"CFO/PAT ratio of -3.70x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+PFC,Con,CON_09,"Free cash flow is negative at -101229.00 crore, which can constrain internally generated funding.",86
+PFC,Con,CON_05,"ROCE of 3.5% is relatively low, indicating weaker capital efficiency.",85
+PFC,Pro,PRO_04,ROE of 26.2% indicates efficient use of shareholder capital.,87
+PFC,Pro,PRO_02,Strong 5-year profit growth of 15.9% shows good earnings expansion.,81
+PFC,Pro,PRO_11,Dividend payout of 23.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+PIDILITIND,Con,CON_10,CapEx intensity of 14.3% indicates a capital-intensive business model.,81
+PIDILITIND,Pro,PRO_08,Interest coverage of 54.33x provides a strong buffer for interest payments.,95
+PIDILITIND,Pro,PRO_05,ROCE of 30.8% indicates efficient deployment of operating capital.,94
+PIDILITIND,Pro,PRO_07,Low debt-to-equity of 0.05 indicates a relatively conservative capital structure.,94
+PIDILITIND,Pro,PRO_09,"CFO/PAT ratio of 1.56x is classified as High Quality, indicating strong cash backing for earnings.",84
+PIDILITIND,Pro,PRO_06,ROA of 14.5% indicates productive use of the company's asset base.,83
+PIDILITIND,Pro,PRO_04,ROE of 20.8% indicates efficient use of shareholder capital.,79
+PIDILITIND,Pro,PRO_11,Dividend payout of 47.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+PNB,Con,CON_06,Debt-to-equity of 3.68 indicates higher financial leverage.,93
+PNB,Con,CON_12,"Capital allocation is classified as 'Growth Funded by Debt', which warrants closer monitoring of cash-flow quality and funding requirements.",90
+PNB,Con,CON_08,"CFO/PAT ratio of -3.05x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+PNB,Con,CON_09,"Free cash flow is negative at -29445.00 crore, which can constrain internally generated funding.",86
+PNB,Pro,PRO_04,ROE of 61.3% indicates efficient use of shareholder capital.,98
+PNB,Pro,PRO_01,Strong 5-year revenue growth of 15.9% indicates healthy business expansion.,81
+PNB,Pro,PRO_06,ROA of 12.7% indicates productive use of the company's asset base.,79
+PNB,Pro,PRO_12,CapEx intensity of 1.4% indicates an asset-light business model.,75
+PNB,Pro,PRO_11,Dividend payout of 18.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+POWERGRID,Con,CON_10,CapEx intensity of 28.6% indicates a capital-intensive business model.,95
+POWERGRID,Con,CON_06,Debt-to-equity of 1.42 indicates higher financial leverage.,82
+POWERGRID,Pro,PRO_09,"CFO/PAT ratio of 2.39x is classified as High Quality, indicating strong cash backing for earnings.",92
+POWERGRID,Pro,PRO_05,ROCE of 18.9% indicates efficient deployment of operating capital.,76
+POWERGRID,Pro,PRO_04,ROE of 17.9% indicates efficient use of shareholder capital.,74
+RECLTD,Con,CON_06,Debt-to-equity of 6.42 indicates higher financial leverage.,95
+RECLTD,Con,CON_12,"Capital allocation is classified as 'Growth Funded by Debt', which warrants closer monitoring of cash-flow quality and funding requirements.",90
+RECLTD,Con,CON_08,"CFO/PAT ratio of -4.08x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+RECLTD,Con,CON_09,"Free cash flow is negative at -59554.00 crore, which can constrain internally generated funding.",86
+RECLTD,Con,CON_07,Interest coverage of 1.60x provides a limited buffer for interest payments.,83
+RECLTD,Con,CON_05,"ROCE of 9.3% is relatively low, indicating weaker capital efficiency.",73
+RECLTD,Pro,PRO_02,Strong 5-year profit growth of 19.8% shows good earnings expansion.,85
+RECLTD,Pro,PRO_03,"EPS grew at 19.7% over 5 years, supporting improving shareholder earnings.",85
+RECLTD,Pro,PRO_04,ROE of 20.4% indicates efficient use of shareholder capital.,78
+RECLTD,Pro,PRO_11,Dividend payout of 30.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+RELIANCE,Con,CON_10,CapEx intensity of 12.6% indicates a capital-intensive business model.,80
+RELIANCE,Con,CON_04,"ROE of 10.0% is relatively low, indicating weaker returns on shareholder capital.",72
+RELIANCE,Pro,PRO_09,"CFO/PAT ratio of 2.01x is classified as High Quality, indicating strong cash backing for earnings.",88
+RELIANCE,Pro,PRO_08,Interest coverage of 7.73x provides a strong buffer for interest payments.,83
+RELIANCE,Pro,PRO_11,Dividend payout of 10.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+SBILIFE,Con,CON_10,CapEx intensity of 23.7% indicates a capital-intensive business model.,91
+SBILIFE,Con,CON_05,"ROCE of 1.7% is relatively low, indicating weaker capital efficiency.",89
+SBILIFE,Con,CON_09,"Free cash flow is negative at -2099.00 crore, which can constrain internally generated funding.",86
+SBILIFE,Pro,PRO_09,"CFO/PAT ratio of 15.38x is classified as High Quality, indicating strong cash backing for earnings.",98
+SBILIFE,Pro,PRO_07,Low debt-to-equity of 0.00 indicates a relatively conservative capital structure.,95
+SBILIFE,Pro,PRO_08,Interest coverage of 240.33x provides a strong buffer for interest payments.,95
+SBILIFE,Pro,PRO_01,Strong 5-year revenue growth of 24.2% indicates healthy business expansion.,89
+SBILIFE,Pro,PRO_11,Dividend payout of 14.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+SBIN,Con,CON_08,"CFO/PAT ratio of 0.31x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+SBIN,Pro,PRO_02,Strong 5-year profit growth of 83.4% shows good earnings expansion.,98
+SBIN,Pro,PRO_03,"EPS grew at 90.4% over 5 years, supporting improving shareholder earnings.",97
+SBIN,Pro,PRO_12,CapEx intensity of 0.8% indicates an asset-light business model.,75
+SBIN,Pro,PRO_11,Dividend payout of 18.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+SHREECEM,Con,CON_04,"ROE of 8.4% is relatively low, indicating weaker returns on shareholder capital.",75
+SHREECEM,Pro,PRO_08,Interest coverage of 19.83x provides a strong buffer for interest payments.,95
+SHREECEM,Pro,PRO_07,Low debt-to-equity of 0.08 indicates a relatively conservative capital structure.,93
+SHREECEM,Pro,PRO_09,"CFO/PAT ratio of 1.93x is classified as High Quality, indicating strong cash backing for earnings.",87
+SHREECEM,Pro,PRO_05,ROCE of 20.2% indicates efficient deployment of operating capital.,78
+SHREECEM,Pro,PRO_11,Dividend payout of 16.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+SHRIRAMFIN,Con,CON_06,Debt-to-equity of 3.99 indicates higher financial leverage.,95
+SHRIRAMFIN,Con,CON_07,Interest coverage of 0.68x provides a limited buffer for interest payments.,91
+SHRIRAMFIN,Con,CON_12,"Capital allocation is classified as 'Growth Funded by Debt', which warrants closer monitoring of cash-flow quality and funding requirements.",90
+SHRIRAMFIN,Con,CON_08,"CFO/PAT ratio of -4.20x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+SHRIRAMFIN,Con,CON_09,"Free cash flow is negative at -31359.00 crore, which can constrain internally generated funding.",86
+SHRIRAMFIN,Con,CON_05,"ROCE of 4.3% is relatively low, indicating weaker capital efficiency.",83
+SHRIRAMFIN,Pro,PRO_02,Strong 5-year profit growth of 23.5% shows good earnings expansion.,88
+SHRIRAMFIN,Pro,PRO_01,Strong 5-year revenue growth of 18.6% indicates healthy business expansion.,84
+SHRIRAMFIN,Pro,PRO_12,CapEx intensity of 0.7% indicates an asset-light business model.,75
+SHRIRAMFIN,Pro,PRO_11,Dividend payout of 23.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+SHRIRAMFIN,Pro,PRO_04,ROE of 15.1% indicates efficient use of shareholder capital.,70
+SIEMENS,Con,CON_12,"Revenue CAGR is the weakest among the available core financial metrics, at 11.19%. This deserves monitoring.",65
+SIEMENS,Pro,PRO_08,Interest coverage of 67.15x provides a strong buffer for interest payments.,95
+SIEMENS,Pro,PRO_07,Low debt-to-equity of 0.02 indicates a relatively conservative capital structure.,94
+SIEMENS,Pro,PRO_02,Strong 5-year profit growth of 19.9% shows good earnings expansion.,85
+SIEMENS,Pro,PRO_03,"EPS grew at 19.6% over 5 years, supporting improving shareholder earnings.",85
+SIEMENS,Pro,PRO_05,ROCE of 19.9% indicates efficient deployment of operating capital.,77
+SIEMENS,Pro,PRO_06,ROA of 10.7% indicates productive use of the company's asset base.,75
+SIEMENS,Pro,PRO_12,CapEx intensity of 2.3% indicates an asset-light business model.,75
+SIEMENS,Pro,PRO_04,ROE of 17.7% indicates efficient use of shareholder capital.,74
+SIEMENS,Pro,PRO_11,Dividend payout of 16.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+SUNPHARMA,Con,CON_12,"Revenue CAGR is the weakest among the available core financial metrics, at 10.78%. This deserves monitoring.",65
+SUNPHARMA,Pro,PRO_08,Interest coverage of 58.33x provides a strong buffer for interest payments.,95
+SUNPHARMA,Pro,PRO_03,"EPS grew at 29.5% over 5 years, supporting improving shareholder earnings.",94
+SUNPHARMA,Pro,PRO_07,Low debt-to-equity of 0.05 indicates a relatively conservative capital structure.,93
+SUNPHARMA,Pro,PRO_02,Strong 5-year profit growth of 24.5% shows good earnings expansion.,90
+SUNPHARMA,Pro,PRO_09,"CFO/PAT ratio of 1.26x is classified as High Quality, indicating strong cash backing for earnings.",81
+SUNPHARMA,Pro,PRO_05,ROCE of 19.4% indicates efficient deployment of operating capital.,77
+SUNPHARMA,Pro,PRO_06,ROA of 11.3% indicates productive use of the company's asset base.,77
+SUNPHARMA,Pro,PRO_12,CapEx intensity of 1.6% indicates an asset-light business model.,75
+SUNPHARMA,Pro,PRO_10,FCF conversion of 87.4% indicates good conversion of operating profit into free cash flow.,74
+SUNPHARMA,Pro,PRO_11,Dividend payout of 34.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+SUNPHARMA,Pro,PRO_04,ROE of 15.1% indicates efficient use of shareholder capital.,70
+TATACONSUM,Con,CON_10,CapEx intensity of 12.6% indicates a capital-intensive business model.,80
+TATACONSUM,Con,CON_04,"ROE of 7.6% is relatively low, indicating weaker returns on shareholder capital.",77
+TATACONSUM,Pro,PRO_08,Interest coverage of 25.32x provides a strong buffer for interest payments.,95
+TATACONSUM,Pro,PRO_07,Low debt-to-equity of 0.22 indicates a relatively conservative capital structure.,89
+TATACONSUM,Pro,PRO_02,Strong 5-year profit growth of 21.6% shows good earnings expansion.,87
+TATACONSUM,Pro,PRO_09,"CFO/PAT ratio of 1.59x is classified as High Quality, indicating strong cash backing for earnings.",84
+TATACONSUM,Pro,PRO_01,Strong 5-year revenue growth of 16.0% indicates healthy business expansion.,81
+TATAMOTORS,Con,CON_06,Debt-to-equity of 1.26 indicates higher financial leverage.,81
+TATAMOTORS,Pro,PRO_04,ROE of 37.5% indicates efficient use of shareholder capital.,98
+TATAMOTORS,Pro,PRO_05,ROCE of 31.0% indicates efficient deployment of operating capital.,94
+TATAMOTORS,Pro,PRO_09,"CFO/PAT ratio of 2.14x is classified as High Quality, indicating strong cash backing for earnings.",89
+TATAMOTORS,Pro,PRO_08,Interest coverage of 6.53x provides a strong buffer for interest payments.,82
+TATAMOTORS,Pro,PRO_06,ROA of 8.6% indicates productive use of the company's asset base.,71
+TATAPOWER,Con,CON_06,Debt-to-equity of 1.66 indicates higher financial leverage.,83
+TATAPOWER,Con,CON_10,CapEx intensity of 14.7% indicates a capital-intensive business model.,82
+TATAPOWER,Pro,PRO_09,"CFO/PAT ratio of 2.94x is classified as High Quality, indicating strong cash backing for earnings.",97
+TATAPOWER,Pro,PRO_01,Strong 5-year revenue growth of 15.5% indicates healthy business expansion.,81
+TATAPOWER,Pro,PRO_11,Dividend payout of 17.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+TATASTEEL,Con,CON_04,"ROE of -5.3% is relatively low, indicating weaker returns on shareholder capital.",95
+TATASTEEL,Con,CON_08,"CFO/PAT ratio of -4.13x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+TATASTEEL,Pro,PRO_12,ROCE provides a measurable financial strength with a latest available value of 12.42%.,65
+TCS,Con,CON_12,"Profit CAGR is the weakest among the available core financial metrics, at 7.87%. This deserves monitoring.",65
+TCS,Pro,PRO_04,ROE of 50.9% indicates efficient use of shareholder capital.,98
+TCS,Pro,PRO_05,ROCE of 65.3% indicates efficient deployment of operating capital.,98
+TCS,Pro,PRO_06,ROA of 31.7% indicates productive use of the company's asset base.,95
+TCS,Pro,PRO_08,Interest coverage of 87.10x provides a strong buffer for interest payments.,95
+TCS,Pro,PRO_07,Low debt-to-equity of 0.09 indicates a relatively conservative capital structure.,92
+TCS,Pro,PRO_12,CapEx intensity of 2.5% indicates an asset-light business model.,75
+TCS,Pro,PRO_11,Dividend payout of 58.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+TECHM,Con,CON_03,"5-year EPS growth is only -11.4%, which may limit shareholder earnings growth.",93
+TECHM,Con,CON_02,"5-year profit growth is only -11.0%, showing limited earnings growth.",92
+TECHM,Con,CON_04,"ROE of 9.0% is relatively low, indicating weaker returns on shareholder capital.",74
+TECHM,Pro,PRO_09,"CFO/PAT ratio of 2.66x is classified as High Quality, indicating strong cash backing for earnings.",95
+TECHM,Pro,PRO_07,Low debt-to-equity of 0.10 indicates a relatively conservative capital structure.,92
+TECHM,Pro,PRO_08,Interest coverage of 13.86x provides a strong buffer for interest payments.,89
+TECHM,Pro,PRO_10,FCF conversion of 112.3% indicates good conversion of operating profit into free cash flow.,86
+TECHM,Pro,PRO_12,CapEx intensity of 2.5% indicates an asset-light business model.,75
+TECHM,Pro,PRO_05,ROCE of 15.4% indicates efficient deployment of operating capital.,71
+TITAN,Con,CON_08,"CFO/PAT ratio of 0.48x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+TITAN,Con,CON_06,Debt-to-equity of 1.65 indicates higher financial leverage.,83
+TITAN,Pro,PRO_04,ROE of 37.2% indicates efficient use of shareholder capital.,98
+TITAN,Pro,PRO_01,Strong 5-year revenue growth of 20.9% indicates healthy business expansion.,86
+TITAN,Pro,PRO_02,Strong 5-year profit growth of 20.3% shows good earnings expansion.,85
+TITAN,Pro,PRO_03,"EPS grew at 19.5% over 5 years, supporting improving shareholder earnings.",85
+TITAN,Pro,PRO_08,Interest coverage of 9.41x provides a strong buffer for interest payments.,84
+TITAN,Pro,PRO_05,ROCE of 21.2% indicates efficient deployment of operating capital.,79
+TITAN,Pro,PRO_06,ROA of 11.1% indicates productive use of the company's asset base.,76
+TITAN,Pro,PRO_12,CapEx intensity of 0.4% indicates an asset-light business model.,75
+TITAN,Pro,PRO_11,Dividend payout of 28.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+TORNTPHARM,Con,CON_12,"Revenue CAGR is the weakest among the available core financial metrics, at 6.93%. This deserves monitoring.",65
+TORNTPHARM,Pro,PRO_02,Strong 5-year profit growth of 30.6% shows good earnings expansion.,96
+TORNTPHARM,Pro,PRO_03,"EPS grew at 30.4% over 5 years, supporting improving shareholder earnings.",95
+TORNTPHARM,Pro,PRO_05,ROCE of 31.0% indicates efficient deployment of operating capital.,94
+TORNTPHARM,Pro,PRO_09,"CFO/PAT ratio of 1.97x is classified as High Quality, indicating strong cash backing for earnings.",88
+TORNTPHARM,Pro,PRO_08,Interest coverage of 9.93x provides a strong buffer for interest payments.,85
+TORNTPHARM,Pro,PRO_04,ROE of 24.2% indicates efficient use of shareholder capital.,84
+TORNTPHARM,Pro,PRO_06,ROA of 11.4% indicates productive use of the company's asset base.,77
+TORNTPHARM,Pro,PRO_10,FCF conversion of 92.2% indicates good conversion of operating profit into free cash flow.,76
+TORNTPHARM,Pro,PRO_12,CapEx intensity of 1.5% indicates an asset-light business model.,75
+TORNTPHARM,Pro,PRO_11,Dividend payout of 57.0% shows a balanced approach between shareholder returns and retaining earnings.,72
+TRENT,Con,CON_12,"ROCE is the weakest among the available core financial metrics, at 33.86%. This deserves monitoring.",65
+TRENT,Pro,PRO_01,Strong 5-year revenue growth of 36.3% indicates healthy business expansion.,98
+TRENT,Pro,PRO_02,Strong 5-year profit growth of 73.1% shows good earnings expansion.,98
+TRENT,Pro,PRO_04,ROE of 36.3% indicates efficient use of shareholder capital.,98
+TRENT,Pro,PRO_05,ROCE of 33.9% indicates efficient deployment of operating capital.,98
+TRENT,Pro,PRO_03,"EPS grew at 69.5% over 5 years, supporting improving shareholder earnings.",97
+TRENT,Pro,PRO_06,ROA of 20.6% indicates productive use of the company's asset base.,95
+TRENT,Pro,PRO_08,Interest coverage of 8.04x provides a strong buffer for interest payments.,83
+TRENT,Pro,PRO_07,Low debt-to-equity of 0.43 indicates a relatively conservative capital structure.,82
+TVSMOTOR,Con,CON_06,Debt-to-equity of 3.83 indicates higher financial leverage.,94
+TVSMOTOR,Con,CON_12,"Capital allocation is classified as 'Growth Funded by Debt', which warrants closer monitoring of cash-flow quality and funding requirements.",90
+TVSMOTOR,Con,CON_08,"CFO/PAT ratio of -0.70x is classified as Accrual Risk, suggesting earnings have weaker cash support.",88
+TVSMOTOR,Con,CON_09,"Free cash flow is negative at -2254.00 crore, which can constrain internally generated funding.",86
+TVSMOTOR,Pro,PRO_04,ROE of 26.2% indicates efficient use of shareholder capital.,87
+TVSMOTOR,Pro,PRO_02,Strong 5-year profit growth of 19.7% shows good earnings expansion.,85
+TVSMOTOR,Pro,PRO_03,"EPS grew at 19.1% over 5 years, supporting improving shareholder earnings.",84
+TVSMOTOR,Pro,PRO_12,CapEx intensity of 2.6% indicates an asset-light business model.,75
+TVSMOTOR,Pro,PRO_05,ROCE of 16.8% indicates efficient deployment of operating capital.,73
+TVSMOTOR,Pro,PRO_11,Dividend payout of 23.0% shows a balanced approach between shareholder returns and retaining earnings.,72
