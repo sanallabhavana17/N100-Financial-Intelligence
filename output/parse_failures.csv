@@ -1,0 +1,13 @@
+company_id,metric_type,raw_text,reason
+HDFCBANK,compounded_sales_growth,TTM:            47%,Pattern not matched
+HDFCBANK,compounded_profit_growth,TTM:                27%,Pattern not matched
+HDFCBANK,roe,Last Year:    17%,Pattern not matched
+INFY,compounded_sales_growth,TTM:            3%,Pattern not matched
+INFY,compounded_profit_growth,TTM:                 8%,Pattern not matched
+INFY,roe,Last Year:     32%,Pattern not matched
+SBILIFE,compounded_sales_growth,TTM:            43%,Pattern not matched
+SBILIFE,compounded_profit_growth,TTM:                 18%,Pattern not matched
+SBILIFE,roe,Last Year:      12%,Pattern not matched
+TCS,compounded_sales_growth,TTM:            5%             ,Pattern not matched
+TCS,compounded_profit_growth,TTM:                 8%,Pattern not matched
+TCS,roe,Last Year:       52%,Pattern not matched
