@@ -16,4 +16,4 @@ The application is built using Streamlit and uses a SQLite database.
 From the project root:
 
 ```powershell
-streamlit run app.py
+streamlit run src/dashboard/app.py

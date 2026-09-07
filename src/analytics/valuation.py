@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 
-from src.dashboard.data_loader import load_db
+from src.dashboard.utils.db import _read_sql
 
 
 # ============================================================
@@ -65,7 +65,7 @@ def build_valuation_summary():
         m.year
     """
 
-    df = load_db(query)
+    df = _read_sql(query)
 
     if df.empty:
         raise ValueError(
