@@ -1,9 +1,8 @@
-from pathlib import Path
 import sqlite3
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
-
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 DB_PATH = BASE_DIR / "data" / "nifty100.db"
@@ -16,9 +15,7 @@ def load_db(
     """Run a SQL query against the NIFTY 100 SQLite database."""
 
     if not DB_PATH.exists():
-        raise FileNotFoundError(
-            f"Database not found: {DB_PATH}"
-        )
+        raise FileNotFoundError(f"Database not found: {DB_PATH}")
 
     with sqlite3.connect(DB_PATH) as connection:
         return pd.read_sql_query(

@@ -24,7 +24,6 @@ from pathlib import Path
 
 import pandas as pd
 
-
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
@@ -39,6 +38,7 @@ OUTPUT_FILE = OUTPUT_DIR / "pros_cons_generated.csv"
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def to_float(value):
     """Safely convert database values to float."""
@@ -69,6 +69,7 @@ def to_float(value):
 
 
 def is_valid(value):
+    """Is valid."""
     return value is not None and math.isfinite(value)
 
 
@@ -80,6 +81,7 @@ def fmt_pct(value):
 
 
 def fmt_num(value):
+    """Fmt num."""
     if not is_valid(value):
         return "N/A"
     return f"{value:.2f}"
@@ -106,6 +108,7 @@ def latest_rows(df):
 # ---------------------------------------------------------------------------
 # Rule engine
 # ---------------------------------------------------------------------------
+
 
 def generate_pros(row):
     """
@@ -145,8 +148,8 @@ def generate_pros(row):
         pros.append(
             (
                 "PRO_01",
-                f"Strong 5-year revenue growth of {fmt_pct(revenue_5y)} "
-                f"indicates healthy business expansion.",
+                (f"Strong 5-year revenue growth of {fmt_pct(revenue_5y)} "
+                f"indicates healthy business expansion."),
                 round(confidence),
             )
         )
@@ -161,8 +164,8 @@ def generate_pros(row):
         pros.append(
             (
                 "PRO_02",
-                f"Strong 5-year profit growth of {fmt_pct(profit_5y)} "
-                f"shows good earnings expansion.",
+                (f"Strong 5-year profit growth of {fmt_pct(profit_5y)} "
+                f"shows good earnings expansion."),
                 round(confidence),
             )
         )
@@ -177,8 +180,8 @@ def generate_pros(row):
         pros.append(
             (
                 "PRO_03",
-                f"EPS grew at {fmt_pct(eps_5y)} over 5 years, "
-                f"supporting improving shareholder earnings.",
+                (f"EPS grew at {fmt_pct(eps_5y)} over 5 years, "
+                f"supporting improving shareholder earnings."),
                 round(confidence),
             )
         )
@@ -193,8 +196,8 @@ def generate_pros(row):
         pros.append(
             (
                 "PRO_04",
-                f"ROE of {fmt_pct(roe)} indicates efficient use "
-                f"of shareholder capital.",
+                (f"ROE of {fmt_pct(roe)} indicates efficient use "
+                f"of shareholder capital."),
                 round(confidence),
             )
         )
@@ -209,8 +212,8 @@ def generate_pros(row):
         pros.append(
             (
                 "PRO_05",
-                f"ROCE of {fmt_pct(roce)} indicates efficient "
-                f"deployment of operating capital.",
+                (f"ROCE of {fmt_pct(roce)} indicates efficient "
+                f"deployment of operating capital."),
                 round(confidence),
             )
         )
@@ -225,8 +228,8 @@ def generate_pros(row):
         pros.append(
             (
                 "PRO_06",
-                f"ROA of {fmt_pct(roa)} indicates productive use "
-                f"of the company's asset base.",
+                (f"ROA of {fmt_pct(roa)} indicates productive use "
+                f"of the company's asset base."),
                 round(confidence),
             )
         )
@@ -241,8 +244,8 @@ def generate_pros(row):
         pros.append(
             (
                 "PRO_07",
-                f"Low debt-to-equity of {fmt_num(debt_equity)} "
-                f"indicates a relatively conservative capital structure.",
+                (f"Low debt-to-equity of {fmt_num(debt_equity)} "
+                f"indicates a relatively conservative capital structure."),
                 round(confidence),
             )
         )
@@ -257,8 +260,8 @@ def generate_pros(row):
         pros.append(
             (
                 "PRO_08",
-                f"Interest coverage of {fmt_num(interest_coverage)}x "
-                f"provides a strong buffer for interest payments.",
+                (f"Interest coverage of {fmt_num(interest_coverage)}x "
+                f"provides a strong buffer for interest payments."),
                 round(confidence),
             )
         )
@@ -273,8 +276,8 @@ def generate_pros(row):
         pros.append(
             (
                 "PRO_09",
-                f"CFO/PAT ratio of {fmt_num(cfo_quality)}x is classified "
-                f"as High Quality, indicating strong cash backing for earnings.",
+                (f"CFO/PAT ratio of {fmt_num(cfo_quality)}x is classified "
+                f"as High Quality, indicating strong cash backing for earnings."),
                 round(confidence),
             )
         )
@@ -289,8 +292,8 @@ def generate_pros(row):
         pros.append(
             (
                 "PRO_10",
-                f"FCF conversion of {fmt_pct(fcf_conversion)} indicates "
-                f"good conversion of operating profit into free cash flow.",
+                (f"FCF conversion of {fmt_pct(fcf_conversion)} indicates "
+                f"good conversion of operating profit into free cash flow."),
                 round(confidence),
             )
         )
@@ -299,17 +302,13 @@ def generate_pros(row):
     # PRO 11 - Reasonable dividend payout
     # ---------------------------------------------------------------
 
-    if (
-        is_valid(dividend_payout)
-        and dividend_payout >= 10
-        and dividend_payout <= 60
-    ):
+    if is_valid(dividend_payout) and dividend_payout >= 10 and dividend_payout <= 60:
         pros.append(
             (
                 "PRO_11",
-                f"Dividend payout of {fmt_pct(dividend_payout)} "
+                (f"Dividend payout of {fmt_pct(dividend_payout)} "
                 f"shows a balanced approach between shareholder returns "
-                f"and retaining earnings.",
+                f"and retaining earnings."),
                 72,
             )
         )
@@ -322,8 +321,8 @@ def generate_pros(row):
         pros.append(
             (
                 "PRO_12",
-                f"CapEx intensity of {fmt_pct(capex_intensity)} "
-                f"indicates an asset-light business model.",
+                (f"CapEx intensity of {fmt_pct(capex_intensity)} "
+                f"indicates an asset-light business model."),
                 75,
             )
         )
@@ -358,9 +357,7 @@ def generate_cons(row):
 
     high_leverage = to_float(row.get("high_leverage_flag"))
 
-    capital_pattern = str(
-        row.get("capital_allocation_pattern") or ""
-    ).strip()
+    capital_pattern = str(row.get("capital_allocation_pattern") or "").strip()
 
     # ---------------------------------------------------------------
     # CON 01 - Weak revenue growth
@@ -372,8 +369,8 @@ def generate_cons(row):
         cons.append(
             (
                 "CON_01",
-                f"5-year revenue growth is only {fmt_pct(revenue_5y)}, "
-                f"indicating weak business expansion.",
+                (f"5-year revenue growth is only {fmt_pct(revenue_5y)}, "
+                f"indicating weak business expansion."),
                 round(confidence),
             )
         )
@@ -388,8 +385,8 @@ def generate_cons(row):
         cons.append(
             (
                 "CON_02",
-                f"5-year profit growth is only {fmt_pct(profit_5y)}, "
-                f"showing limited earnings growth.",
+                (f"5-year profit growth is only {fmt_pct(profit_5y)}, "
+                f"showing limited earnings growth."),
                 round(confidence),
             )
         )
@@ -404,8 +401,8 @@ def generate_cons(row):
         cons.append(
             (
                 "CON_03",
-                f"5-year EPS growth is only {fmt_pct(eps_5y)}, "
-                f"which may limit shareholder earnings growth.",
+                (f"5-year EPS growth is only {fmt_pct(eps_5y)}, "
+                f"which may limit shareholder earnings growth."),
                 round(confidence),
             )
         )
@@ -420,8 +417,8 @@ def generate_cons(row):
         cons.append(
             (
                 "CON_04",
-                f"ROE of {fmt_pct(roe)} is relatively low, "
-                f"indicating weaker returns on shareholder capital.",
+                (f"ROE of {fmt_pct(roe)} is relatively low, "
+                f"indicating weaker returns on shareholder capital."),
                 round(confidence),
             )
         )
@@ -436,8 +433,8 @@ def generate_cons(row):
         cons.append(
             (
                 "CON_05",
-                f"ROCE of {fmt_pct(roce)} is relatively low, "
-                f"indicating weaker capital efficiency.",
+                (f"ROCE of {fmt_pct(roce)} is relatively low, "
+                f"indicating weaker capital efficiency."),
                 round(confidence),
             )
         )
@@ -452,8 +449,8 @@ def generate_cons(row):
         cons.append(
             (
                 "CON_06",
-                f"Debt-to-equity of {fmt_num(debt_equity)} indicates "
-                f"higher financial leverage.",
+                (f"Debt-to-equity of {fmt_num(debt_equity)} indicates "
+                f"higher financial leverage."),
                 round(confidence),
             )
         )
@@ -468,8 +465,8 @@ def generate_cons(row):
         cons.append(
             (
                 "CON_07",
-                f"Interest coverage of {fmt_num(interest_coverage)}x "
-                f"provides a limited buffer for interest payments.",
+                (f"Interest coverage of {fmt_num(interest_coverage)}x "
+                f"provides a limited buffer for interest payments."),
                 round(confidence),
             )
         )
@@ -482,8 +479,8 @@ def generate_cons(row):
         cons.append(
             (
                 "CON_08",
-                f"CFO/PAT ratio of {fmt_num(cfo_quality)}x is classified "
-                f"as Accrual Risk, suggesting earnings have weaker cash support.",
+                (f"CFO/PAT ratio of {fmt_num(cfo_quality)}x is classified "
+                f"as Accrual Risk, suggesting earnings have weaker cash support."),
                 88,
             )
         )
@@ -496,8 +493,8 @@ def generate_cons(row):
         cons.append(
             (
                 "CON_09",
-                f"Free cash flow is negative at {fmt_num(fcf)} crore, "
-                f"which can constrain internally generated funding.",
+                (f"Free cash flow is negative at {fmt_num(fcf)} crore, "
+                f"which can constrain internally generated funding."),
                 86,
             )
         )
@@ -512,8 +509,8 @@ def generate_cons(row):
         cons.append(
             (
                 "CON_10",
-                f"CapEx intensity of {fmt_pct(capex_intensity)} "
-                f"indicates a capital-intensive business model.",
+                (f"CapEx intensity of {fmt_pct(capex_intensity)} "
+                f"indicates a capital-intensive business model."),
                 round(confidence),
             )
         )
@@ -526,8 +523,8 @@ def generate_cons(row):
         cons.append(
             (
                 "CON_11",
-                "The company is flagged for high leverage, "
-                "which increases financial risk.",
+                ("The company is flagged for high leverage, "
+                "which increases financial risk."),
                 92,
             )
         )
@@ -545,9 +542,9 @@ def generate_cons(row):
         cons.append(
             (
                 "CON_12",
-                f"Capital allocation is classified as '{label}', "
+                (f"Capital allocation is classified as '{label}', "
                 f"which warrants closer monitoring of cash-flow quality "
-                f"and funding requirements.",
+                f"and funding requirements."),
                 90,
             )
         )
@@ -558,6 +555,7 @@ def generate_cons(row):
 # ---------------------------------------------------------------------------
 # Fallback rules
 # ---------------------------------------------------------------------------
+
 
 def fallback_pro(row):
     """
@@ -582,9 +580,9 @@ def fallback_pro(row):
 
         return (
             "PRO_12",
-            f"{name} provides a measurable financial strength "
+            (f"{name} provides a measurable financial strength "
             f"with a latest available value of {fmt_num(value)}"
-            f"{'%' if name != 'CFO/PAT' else 'x'}.",
+            f"{'%' if name != 'CFO/PAT' else 'x'}."),
             65,
         )
 
@@ -617,15 +615,15 @@ def fallback_con(row):
 
         return (
             "CON_12",
-            f"{name} is the weakest among the available core financial "
-            f"metrics, at {fmt_num(value)}%. This deserves monitoring.",
+            (f"{name} is the weakest among the available core financial "
+            f"metrics, at {fmt_num(value)}%. This deserves monitoring."),
             65,
         )
 
     return (
         "CON_12",
-        "Limited financial information is available for generating "
-        "stronger rule-based risk signals.",
+        ("Limited financial information is available for generating "
+        "stronger rule-based risk signals."),
         61,
     )
 
@@ -634,7 +632,9 @@ def fallback_con(row):
 # Main
 # ---------------------------------------------------------------------------
 
+
 def main():
+    """Main."""
     print("N100 NLP PROS / CONS GENERATOR")
     print("=" * 70)
 
@@ -671,15 +671,9 @@ def main():
         cons = generate_cons(row)
 
         # Only confidence > 60 is allowed.
-        pros = [
-            item for item in pros
-            if item[2] > 60
-        ]
+        pros = [item for item in pros if item[2] > 60]
 
-        cons = [
-            item for item in cons
-            if item[2] > 60
-        ]
+        cons = [item for item in cons if item[2] > 60]
 
         # Requirement: every company gets at least 1 Pro.
         if not pros:
@@ -723,9 +717,7 @@ def main():
     )
 
     # Final confidence filter.
-    result = result[
-        result["confidence_pct"] > 60
-    ].copy()
+    result = result[result["confidence_pct"] > 60].copy()
 
     result = result.sort_values(
         ["company_id", "type", "confidence_pct", "rule_id"],
@@ -744,13 +736,9 @@ def main():
 
     company_count = result["company_id"].nunique()
 
-    pro_companies = set(
-        result.loc[result["type"] == "Pro", "company_id"]
-    )
+    pro_companies = set(result.loc[result["type"] == "Pro", "company_id"])
 
-    con_companies = set(
-        result.loc[result["type"] == "Con", "company_id"]
-    )
+    con_companies = set(result.loc[result["type"] == "Con", "company_id"])
 
     all_companies = set(latest["company_id"].astype(str))
 
@@ -778,23 +766,17 @@ def main():
         print("ERROR: Companies missing Pro:")
         print(missing_pro)
 
-        raise RuntimeError(
-            "Every company must have at least one Pro."
-        )
+        raise RuntimeError("Every company must have at least one Pro.")
 
     if missing_con:
         print()
         print("ERROR: Companies missing Con:")
         print(missing_con)
 
-        raise RuntimeError(
-            "Every company must have at least one Con."
-        )
+        raise RuntimeError("Every company must have at least one Con.")
 
     if result["confidence_pct"].min() <= 60:
-        raise RuntimeError(
-            "Confidence filter failed: value <= 60 found."
-        )
+        raise RuntimeError("Confidence filter failed: value <= 60 found.")
 
     print()
     print(f"Saved: {OUTPUT_FILE}")

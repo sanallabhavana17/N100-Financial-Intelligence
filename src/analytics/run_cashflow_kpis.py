@@ -1,13 +1,12 @@
 import pandas as pd
 
 from src.analytics.cashflow_kpis import (
-    free_cash_flow,
-    cfo_quality_score,
     capex_intensity,
-    fcf_conversion_rate,
     capital_allocation_pattern,
+    cfo_quality_score,
+    fcf_conversion_rate,
+    free_cash_flow,
 )
-
 
 # ==========================================================
 # CONFIGURATION
@@ -35,15 +34,9 @@ print("P&L rows:", len(pnl))
 # 2. NORMALIZE COLUMNS
 # ==========================================================
 
-cashflow.columns = [
-    str(col).strip().lower()
-    for col in cashflow.columns
-]
+cashflow.columns = [str(col).strip().lower() for col in cashflow.columns]
 
-pnl.columns = [
-    str(col).strip().lower()
-    for col in pnl.columns
-]
+pnl.columns = [str(col).strip().lower() for col in pnl.columns]
 
 
 # ==========================================================
@@ -52,28 +45,16 @@ pnl.columns = [
 
 for df in [cashflow, pnl]:
 
-    df["company_id"] = (
-        df["company_id"]
-        .astype(str)
-        .str.strip()
-        .str.upper()
-    )
+    df["company_id"] = df["company_id"].astype(str).str.strip().str.upper()
 
-    df["year"] = pd.to_numeric(
-        df["year"],
-        errors="coerce"
-    )
+    df["year"] = pd.to_numeric(df["year"], errors="coerce")
 
 
 # Remove invalid years
 
-cashflow = cashflow.dropna(
-    subset=["company_id", "year"]
-).copy()
+cashflow = cashflow.dropna(subset=["company_id", "year"]).copy()
 
-pnl = pnl.dropna(
-    subset=["company_id", "year"]
-).copy()
+pnl = pnl.dropna(subset=["company_id", "year"]).copy()
 
 cashflow["year"] = cashflow["year"].astype(int)
 pnl["year"] = pnl["year"].astype(int)
@@ -83,35 +64,19 @@ pnl["year"] = pnl["year"].astype(int)
 # 4. VERIFY UNIQUENESS
 # ==========================================================
 
-cashflow_duplicates = cashflow.duplicated(
-    ["company_id", "year"]
-).sum()
+cashflow_duplicates = cashflow.duplicated(["company_id", "year"]).sum()
 
-pnl_duplicates = pnl.duplicated(
-    ["company_id", "year"]
-).sum()
+pnl_duplicates = pnl.duplicated(["company_id", "year"]).sum()
 
-print(
-    "Cash Flow company-year duplicates:",
-    cashflow_duplicates
-)
+print("Cash Flow company-year duplicates:", cashflow_duplicates)
 
-print(
-    "P&L company-year duplicates:",
-    pnl_duplicates
-)
+print("P&L company-year duplicates:", pnl_duplicates)
 
 if cashflow_duplicates > 0:
-    raise ValueError(
-        "Duplicate company-year records found "
-        "in Cash Flow data."
-    )
+    raise ValueError("Duplicate company-year records found " "in Cash Flow data.")
 
 if pnl_duplicates > 0:
-    raise ValueError(
-        "Duplicate company-year records found "
-        "in P&L data."
-    )
+    raise ValueError("Duplicate company-year records found " "in P&L data.")
 
 
 # ==========================================================
@@ -150,15 +115,9 @@ df = cashflow.merge(
     validate="one_to_one",
 )
 
-print(
-    "\nMerged rows:",
-    len(df)
-)
+print("\nMerged rows:", len(df))
 
-print(
-    "Companies:",
-    df["company_id"].nunique()
-)
+print("Companies:", df["company_id"].nunique())
 
 
 # ==========================================================
@@ -177,7 +136,6 @@ for _, row in df.iterrows():
     operating_profit = row["operating_profit"]
     pat = row["net_profit"]
 
-
     # ------------------------------------------------------
     # Free Cash Flow
     # ------------------------------------------------------
@@ -187,30 +145,23 @@ for _, row in df.iterrows():
         cfi,
     )
 
-
     # ------------------------------------------------------
     # CFO Quality
     # ------------------------------------------------------
 
-    cfo_quality_ratio, cfo_quality_label = (
-        cfo_quality_score(
-            cfo,
-            pat,
-        )
+    cfo_quality_ratio, cfo_quality_label = cfo_quality_score(
+        cfo,
+        pat,
     )
-
 
     # ------------------------------------------------------
     # CapEx Intensity
     # ------------------------------------------------------
 
-    capex_intensity_pct, capex_intensity_label = (
-        capex_intensity(
-            cfi,
-            sales,
-        )
+    capex_intensity_pct, capex_intensity_label = capex_intensity(
+        cfi,
+        sales,
     )
-
 
     # ------------------------------------------------------
     # FCF Conversion
@@ -220,7 +171,6 @@ for _, row in df.iterrows():
         fcf,
         operating_profit,
     )
-
 
     # ------------------------------------------------------
     # Capital Allocation
@@ -232,7 +182,6 @@ for _, row in df.iterrows():
         cff,
         cfo_quality_ratio,
     )
-
 
     results.append(
         {
@@ -270,22 +219,11 @@ print("\n========================================")
 print("CASH FLOW KPI VALIDATION")
 print("========================================")
 
-print(
-    "Rows:",
-    len(result)
-)
+print("Rows:", len(result))
 
-print(
-    "Companies:",
-    result["company_id"].nunique()
-)
+print("Companies:", result["company_id"].nunique())
 
-print(
-    "Company-year duplicates:",
-    result.duplicated(
-        ["company_id", "year"]
-    ).sum()
-)
+print("Company-year duplicates:", result.duplicated(["company_id", "year"]).sum())
 
 
 # ==========================================================
@@ -294,29 +232,17 @@ print(
 
 print("\nCFO Quality Distribution:")
 
-print(
-    result[
-        "cfo_quality_label"
-    ].value_counts(dropna=False)
-)
+print(result["cfo_quality_label"].value_counts(dropna=False))
 
 
 print("\nCapEx Intensity Distribution:")
 
-print(
-    result[
-        "capex_intensity_label"
-    ].value_counts(dropna=False)
-)
+print(result["capex_intensity_label"].value_counts(dropna=False))
 
 
 print("\nCapital Allocation Distribution:")
 
-print(
-    result[
-        "capital_allocation_pattern"
-    ].value_counts(dropna=False)
-)
+print(result["capital_allocation_pattern"].value_counts(dropna=False))
 
 
 # ==========================================================
@@ -328,9 +254,7 @@ result.to_csv(
     index=False,
 )
 
-print(
-    f"\nSaved: {OUTPUT_FILE}"
-)
+print(f"\nSaved: {OUTPUT_FILE}")
 
 
 # ==========================================================
@@ -339,8 +263,4 @@ print(
 
 print("\nSample results:")
 
-print(
-    result.head(10).to_string(
-        index=False
-    )
-)
+print(result.head(10).to_string(index=False))

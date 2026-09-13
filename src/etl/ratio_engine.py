@@ -3,7 +3,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-
 PROCESSED_DIR = Path("data/processed")
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -32,45 +31,30 @@ def prepare_cashflow(cashflow):
 
     cashflow = cashflow.copy()
 
-    duplicate_count = cashflow.duplicated(
-        subset=["company_id", "year"]
-    ).sum()
+    duplicate_count = cashflow.duplicated(subset=["company_id", "year"]).sum()
 
     print(
         f"Cash Flow duplicate company-year rows before "
         f"aggregation: {duplicate_count}"
     )
 
-    cashflow = (
-        cashflow
-        .groupby(
-            ["company_id", "year"],
-            as_index=False
-        )[
-            [
-                "operating_activity",
-                "investing_activity",
-                "financing_activity",
-                "net_cash_flow",
-            ]
+    cashflow = cashflow.groupby(["company_id", "year"], as_index=False)[
+        [
+            "operating_activity",
+            "investing_activity",
+            "financing_activity",
+            "net_cash_flow",
         ]
-        .sum(min_count=1)
-    )
+    ].sum(min_count=1)
 
-    remaining = cashflow.duplicated(
-        subset=["company_id", "year"]
-    ).sum()
+    remaining = cashflow.duplicated(subset=["company_id", "year"]).sum()
 
     if remaining > 0:
         raise ValueError(
-            "Cash Flow still contains duplicate "
-            "(company_id, year) records."
+            "Cash Flow still contains duplicate " "(company_id, year) records."
         )
 
-    print(
-        f"Cash Flow rows after company-year aggregation: "
-        f"{len(cashflow)}"
-    )
+    print(f"Cash Flow rows after company-year aggregation: " f"{len(cashflow)}")
 
     return cashflow
 
@@ -81,17 +65,12 @@ def calculate_ratios():
     # 1. Load cleaned datasets
     # =========================================================
 
-    pnl = pd.read_csv(
-        PROCESSED_DIR / "profitandloss_cleaned.csv"
-    )
+    """Calculate ratios."""
+    pnl = pd.read_csv(PROCESSED_DIR / "profitandloss_cleaned.csv")
 
-    balance = pd.read_csv(
-        PROCESSED_DIR / "balancesheet_cleaned.csv"
-    )
+    balance = pd.read_csv(PROCESSED_DIR / "balancesheet_cleaned.csv")
 
-    cashflow = pd.read_csv(
-        PROCESSED_DIR / "cashflow_cleaned.csv"
-    )
+    cashflow = pd.read_csv(PROCESSED_DIR / "cashflow_cleaned.csv")
 
     print("Cleaned datasets loaded successfully.")
 
@@ -105,29 +84,16 @@ def calculate_ratios():
 
     for df in [pnl, balance, cashflow]:
 
-        df["company_id"] = (
-            df["company_id"]
-            .astype(str)
-            .str.strip()
-        )
+        df["company_id"] = df["company_id"].astype(str).str.strip()
 
-        df["year"] = pd.to_numeric(
-            df["year"],
-            errors="coerce"
-        )
+        df["year"] = pd.to_numeric(df["year"], errors="coerce")
 
     # Remove rows where company/year is missing
-    pnl = pnl.dropna(
-        subset=["company_id", "year"]
-    ).copy()
+    pnl = pnl.dropna(subset=["company_id", "year"]).copy()
 
-    balance = balance.dropna(
-        subset=["company_id", "year"]
-    ).copy()
+    balance = balance.dropna(subset=["company_id", "year"]).copy()
 
-    cashflow = cashflow.dropna(
-        subset=["company_id", "year"]
-    ).copy()
+    cashflow = cashflow.dropna(subset=["company_id", "year"]).copy()
 
     # Convert year to integer
     pnl["year"] = pnl["year"].astype(int)
@@ -138,59 +104,33 @@ def calculate_ratios():
     # 3. Validate P&L uniqueness
     # =========================================================
 
-    pnl_duplicates = pnl.duplicated(
-        subset=["company_id", "year"]
-    ).sum()
+    pnl_duplicates = pnl.duplicated(subset=["company_id", "year"]).sum()
 
-    print(
-        f"P&L duplicate company-year rows: "
-        f"{pnl_duplicates}"
-    )
+    print(f"P&L duplicate company-year rows: " f"{pnl_duplicates}")
 
     if pnl_duplicates > 0:
 
-        print(
-            "\nWarning: P&L contains multiple records "
-            "for the same company-year."
-        )
+        print("\nWarning: P&L contains multiple records " "for the same company-year.")
 
-        pnl = (
-            pnl
-            .drop_duplicates(
-                subset=["company_id", "year"],
-                keep="first"
-            )
-            .copy()
-        )
+        pnl = pnl.drop_duplicates(subset=["company_id", "year"], keep="first").copy()
 
     # =========================================================
     # 4. Validate Balance Sheet uniqueness
     # =========================================================
 
-    balance_duplicates = balance.duplicated(
-        subset=["company_id", "year"]
-    ).sum()
+    balance_duplicates = balance.duplicated(subset=["company_id", "year"]).sum()
 
-    print(
-        f"Balance Sheet duplicate company-year rows: "
-        f"{balance_duplicates}"
-    )
+    print(f"Balance Sheet duplicate company-year rows: " f"{balance_duplicates}")
 
     if balance_duplicates > 0:
 
         print(
-            "\nWarning: Balance Sheet contains duplicate "
-            "(company_id, year) records."
+            "\nWarning: Balance Sheet contains duplicate " "(company_id, year) records."
         )
 
-        balance = (
-            balance
-            .drop_duplicates(
-                subset=["company_id", "year"],
-                keep="first"
-            )
-            .copy()
-        )
+        balance = balance.drop_duplicates(
+            subset=["company_id", "year"], keep="first"
+        ).copy()
 
     # =========================================================
     # 5. Prepare Cash Flow
@@ -262,10 +202,7 @@ def calculate_ratios():
         validate="one_to_one",
     )
 
-    print(
-        f"\nAfter P&L + Balance Sheet merge: "
-        f"{len(ratios)} rows"
-    )
+    print(f"\nAfter P&L + Balance Sheet merge: " f"{len(ratios)} rows")
 
     # =========================================================
     # 10. Merge Cash Flow
@@ -278,19 +215,13 @@ def calculate_ratios():
         validate="one_to_one",
     )
 
-    print(
-        f"After Cash Flow merge: "
-        f"{len(ratios)} rows"
-    )
+    print(f"After Cash Flow merge: " f"{len(ratios)} rows")
 
     # =========================================================
     # 11. Calculate Shareholders' Equity
     # =========================================================
 
-    ratios["shareholders_equity"] = (
-        ratios["equity_capital"]
-        + ratios["reserves"]
-    )
+    ratios["shareholders_equity"] = ratios["equity_capital"] + ratios["reserves"]
 
     # =========================================================
     # 12. Operating Profit Margin
@@ -379,16 +310,10 @@ def calculate_ratios():
 
     # -99 and 99 are placeholder/invalid values
     # and should be treated as missing.
-    ratios["tax_rate"] = ratios["tax_rate"].replace(
-        [-99, 99],
-        np.nan
-    )
+    ratios["tax_rate"] = ratios["tax_rate"].replace([-99, 99], np.nan)
 
     # -999 is an invalid dividend payout placeholder.
-    ratios["dividend_payout"] = (
-        ratios["dividend_payout"]
-        .replace(-999, np.nan)
-    )
+    ratios["dividend_payout"] = ratios["dividend_payout"].replace(-999, np.nan)
 
     # Negative EPS is valid.
     #
@@ -415,23 +340,17 @@ def calculate_ratios():
     # 22. Cash Flow indicators
     # =========================================================
 
-    ratios["operating_cash_flow"] = (
-        ratios["operating_activity"]
-    )
+    ratios["operating_cash_flow"] = ratios["operating_activity"]
 
-    ratios["net_cash_flow"] = (
-        ratios["net_cash_flow"]
-    )
+    ratios["net_cash_flow"] = ratios["net_cash_flow"]
 
     # =========================================================
     # 23. Final columns
     # =========================================================
 
     final_columns = [
-
         "company_id",
         "year",
-
         # -------------------------
         # Profitability
         # -------------------------
@@ -439,25 +358,21 @@ def calculate_ratios():
         "net_profit_margin",
         "roa",
         "roe",
-
         # -------------------------
         # Leverage
         # -------------------------
         "debt_to_equity",
         "interest_coverage",
-
         # -------------------------
         # Efficiency
         # -------------------------
         "asset_turnover",
-
         # -------------------------
         # Shareholder metrics
         # -------------------------
         "tax_rate",
         "eps",
         "dividend_payout",
-
         # -------------------------
         # Supporting financial data
         # -------------------------
@@ -467,7 +382,6 @@ def calculate_ratios():
         "borrowings",
         "shareholders_equity",
         "total_assets",
-
         # -------------------------
         # Cash Flow
         # -------------------------
@@ -481,42 +395,27 @@ def calculate_ratios():
     # 24. Final duplicate validation
     # =========================================================
 
-    final_duplicates = ratios.duplicated(
-        subset=["company_id", "year"]
-    ).sum()
+    final_duplicates = ratios.duplicated(subset=["company_id", "year"]).sum()
 
-    print(
-        f"\nFinal duplicate company-year records: "
-        f"{final_duplicates}"
-    )
+    print(f"\nFinal duplicate company-year records: " f"{final_duplicates}")
 
     if final_duplicates > 0:
 
         raise ValueError(
-            "Final ratio dataset contains duplicate "
-            "(company_id, year) records."
+            "Final ratio dataset contains duplicate " "(company_id, year) records."
         )
 
     # =========================================================
     # 25. Sort
     # =========================================================
 
-    ratios = (
-        ratios
-        .sort_values(
-            ["company_id", "year"]
-        )
-        .reset_index(drop=True)
-    )
+    ratios = ratios.sort_values(["company_id", "year"]).reset_index(drop=True)
 
     # =========================================================
     # 26. Save
     # =========================================================
 
-    output_file = (
-        PROCESSED_DIR
-        / "financial_ratios_calculated.csv"
-    )
+    output_file = PROCESSED_DIR / "financial_ratios_calculated.csv"
 
     ratios.to_csv(
         output_file,
@@ -527,22 +426,13 @@ def calculate_ratios():
     # 27. Final statistics
     # =========================================================
 
-    print(
-        "\nFinancial Ratio Engine completed successfully."
-    )
+    print("\nFinancial Ratio Engine completed successfully.")
 
-    print(
-        f"Output file: {output_file}"
-    )
+    print(f"Output file: {output_file}")
 
-    print(
-        f"Rows: {len(ratios)}"
-    )
+    print(f"Rows: {len(ratios)}")
 
-    print(
-        f"Companies: "
-        f"{ratios['company_id'].nunique()}"
-    )
+    print(f"Companies: " f"{ratios['company_id'].nunique()}")
 
     print("\nRatio columns:")
 
@@ -565,47 +455,33 @@ def calculate_ratios():
     # 28. Balance Sheet coverage
     # =========================================================
 
-    missing_balance = sorted(
-        set(pnl["company_id"])
-        - set(balance["company_id"])
-    )
+    missing_balance = sorted(set(pnl["company_id"]) - set(balance["company_id"]))
 
     if missing_balance:
 
-        print(
-            "\nCompanies without Balance Sheet data:"
-        )
+        print("\nCompanies without Balance Sheet data:")
 
         print(missing_balance)
 
     else:
 
-        print(
-            "\nAll P&L companies have Balance Sheet data."
-        )
+        print("\nAll P&L companies have Balance Sheet data.")
 
     # =========================================================
     # 29. Cash Flow coverage
     # =========================================================
 
-    missing_cashflow = sorted(
-        set(pnl["company_id"])
-        - set(cashflow["company_id"])
-    )
+    missing_cashflow = sorted(set(pnl["company_id"]) - set(cashflow["company_id"]))
 
     if missing_cashflow:
 
-        print(
-            "\nCompanies without Cash Flow data:"
-        )
+        print("\nCompanies without Cash Flow data:")
 
         print(missing_cashflow)
 
     else:
 
-        print(
-            "All P&L companies have Cash Flow data."
-        )
+        print("All P&L companies have Cash Flow data.")
 
     # =========================================================
     # 30. Sample
@@ -613,11 +489,7 @@ def calculate_ratios():
 
     print("\nSample ratio records:")
 
-    print(
-        ratios.head(10).to_string(
-            index=False
-        )
-    )
+    print(ratios.head(10).to_string(index=False))
 
 
 if __name__ == "__main__":

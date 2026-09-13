@@ -4,7 +4,6 @@ import pandas as pd
 
 from src.etl.normaliser import normalize_year
 
-
 # ==========================================================
 # DATA DIRECTORY
 # ==========================================================
@@ -31,6 +30,7 @@ CORE_FILES = {
 # LOAD ONE EXCEL FILE
 # ==========================================================
 
+
 def load_excel(file_path):
     """
     Load one Excel file and return a pandas DataFrame.
@@ -45,30 +45,16 @@ def load_excel(file_path):
     file_path = Path(file_path)
 
     if not file_path.exists():
-        raise FileNotFoundError(
-            f"Excel file not found: {file_path}"
-        )
+        raise FileNotFoundError(f"Excel file not found: {file_path}")
 
     if file_path.name in CORE_FILES:
-        df = pd.read_excel(
-            file_path,
-            header=1
-        )
+        df = pd.read_excel(file_path, header=1)
     else:
-        df = pd.read_excel(
-            file_path,
-            header=0
-        )
+        df = pd.read_excel(file_path, header=0)
 
-    df = df.dropna(
-        axis=0,
-        how="all"
-    )
+    df = df.dropna(axis=0, how="all")
 
-    df = df.dropna(
-        axis=1,
-        how="all"
-    )
+    df = df.dropna(axis=1, how="all")
 
     return df
 
@@ -77,6 +63,7 @@ def load_excel(file_path):
 # NORMALIZE DATAFRAME
 # ==========================================================
 
+
 def normalize_dataframe(df):
     """
     Apply common normalization rules to a DataFrame.
@@ -84,15 +71,10 @@ def normalize_dataframe(df):
 
     df = df.copy()
 
-    df.columns = [
-        str(col).strip()
-        for col in df.columns
-    ]
+    df.columns = [str(col).strip() for col in df.columns]
 
     if "year" in df.columns:
-        df["year"] = df["year"].apply(
-            normalize_year
-        )
+        df["year"] = df["year"].apply(normalize_year)
 
     return df
 
@@ -100,6 +82,7 @@ def normalize_dataframe(df):
 # ==========================================================
 # LOAD ALL RAW EXCEL FILES
 # ==========================================================
+
 
 def load_all_files():
     """
@@ -111,15 +94,11 @@ def load_all_files():
     """
 
     if not RAW_DATA_DIR.exists():
-        raise FileNotFoundError(
-            f"Raw data directory not found: {RAW_DATA_DIR}"
-        )
+        raise FileNotFoundError(f"Raw data directory not found: {RAW_DATA_DIR}")
 
     datasets = {}
 
-    for file_path in sorted(
-        RAW_DATA_DIR.glob("*.xlsx")
-    ):
+    for file_path in sorted(RAW_DATA_DIR.glob("*.xlsx")):
 
         df = load_excel(file_path)
 
@@ -138,14 +117,8 @@ if __name__ == "__main__":
 
     datasets = load_all_files()
 
-    print(
-        "\nExcel files loaded successfully:\n"
-    )
+    print("\nExcel files loaded successfully:\n")
 
     for filename, df in datasets.items():
 
-        print(
-            f"{filename}: "
-            f"{len(df)} rows × "
-            f"{len(df.columns)} columns"
-        )
+        print(f"{filename}: " f"{len(df)} rows × " f"{len(df.columns)} columns")

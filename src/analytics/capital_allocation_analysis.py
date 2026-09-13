@@ -26,20 +26,13 @@ from pathlib import Path
 import pandas as pd
 from openpyxl import load_workbook
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
-CAPITAL_ALLOCATION_FILE = (
-    PROJECT_ROOT / "output" / "capital_allocation.csv"
-)
+CAPITAL_ALLOCATION_FILE = PROJECT_ROOT / "output" / "capital_allocation.csv"
 
-CASHFLOW_FILE = (
-    PROJECT_ROOT / "output" / "cashflow_intelligence.xlsx"
-)
+CASHFLOW_FILE = PROJECT_ROOT / "output" / "cashflow_intelligence.xlsx"
 
-PATTERN_CHANGES_FILE = (
-    PROJECT_ROOT / "output" / "pattern_changes.csv"
-)
+PATTERN_CHANGES_FILE = PROJECT_ROOT / "output" / "pattern_changes.csv"
 
 
 EXPECTED_PATTERNS = [
@@ -65,23 +58,16 @@ REQUIRED_COLUMNS = [
 
 
 def load_capital_allocation():
+    """Load capital allocation."""
     if not CAPITAL_ALLOCATION_FILE.exists():
-        raise FileNotFoundError(
-            f"Missing file: {CAPITAL_ALLOCATION_FILE}"
-        )
+        raise FileNotFoundError(f"Missing file: {CAPITAL_ALLOCATION_FILE}")
 
     df = pd.read_csv(CAPITAL_ALLOCATION_FILE)
 
-    missing = [
-        column
-        for column in REQUIRED_COLUMNS
-        if column not in df.columns
-    ]
+    missing = [column for column in REQUIRED_COLUMNS if column not in df.columns]
 
     if missing:
-        raise RuntimeError(
-            f"Missing required columns: {missing}"
-        )
+        raise RuntimeError(f"Missing required columns: {missing}")
 
     df["company_id"] = df["company_id"].astype(str)
     df["year"] = pd.to_numeric(
@@ -93,6 +79,7 @@ def load_capital_allocation():
 
 
 def verify_coverage(df):
+    """Verify coverage."""
     print()
     print("COVERAGE VALIDATION")
     print("-" * 70)
@@ -101,27 +88,18 @@ def verify_coverage(df):
 
     print(f"Companies: {company_count}")
     print(f"Rows:      {len(df):,}")
-    print(
-        f"Years:     {int(df['year'].min())} - "
-        f"{int(df['year'].max())}"
-    )
+    print(f"Years:     {int(df['year'].min())} - " f"{int(df['year'].max())}")
 
     if company_count != 92:
-        raise RuntimeError(
-            f"Expected 92 companies, found {company_count}."
-        )
+        raise RuntimeError(f"Expected 92 companies, found {company_count}.")
 
     # Check duplicate company/year combinations.
-    duplicates = df.duplicated(
-        subset=["company_id", "year"]
-    ).sum()
+    duplicates = df.duplicated(subset=["company_id", "year"]).sum()
 
     print(f"Duplicate company/year rows: {duplicates}")
 
     if duplicates:
-        raise RuntimeError(
-            "Duplicate company/year records found."
-        )
+        raise RuntimeError("Duplicate company/year records found.")
 
     # Check missing patterns.
     missing_patterns = df["pattern_label"].isna().sum()
@@ -129,22 +107,13 @@ def verify_coverage(df):
     print(f"Missing pattern labels:       {missing_patterns}")
 
     if missing_patterns:
-        raise RuntimeError(
-            "Missing capital allocation pattern labels found."
-        )
+        raise RuntimeError("Missing capital allocation pattern labels found.")
 
-    counts = (
-        df.groupby("company_id")
-        .size()
-    )
+    counts = df.groupby("company_id").size()
 
-    print(
-        f"Minimum years/company:       {counts.min()}"
-    )
+    print(f"Minimum years/company:       {counts.min()}")
 
-    print(
-        f"Maximum years/company:       {counts.max()}"
-    )
+    print(f"Maximum years/company:       {counts.max()}")
 
     short_history = counts[counts < 3]
 
@@ -155,16 +124,13 @@ def verify_coverage(df):
 
 
 def latest_year_distribution(df):
+    """Latest year distribution."""
     latest_year = int(df["year"].max())
 
-    latest = df[
-        df["year"] == latest_year
-    ].copy()
+    latest = df[df["year"] == latest_year].copy()
 
     if latest["company_id"].nunique() != 92:
-        raise RuntimeError(
-            "Latest year does not contain all 92 companies."
-        )
+        raise RuntimeError("Latest year does not contain all 92 companies.")
 
     distribution = (
         latest["pattern_label"]
@@ -177,11 +143,7 @@ def latest_year_distribution(df):
         .reset_index(name="company_count")
     )
 
-    distribution["percentage"] = (
-        distribution["company_count"]
-        / len(latest)
-        * 100
-    )
+    distribution["percentage"] = distribution["company_count"] / len(latest) * 100
 
     return latest_year, latest, distribution
 
@@ -195,28 +157,17 @@ def calculate_pattern_changes(df):
     than assuming every company has every calendar year.
     """
 
-    ordered = df.sort_values(
-        ["company_id", "year"]
-    ).copy()
+    ordered = df.sort_values(["company_id", "year"]).copy()
 
-    ordered["previous_year"] = (
-        ordered.groupby("company_id")["year"]
-        .shift(1)
+    ordered["previous_year"] = ordered.groupby("company_id")["year"].shift(1)
+
+    ordered["previous_pattern"] = ordered.groupby("company_id")["pattern_label"].shift(
+        1
     )
 
-    ordered["previous_pattern"] = (
-        ordered.groupby("company_id")["pattern_label"]
-        .shift(1)
-    )
+    changes = ordered[ordered["previous_pattern"].notna()].copy()
 
-    changes = ordered[
-        ordered["previous_pattern"].notna()
-    ].copy()
-
-    changes["changed"] = (
-        changes["pattern_label"]
-        != changes["previous_pattern"]
-    )
+    changes["changed"] = changes["pattern_label"] != changes["previous_pattern"]
 
     changes = changes.rename(
         columns={
@@ -225,9 +176,7 @@ def calculate_pattern_changes(df):
         }
     )
 
-    changes["company_id"] = (
-        changes["company_id"].astype(str)
-    )
+    changes["company_id"] = changes["company_id"].astype(str)
 
     changes["previous_year"] = pd.to_numeric(
         changes["previous_year"],
@@ -254,9 +203,8 @@ def calculate_pattern_changes(df):
 
 
 def transition_summary(pattern_changes):
-    changed = pattern_changes[
-        pattern_changes["changed"] == True
-    ].copy()
+    """Transition summary."""
+    changed = pattern_changes[pattern_changes["changed"] == True].copy()
 
     if changed.empty:
         return pd.DataFrame(
@@ -275,9 +223,7 @@ def transition_summary(pattern_changes):
             ]
         )
         .size()
-        .reset_index(
-            name="company_count"
-        )
+        .reset_index(name="company_count")
         .sort_values(
             "company_count",
             ascending=False,
@@ -301,9 +247,7 @@ def update_cashflow_workbook(
     """
 
     if not cashflow_file.exists():
-        raise FileNotFoundError(
-            f"Missing workbook: {cashflow_file}"
-        )
+        raise FileNotFoundError(f"Missing workbook: {cashflow_file}")
 
     # Read the existing main intelligence sheet.
     intelligence = pd.read_excel(
@@ -322,23 +266,15 @@ def update_cashflow_workbook(
 
     allocation_latest = allocation_latest.rename(
         columns={
-            "pattern_label":
-                "latest_capital_allocation",
-            "year":
-                "capital_allocation_year",
+            "pattern_label": "latest_capital_allocation",
+            "year": "capital_allocation_year",
         }
     )
 
     # Add the latest pattern to the intelligence table.
-    intelligence["company_id"] = (
-        intelligence["company_id"]
-        .astype(str)
-    )
+    intelligence["company_id"] = intelligence["company_id"].astype(str)
 
-    allocation_latest["company_id"] = (
-        allocation_latest["company_id"]
-        .astype(str)
-    )
+    allocation_latest["company_id"] = allocation_latest["company_id"].astype(str)
 
     intelligence = intelligence.drop(
         columns=[
@@ -382,44 +318,15 @@ def update_cashflow_workbook(
                     "Deleveraging Flags",
                 ],
                 "Count": [
-                    intelligence["company_id"]
-                    .nunique(),
-                    (
-                        intelligence[
-                            "cfo_quality_label"
-                        ] == "High Quality"
-                    ).sum(),
-                    (
-                        intelligence[
-                            "cfo_quality_label"
-                        ] == "Moderate"
-                    ).sum(),
-                    (
-                        intelligence[
-                            "cfo_quality_label"
-                        ] == "Accrual Risk"
-                    ).sum(),
-                    (
-                        intelligence[
-                            "capex_label"
-                        ] == "Asset Light"
-                    ).sum(),
-                    (
-                        intelligence[
-                            "capex_label"
-                        ] == "Moderate"
-                    ).sum(),
-                    (
-                        intelligence[
-                            "capex_label"
-                        ] == "Capital Intensive"
-                    ).sum(),
-                    intelligence[
-                        "distress_flag"
-                    ].sum(),
-                    intelligence[
-                        "deleveraging_flag"
-                    ].sum(),
+                    intelligence["company_id"].nunique(),
+                    (intelligence["cfo_quality_label"] == "High Quality").sum(),
+                    (intelligence["cfo_quality_label"] == "Moderate").sum(),
+                    (intelligence["cfo_quality_label"] == "Accrual Risk").sum(),
+                    (intelligence["capex_label"] == "Asset Light").sum(),
+                    (intelligence["capex_label"] == "Moderate").sum(),
+                    (intelligence["capex_label"] == "Capital Intensive").sum(),
+                    intelligence["distress_flag"].sum(),
+                    intelligence["deleveraging_flag"].sum(),
                 ],
             }
         )
@@ -455,29 +362,22 @@ def update_cashflow_workbook(
         "allocation_changes",
     }
 
-    missing_sheets = (
-        required_sheets
-        - set(workbook.sheetnames)
-    )
+    missing_sheets = required_sheets - set(workbook.sheetnames)
 
     workbook.close()
 
     if missing_sheets:
-        raise RuntimeError(
-            f"Missing workbook sheets: {missing_sheets}"
-        )
+        raise RuntimeError(f"Missing workbook sheets: {missing_sheets}")
 
 
 def main():
+    """Main."""
     print("N100 CAPITAL ALLOCATION ANALYSIS")
     print("=" * 70)
 
     df = load_capital_allocation()
 
-    print(
-        f"Capital allocation rows loaded: "
-        f"{len(df):,}"
-    )
+    print(f"Capital allocation rows loaded: " f"{len(df):,}")
 
     verify_coverage(df)
 
@@ -485,9 +385,7 @@ def main():
     # Latest-year distribution
     # -----------------------------------------------------------------------
 
-    latest_year, latest, distribution = (
-        latest_year_distribution(df)
-    )
+    latest_year, latest, distribution = latest_year_distribution(df)
 
     print()
     print("LATEST-YEAR DISTRIBUTION")
@@ -496,9 +394,7 @@ def main():
     print(f"Companies:   {latest['company_id'].nunique()}")
 
     print()
-    print(
-        distribution.to_string(index=False)
-    )
+    print(distribution.to_string(index=False))
 
     # -----------------------------------------------------------------------
     # Pattern changes
@@ -517,20 +413,11 @@ def main():
     print()
     print("PATTERN CHANGE ANALYSIS")
     print("-" * 70)
-    print(
-        f"Year-over-year observations: "
-        f"{len(changes):,}"
-    )
+    print(f"Year-over-year observations: " f"{len(changes):,}")
 
-    print(
-        f"Pattern changes: "
-        f"{changes['changed'].sum():,}"
-    )
+    print(f"Pattern changes: " f"{changes['changed'].sum():,}")
 
-    print(
-        f"Unchanged observations: "
-        f"{(~changes['changed']).sum():,}"
-    )
+    print(f"Unchanged observations: " f"{(~changes['changed']).sum():,}")
 
     print()
     print("Top pattern transitions:")
@@ -538,11 +425,7 @@ def main():
     if transition.empty:
         print("No pattern changes detected.")
     else:
-        print(
-            transition
-            .head(15)
-            .to_string(index=False)
-        )
+        print(transition.head(15).to_string(index=False))
 
     # -----------------------------------------------------------------------
     # Update Day 31 workbook
@@ -563,39 +446,21 @@ def main():
     print("FINAL VALIDATION")
     print("-" * 70)
 
-    print(
-        f"Latest-year companies: "
-        f"{latest['company_id'].nunique()}"
-    )
+    print(f"Latest-year companies: " f"{latest['company_id'].nunique()}")
 
-    print(
-        f"Expected patterns represented: "
-        f"{len(EXPECTED_PATTERNS)}"
-    )
+    print(f"Expected patterns represented: " f"{len(EXPECTED_PATTERNS)}")
 
-    print(
-        f"Distribution total: "
-        f"{distribution['company_count'].sum()}"
-    )
+    print(f"Distribution total: " f"{distribution['company_count'].sum()}")
 
-    print(
-        f"Pattern-change rows: "
-        f"{len(changes):,}"
-    )
+    print(f"Pattern-change rows: " f"{len(changes):,}")
 
-    print(
-        f"Changed rows: "
-        f"{changes['changed'].sum():,}"
-    )
+    print(f"Changed rows: " f"{changes['changed'].sum():,}")
 
     print()
     print(f"Saved: {PATTERN_CHANGES_FILE}")
     print(f"Updated: {CASHFLOW_FILE}")
     print()
-    print(
-        "Day 32 Capital Allocation Analysis "
-        "completed successfully."
-    )
+    print("Day 32 Capital Allocation Analysis " "completed successfully.")
 
 
 if __name__ == "__main__":

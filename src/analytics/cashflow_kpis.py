@@ -97,6 +97,7 @@ def capital_allocation_pattern(cfo, cfi, cff, cfo_pat_ratio=None):
     """
 
     def sign(value):
+        """Sign."""
         if value > 0:
             return "+"
         elif value < 0:

@@ -10,9 +10,7 @@ def calculate_cagr(start_value: float, end_value: float, years: int):
     if start_value is None or end_value is None:
         return None, "INSUFFICIENT"
 
-    if not math.isfinite(float(start_value)) or not math.isfinite(
-        float(end_value)
-    ):
+    if not math.isfinite(float(start_value)) or not math.isfinite(float(end_value)):
         return None, "INSUFFICIENT"
 
     if start_value == 0:
@@ -46,20 +44,15 @@ def calculate_cagr_for_years(
     start_year = end_year - years
 
     company_data = df[
-        (df["company_id"] == company_id)
-        & (df["year"].isin([start_year, end_year]))
+        (df["company_id"] == company_id) & (df["year"].isin([start_year, end_year]))
     ].copy()
 
     if len(company_data) < 2:
         return None, "INSUFFICIENT"
 
-    start_rows = company_data[
-        company_data["year"] == start_year
-    ]
+    start_rows = company_data[company_data["year"] == start_year]
 
-    end_rows = company_data[
-        company_data["year"] == end_year
-    ]
+    end_rows = company_data[company_data["year"] == end_year]
 
     if start_rows.empty or end_rows.empty:
         return None, "INSUFFICIENT"

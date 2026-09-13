@@ -7,7 +7,7 @@ def configure_page() -> None:
     Page configuration is handled once by src/dashboard/app.py
     because the dashboard uses Streamlit's multipage navigation.
     """
-    return None
+    return
 
 
 def apply_styles() -> None:

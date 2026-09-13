@@ -1,10 +1,9 @@
-﻿import sqlite3
 import operator
+import sqlite3
 from pathlib import Path
 
 import pandas as pd
 import yaml
-
 
 CONFIG_PATH = Path("config/screener_config.yaml")
 DB_PATH = Path("data/nifty100.db")
@@ -45,6 +44,7 @@ FILTERABLE_METRICS = {
     "revenue_cr",
 }
 
+
 def load_sector_data():
     """
     Load company-to-sector mapping from the SQLite database.
@@ -62,8 +62,9 @@ def load_sector_data():
                 """,
                 conn,
             )
-    except Exception:
+    except Exception:  # noqa: BLE001
         return pd.DataFrame(columns=["company_id", "broad_sector"])
+
 
 def load_config(config_path=CONFIG_PATH):
     """Load screener configuration from YAML."""
@@ -106,9 +107,7 @@ def load_data(
     ]
 
     available_market_columns = [
-        column
-        for column in market_columns
-        if column in market.columns
+        column for column in market_columns if column in market.columns
     ]
 
     market = market[available_market_columns].copy()
@@ -139,9 +138,7 @@ def load_data(
     ]
 
     missing_pl_columns = [
-        column
-        for column in required_pl_columns
-        if column not in pl.columns
+        column for column in required_pl_columns if column not in pl.columns
     ]
 
     if missing_pl_columns:
@@ -159,9 +156,7 @@ def load_data(
         ]
     ].copy()
 
-    pl_data = pl_data.rename(
-        columns={"sales": "revenue_cr"}
-    )
+    pl_data = pl_data.rename(columns={"sales": "revenue_cr"})
 
     pl_data = pl_data.drop_duplicates(
         subset=["company_id", "year"],
@@ -175,16 +170,11 @@ def load_data(
     )
     # 4. FCF Yield
     # ---------------------------------------------------------
-    result["fcf_yield"] = (
-        result["free_cash_flow_cr"]
-        / result["market_cap_crore"]
-        * 100
-    )
+    result["fcf_yield"] = result["free_cash_flow_cr"] / result["market_cap_crore"] * 100
 
     # Invalid / zero market cap cannot produce meaningful yield.
     result.loc[
-        result["market_cap_crore"].isna()
-        | result["market_cap_crore"].eq(0),
+        result["market_cap_crore"].isna() | result["market_cap_crore"].eq(0),
         "fcf_yield",
     ] = pd.NA
 
@@ -222,10 +212,7 @@ def apply_filters(df, filters):
             "revenue_cagr_3yr",
         }
 
-        if (
-            metric not in FILTERABLE_METRICS
-            and metric not in preset_only_metrics
-        ):
+        if metric not in FILTERABLE_METRICS and metric not in preset_only_metrics:
             raise ValueError(
                 f"Unsupported screener metric '{metric}'. "
                 f"Supported metrics: "
@@ -234,8 +221,7 @@ def apply_filters(df, filters):
 
         if metric not in result.columns:
             raise ValueError(
-                f"Screener metric '{metric}' is not available "
-                f"in the loaded data."
+                f"Screener metric '{metric}' is not available " f"in the loaded data."
             )
 
         # ---------------------------------------------------------
@@ -251,10 +237,7 @@ def apply_filters(df, filters):
         # ---------------------------------------------------------
         # Financial-sector D/E handling
         # ---------------------------------------------------------
-        if (
-            metric == "debt_to_equity"
-            and "broad_sector" in result.columns
-        ):
+        if metric == "debt_to_equity" and "broad_sector" in result.columns:
             financial_mask = (
                 result["broad_sector"]
                 .astype(str)
@@ -286,11 +269,11 @@ def apply_filters(df, filters):
         # Normal AND filter
         # ---------------------------------------------------------
         result = result[
-            result[metric].notna()
-            & OPERATORS[op](result[metric], value)
+            result[metric].notna() & OPERATORS[op](result[metric], value)
         ].copy()
 
     return result
+
 
 def run_screener(
     name,
@@ -327,10 +310,7 @@ def run_screener(
     # ---------------------------------------------------------
     sector_df = load_sector_data()
 
-    if (
-        not sector_df.empty
-        and "company_id" in df.columns
-    ):
+    if not sector_df.empty and "company_id" in df.columns:
         df = df.merge(
             sector_df.drop_duplicates("company_id"),
             on="company_id",
@@ -354,22 +334,16 @@ def run_screener(
                 pd.to_numeric(
                     df["debt_to_equity"],
                     errors="coerce",
-                ) == 0
+                )
+                == 0
             )
 
         if "icr_label" in df.columns:
             label_mask = (
-                df["icr_label"]
-                .astype(str)
-                .str.strip()
-                .str.lower()
-                .eq("debt free")
+                df["icr_label"].astype(str).str.strip().str.lower().eq("debt free")
             )
 
-            debt_free_mask = (
-                debt_free_mask
-                | label_mask
-            )
+            debt_free_mask = debt_free_mask | label_mask
 
         df.loc[
             debt_free_mask,
@@ -387,15 +361,11 @@ def run_screener(
         # Keep history temporarily so we can calculate the
         # previous-year D/E for the latest available year.
         # -----------------------------------------------------
-        df = df.sort_values(
-            ["company_id", "year"]
-        ).copy()
+        df = df.sort_values(["company_id", "year"]).copy()
 
-        df["previous_debt_to_equity"] = (
-            df.groupby("company_id")[
-                "debt_to_equity"
-            ].shift(1)
-        )
+        df["previous_debt_to_equity"] = df.groupby("company_id")[
+            "debt_to_equity"
+        ].shift(1)
 
         # -----------------------------------------------------
         # Keep ONLY the latest available year per company.
@@ -418,9 +388,7 @@ def run_screener(
         # for each company.
         # -----------------------------------------------------
         df = (
-            df.sort_values(
-                ["company_id", "year"]
-            )
+            df.sort_values(["company_id", "year"])
             .groupby(
                 "company_id",
                 as_index=False,
@@ -451,13 +419,8 @@ def run_screener(
         result = result[
             result["previous_debt_to_equity"].notna()
             & result["debt_to_equity"].notna()
-            & (
-                result["debt_to_equity"]
-                < result["previous_debt_to_equity"]
-            )
+            & (result["debt_to_equity"] < result["previous_debt_to_equity"])
         ].copy()
-
-
 
     # ---------------------------------------------------------
     # Sort by configured ranking metric.
@@ -467,9 +430,7 @@ def run_screener(
         {},
     )
 
-    ranking_metric = ranking_config.get(
-        "metric"
-    )
+    ranking_metric = ranking_config.get("metric")
 
     ranking_order = str(
         ranking_config.get(
@@ -478,10 +439,7 @@ def run_screener(
         )
     ).lower()
 
-    if (
-        ranking_metric
-        and ranking_metric in result.columns
-    ):
+    if ranking_metric and ranking_metric in result.columns:
 
         result = result.sort_values(
             ranking_metric,
@@ -492,10 +450,7 @@ def run_screener(
     # ---------------------------------------------------------
     # Fallback: composite quality score.
     # ---------------------------------------------------------
-    if (
-        ranking_metric is None
-        and "composite_quality_score" in result.columns
-    ):
+    if ranking_metric is None and "composite_quality_score" in result.columns:
 
         result = result.sort_values(
             "composite_quality_score",
@@ -505,16 +460,12 @@ def run_screener(
 
     return result
 
+
 if __name__ == "__main__":
 
-    results = run_screener(
-        "quality_compounder"
-    )
+    results = run_screener("quality_compounder")
 
-    print(
-        f"Quality Compounder results: "
-        f"{len(results)} company/year rows"
-    )
+    print(f"Quality Compounder results: " f"{len(results)} company/year rows")
 
     columns = [
         "company_id",
@@ -530,30 +481,7 @@ if __name__ == "__main__":
         "fcf_yield",
     ]
 
-    available = [
-        column
-        for column in columns
-        if column in results.columns
-    ]
+    available = [column for column in columns if column in results.columns]
 
-    print(
-        results[available].to_string(
-            index=False
-        )
-    )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    print(results[available].to_string(index=False))
 

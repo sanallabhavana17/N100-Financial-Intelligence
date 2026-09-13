@@ -3,7 +3,6 @@ from pathlib import Path
 
 import pandas as pd
 
-
 DB_PATH = Path("data/nifty100.db")
 
 PROFITABILITY_FILE = Path("output/profitability_ratios.csv")
@@ -13,42 +12,27 @@ CASHFLOW_FILE = Path("output/cashflow_kpis.csv")
 
 
 def load_csv(path):
+    """Load csv."""
     print(f"Loading {path}...")
     df = pd.read_csv(path)
 
-    df["company_id"] = (
-        df["company_id"]
-        .astype(str)
-        .str.strip()
-        .str.upper()
-    )
+    df["company_id"] = df["company_id"].astype(str).str.strip().str.upper()
 
-    df["year"] = pd.to_numeric(
-        df["year"],
-        errors="coerce"
-    )
+    df["year"] = pd.to_numeric(df["year"], errors="coerce")
 
-    df = df.dropna(
-        subset=["company_id", "year"]
-    ).copy()
+    df = df.dropna(subset=["company_id", "year"]).copy()
 
     df["year"] = df["year"].astype(int)
 
-    df = df.drop_duplicates(
-        ["company_id", "year"],
-        keep="first"
-    )
+    df = df.drop_duplicates(["company_id", "year"], keep="first")
 
-    print(
-        f"  rows={len(df)}, "
-        f"companies={df['company_id'].nunique()}"
-    )
+    print(f"  rows={len(df)}, " f"companies={df['company_id'].nunique()}")
 
     return df
 
 
 def main():
-
+    """Main."""
     print("\n========================================")
     print("POPULATE FINANCIAL RATIOS")
     print("========================================")
@@ -127,21 +111,18 @@ def main():
         [
             "company_id",
             "year",
-
             "revenue_cagr_3yr",
             "revenue_cagr_3yr_flag",
             "revenue_cagr_5yr",
             "revenue_cagr_5yr_flag",
             "revenue_cagr_10yr",
             "revenue_cagr_10yr_flag",
-
             "pat_cagr_3yr",
             "pat_cagr_3yr_flag",
             "pat_cagr_5yr",
             "pat_cagr_5yr_flag",
             "pat_cagr_10yr",
             "pat_cagr_10yr_flag",
-
             "eps_cagr_3yr",
             "eps_cagr_3yr_flag",
             "eps_cagr_5yr",
@@ -175,23 +156,12 @@ def main():
         how="outer",
     )
 
-    result = result.drop_duplicates(
-        ["company_id", "year"],
-        keep="first"
-    )
+    result = result.drop_duplicates(["company_id", "year"], keep="first")
 
     print("Final merged rows:", len(result))
-    print(
-        "Final companies:",
-        result["company_id"].nunique()
-    )
+    print("Final companies:", result["company_id"].nunique())
 
-    print(
-        "Company-year duplicates:",
-        result.duplicated(
-            ["company_id", "year"]
-        ).sum()
-    )
+    print("Company-year duplicates:", result.duplicated(["company_id", "year"]).sum())
 
     # ---------------------------------------------------------
     # 4. Add source per-share metrics from P&L / companies
@@ -199,32 +169,17 @@ def main():
 
     print("\nLoading source data for additional KPIs...")
 
-    pnl = pd.read_csv(
-        "data/processed/profitandloss_cleaned.csv"
-    )
+    pnl = pd.read_csv("data/processed/profitandloss_cleaned.csv")
 
-    pnl["company_id"] = (
-        pnl["company_id"]
-        .astype(str)
-        .str.strip()
-        .str.upper()
-    )
+    pnl["company_id"] = pnl["company_id"].astype(str).str.strip().str.upper()
 
-    pnl["year"] = pd.to_numeric(
-        pnl["year"],
-        errors="coerce"
-    )
+    pnl["year"] = pd.to_numeric(pnl["year"], errors="coerce")
 
-    pnl = pnl.dropna(
-        subset=["company_id", "year"]
-    )
+    pnl = pnl.dropna(subset=["company_id", "year"])
 
     pnl["year"] = pnl["year"].astype(int)
 
-    pnl = pnl.drop_duplicates(
-        ["company_id", "year"],
-        keep="first"
-    )
+    pnl = pnl.drop_duplicates(["company_id", "year"], keep="first")
 
     pnl_extra = pnl[
         [
@@ -236,8 +191,7 @@ def main():
     ].rename(
         columns={
             "eps": "earnings_per_share",
-            "dividend_payout":
-                "dividend_payout_ratio_pct",
+            "dividend_payout": "dividend_payout_ratio_pct",
         }
     )
 
@@ -251,21 +205,10 @@ def main():
     # 5. Book value per share
     # ---------------------------------------------------------
 
-    companies = pd.read_excel(
-    "data/raw/companies.xlsx",
-    header=1
-)
-    companies.columns = [
-        str(c).strip().lower()
-        for c in companies.columns
-    ]
+    companies = pd.read_excel("data/raw/companies.xlsx", header=1)
+    companies.columns = [str(c).strip().lower() for c in companies.columns]
 
-    companies["id"] = (
-        companies["id"]
-        .astype(str)
-        .str.strip()
-        .str.upper()
-    )
+    companies["id"] = companies["id"].astype(str).str.strip().str.upper()
 
     book_values = companies[
         [
@@ -289,40 +232,23 @@ def main():
     # 6. CapEx
     # ---------------------------------------------------------
 
-    result["capex_cr"] = (
-        result["capex_intensity_pct"]
-    )
+    result["capex_cr"] = result["capex_intensity_pct"]
 
     # We keep capex_intensity separately.
     # Actual CapEx will be calculated from cash-flow data
     # below where possible.
 
-    cf = pd.read_csv(
-        "data/processed/cashflow_cleaned.csv"
-    )
+    cf = pd.read_csv("data/processed/cashflow_cleaned.csv")
 
-    cf["company_id"] = (
-        cf["company_id"]
-        .astype(str)
-        .str.strip()
-        .str.upper()
-    )
+    cf["company_id"] = cf["company_id"].astype(str).str.strip().str.upper()
 
-    cf["year"] = pd.to_numeric(
-        cf["year"],
-        errors="coerce"
-    )
+    cf["year"] = pd.to_numeric(cf["year"], errors="coerce")
 
-    cf = cf.dropna(
-        subset=["company_id", "year"]
-    )
+    cf = cf.dropna(subset=["company_id", "year"])
 
     cf["year"] = cf["year"].astype(int)
 
-    cf = cf.drop_duplicates(
-        ["company_id", "year"],
-        keep="first"
-    )
+    cf = cf.drop_duplicates(["company_id", "year"], keep="first")
 
     # Investing activity is used as CapEx proxy
     cf_capex = cf[
@@ -331,11 +257,7 @@ def main():
             "year",
             "investing_activity",
         ]
-    ].rename(
-        columns={
-            "investing_activity": "capex_cr_source"
-        }
-    )
+    ].rename(columns={"investing_activity": "capex_cr_source"})
 
     result = result.merge(
         cf_capex,
@@ -343,14 +265,9 @@ def main():
         how="left",
     )
 
-    result["capex_cr"] = (
-        result["capex_cr_source"].abs()
-    )
+    result["capex_cr"] = result["capex_cr_source"].abs()
 
-    result = result.drop(
-        columns=["capex_cr_source"],
-        errors="ignore"
-    )
+    result = result.drop(columns=["capex_cr_source"], errors="ignore")
 
     # ---------------------------------------------------------
     # 7. Composite quality score
@@ -378,13 +295,11 @@ def main():
     final_columns = [
         "company_id",
         "year",
-
         "net_profit_margin_pct",
         "operating_profit_margin_pct",
         "return_on_equity_pct",
         "return_on_capital_employed_pct",
         "return_on_assets_pct",
-
         "debt_to_equity",
         "high_leverage_flag",
         "interest_coverage",
@@ -392,7 +307,6 @@ def main():
         "icr_warning_flag",
         "net_debt_cr",
         "asset_turnover",
-
         "free_cash_flow_cr",
         "capex_cr",
         "cash_from_operations_cr",
@@ -402,57 +316,42 @@ def main():
         "capex_intensity_label",
         "fcf_conversion_pct",
         "capital_allocation_pattern",
-
         "earnings_per_share",
         "book_value_per_share",
         "dividend_payout_ratio_pct",
         "total_debt_cr",
-
         "revenue_cagr_3yr",
         "revenue_cagr_3yr_flag",
         "revenue_cagr_5yr",
         "revenue_cagr_5yr_flag",
         "revenue_cagr_10yr",
         "revenue_cagr_10yr_flag",
-
         "pat_cagr_3yr",
         "pat_cagr_3yr_flag",
         "pat_cagr_5yr",
         "pat_cagr_5yr_flag",
         "pat_cagr_10yr",
         "pat_cagr_10yr_flag",
-
         "eps_cagr_3yr",
         "eps_cagr_3yr_flag",
         "eps_cagr_5yr",
         "eps_cagr_5yr_flag",
         "eps_cagr_10yr",
         "eps_cagr_10yr_flag",
-
         "composite_quality_score",
     ]
 
-    result = result[
-        final_columns
-    ]
+    result = result[final_columns]
 
     # ---------------------------------------------------------
     # 9. Save combined output
     # ---------------------------------------------------------
 
-    output_path = Path(
-        "output/final_financial_ratios.csv"
-    )
+    output_path = Path("output/final_financial_ratios.csv")
 
-    result.to_csv(
-        output_path,
-        index=False
-    )
+    result.to_csv(output_path, index=False)
 
-    print(
-        f"\nSaved combined ratios to: "
-        f"{output_path}"
-    )
+    print(f"\nSaved combined ratios to: " f"{output_path}")
 
     # ---------------------------------------------------------
     # 10. Database update
@@ -463,9 +362,7 @@ def main():
     conn = sqlite3.connect(DB_PATH)
 
     # Clear old source ratios
-    conn.execute(
-        "DELETE FROM financial_ratios"
-    )
+    conn.execute("DELETE FROM financial_ratios")
 
     # Insert calculated ratios
     result.to_sql(
@@ -481,13 +378,10 @@ def main():
     # 11. Final validation
     # ---------------------------------------------------------
 
-    count = conn.execute(
-        "SELECT COUNT(*) FROM financial_ratios"
-    ).fetchone()[0]
+    count = conn.execute("SELECT COUNT(*) FROM financial_ratios").fetchone()[0]
 
     companies_count = conn.execute(
-        "SELECT COUNT(DISTINCT company_id) "
-        "FROM financial_ratios"
+        "SELECT COUNT(DISTINCT company_id) " "FROM financial_ratios"
     ).fetchone()[0]
 
     duplicates = conn.execute(

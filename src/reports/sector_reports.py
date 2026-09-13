@@ -1,21 +1,19 @@
-from pathlib import Path
-import sqlite3
 import re
+import sqlite3
+from pathlib import Path
 
 import pandas as pd
-
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import mm
 from reportlab.platypus import (
-    SimpleDocTemplate,
     Paragraph,
+    SimpleDocTemplate,
     Spacer,
     Table,
     TableStyle,
-    PageBreak,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -25,16 +23,19 @@ OUTPUT_DIR = ROOT / "reports" / "sector"
 
 
 def get_connection():
+    """Get connection."""
     return sqlite3.connect(DB_PATH)
 
 
 def clean_filename(value):
+    """Clean filename."""
     value = str(value).strip()
     value = re.sub(r"[^A-Za-z0-9]+", "_", value)
     return value.strip("_")
 
 
 def load_sector_data():
+    """Load sector data."""
     conn = get_connection()
 
     query = """
@@ -58,6 +59,7 @@ def load_sector_data():
 
 
 def load_latest_ratios(company_ids):
+    """Load latest ratios."""
     if not company_ids:
         return pd.DataFrame()
 
@@ -97,6 +99,7 @@ def load_latest_ratios(company_ids):
 
 
 def load_cashflow_intelligence(company_ids):
+    """Load cashflow intelligence."""
     path = ROOT / "output" / "cashflow_intelligence.xlsx"
 
     if not path.exists():
@@ -104,7 +107,7 @@ def load_cashflow_intelligence(company_ids):
 
     try:
         df = pd.read_excel(path, sheet_name="cashflow_intelligence")
-    except Exception:
+    except Exception:  # noqa: BLE001
         return pd.DataFrame()
 
     if "company_id" not in df.columns:
@@ -114,6 +117,7 @@ def load_cashflow_intelligence(company_ids):
 
 
 def fmt(value, decimals=1):
+    """Fmt."""
     if value is None or pd.isna(value):
         return "—"
 
@@ -124,6 +128,7 @@ def fmt(value, decimals=1):
 
 
 def fmt_pct(value, decimals=1):
+    """Fmt pct."""
     if value is None or pd.isna(value):
         return "—"
 
@@ -134,6 +139,7 @@ def fmt_pct(value, decimals=1):
 
 
 def build_styles():
+    """Build styles."""
     styles = getSampleStyleSheet()
 
     return {
@@ -179,6 +185,7 @@ def build_styles():
 
 
 def header_footer(canvas, doc):
+    """Header footer."""
     canvas.saveState()
 
     width, height = A4
@@ -213,6 +220,7 @@ def header_footer(canvas, doc):
 
 
 def create_sector_report(sector, sector_df, ratios_df, cashflow_df):
+    """Create sector report."""
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     filename = f"{clean_filename(sector)}_report.pdf"
@@ -220,7 +228,7 @@ def create_sector_report(sector, sector_df, ratios_df, cashflow_df):
 
     styles = build_styles()
 
-    company_ids = sector_df["company_id"].tolist()
+    sector_df["company_id"].tolist()
 
     merged = sector_df.merge(
         ratios_df,
@@ -292,18 +300,10 @@ def create_sector_report(sector, sector_df, ratios_df, cashflow_df):
     total_weight = sector_df["index_weight_pct"].sum()
 
     market_caps = (
-        sector_df["market_cap_category"]
-        .fillna("Unknown")
-        .value_counts()
-        .to_dict()
+        sector_df["market_cap_category"].fillna("Unknown").value_counts().to_dict()
     )
 
-    subsectors = (
-        sector_df["sub_sector"]
-        .fillna("Unknown")
-        .value_counts()
-        .head(8)
-    )
+    subsectors = sector_df["sub_sector"].fillna("Unknown").value_counts().head(8)
 
     overview_data = [
         ["Metric", "Value"],
@@ -337,10 +337,15 @@ def create_sector_report(sector, sector_df, ratios_df, cashflow_df):
                 ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
                 ("FONTSIZE", (0, 0), (-1, -1), 8),
                 ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#BBBBBB")),
-                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [
-                    colors.white,
-                    colors.HexColor("#F5F7FA"),
-                ]),
+                (
+                    "ROWBACKGROUNDS",
+                    (0, 1),
+                    (-1, -1),
+                    [
+                        colors.white,
+                        colors.HexColor("#F5F7FA"),
+                    ],
+                ),
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
                 ("TOPPADDING", (0, 0), (-1, -1), 5),
                 ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
@@ -392,10 +397,15 @@ def create_sector_report(sector, sector_df, ratios_df, cashflow_df):
                 ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
                 ("FONTSIZE", (0, 0), (-1, -1), 7.5),
                 ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#BBBBBB")),
-                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [
-                    colors.white,
-                    colors.HexColor("#F5F7FA"),
-                ]),
+                (
+                    "ROWBACKGROUNDS",
+                    (0, 1),
+                    (-1, -1),
+                    [
+                        colors.white,
+                        colors.HexColor("#F5F7FA"),
+                    ],
+                ),
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
                 ("TOPPADDING", (0, 0), (-1, -1), 4),
                 ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
@@ -465,10 +475,15 @@ def create_sector_report(sector, sector_df, ratios_df, cashflow_df):
                 ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
                 ("FONTSIZE", (0, 0), (-1, -1), 6.5),
                 ("GRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#BBBBBB")),
-                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [
-                    colors.white,
-                    colors.HexColor("#F7F8FA"),
-                ]),
+                (
+                    "ROWBACKGROUNDS",
+                    (0, 1),
+                    (-1, -1),
+                    [
+                        colors.white,
+                        colors.HexColor("#F7F8FA"),
+                    ],
+                ),
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
                 ("TOPPADDING", (0, 0), (-1, -1), 3),
                 ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
@@ -574,9 +589,7 @@ def create_sector_report(sector, sector_df, ratios_df, cashflow_df):
         ascending=False,
     ).head(10)
 
-    top_data = [
-        ["Ticker", "Company", "Weight"]
-    ]
+    top_data = [["Ticker", "Company", "Weight"]]
 
     for _, row in top.iterrows():
         top_data.append(
@@ -601,10 +614,15 @@ def create_sector_report(sector, sector_df, ratios_df, cashflow_df):
                 ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
                 ("FONTSIZE", (0, 0), (-1, -1), 7.5),
                 ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#BBBBBB")),
-                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [
-                    colors.white,
-                    colors.HexColor("#F5F7FA"),
-                ]),
+                (
+                    "ROWBACKGROUNDS",
+                    (0, 1),
+                    (-1, -1),
+                    [
+                        colors.white,
+                        colors.HexColor("#F5F7FA"),
+                    ],
+                ),
                 ("TOPPADDING", (0, 0), (-1, -1), 4),
                 ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
             ]
@@ -633,6 +651,7 @@ def create_sector_report(sector, sector_df, ratios_df, cashflow_df):
 
 
 def main():
+    """Main."""
     print("N100 SECTOR REPORT GENERATOR")
     print("=" * 70)
     print(f"Database : {DB_PATH}")
@@ -644,12 +663,7 @@ def main():
     if sector_df.empty:
         raise RuntimeError("No sector data found.")
 
-    sectors = sorted(
-        sector_df["broad_sector"]
-        .dropna()
-        .unique()
-        .tolist()
-    )
+    sectors = sorted(sector_df["broad_sector"].dropna().unique().tolist())
 
     print(f"Companies loaded : {sector_df['company_id'].nunique()}")
     print(f"Sectors found    : {len(sectors)}")
@@ -665,15 +679,13 @@ def main():
 
     for index, sector in enumerate(sectors, start=1):
 
-        current = sector_df[
-            sector_df["broad_sector"] == sector
-        ].copy()
+        current = sector_df[sector_df["broad_sector"] == sector].copy()
 
         print(
             f"[{index:02d}/{len(sectors)}] "
             f"{sector:<30} "
             f"{len(current):>2} companies",
-            end=" "
+            end=" ",
         )
 
         try:
@@ -686,14 +698,11 @@ def main():
 
             size_kb = path.stat().st_size / 1024
 
-            print(
-                f"OK  {path.name:<40} "
-                f"{size_kb:,.1f} KB"
-            )
+            print(f"OK  {path.name:<40} " f"{size_kb:,.1f} KB")
 
             generated.append(path)
 
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             print(f"FAILED - {exc}")
             failed.append(
                 {
@@ -713,14 +722,9 @@ def main():
         print("-" * 70)
 
         for item in failed:
-            print(
-                f"{item['sector']}: "
-                f"{item['error']}"
-            )
+            print(f"{item['sector']}: " f"{item['error']}")
 
-        raise RuntimeError(
-            f"{len(failed)} sector report(s) failed."
-        )
+        raise RuntimeError(f"{len(failed)} sector report(s) failed.")
 
     print()
     print("Day 34 sector reports generated successfully.")
@@ -728,3 +732,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

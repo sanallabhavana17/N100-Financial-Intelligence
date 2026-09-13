@@ -1,0 +1,67 @@
+company_id,company_name,broad_sector,kpi,kpi_column,value,sector_mean,sector_std,z_score,direction,outlier_flag
+INDIGO,Interglobe Aviation Ltd,Consumer Discretionary,Asset Turnover,asset_turnover,56.386252,5.157839,14.215579,3.603681,High,True
+TVSMOTOR,TVS Motor Company Ltd,Consumer Discretionary,Debt to Equity,debt_to_equity,3.833432,0.698619,1.057577,2.964145,High,True
+INDIGO,Interglobe Aviation Ltd,Consumer Discretionary,EPS CAGR 5Y,eps_cagr_5yr,121.235682,26.729307,31.728851,2.978563,High,True
+BAJAJ-AUTO,Bajaj Auto Ltd,Consumer Discretionary,Interest Coverage,interest_coverage,174.416667,52.900568,52.551941,2.312305,High,True
+IRCTC,Indian Railway Catering & Tourism Corporation Ltd,Consumer Discretionary,Net Profit Margin,net_profit_margin_pct,26.018735,11.500325,6.714969,2.162097,High,True
+INDIGO,Interglobe Aviation Ltd,Consumer Discretionary,Operating Profit Margin,operating_profit_margin_pct,76.298909,25.536186,23.764487,2.136075,High,True
+HEROMOTOCO,"Hero MotoCorp Ltd
+",Consumer Discretionary,Operating Profit Margin,operating_profit_margin_pct,86.146762,25.536186,23.764487,2.550469,High,True
+INDIGO,Interglobe Aviation Ltd,Consumer Discretionary,ROA,return_on_assets_pct,668.330606,59.225935,169.019264,3.603759,High,True
+INDIGO,Interglobe Aviation Ltd,Consumer Discretionary,ROCE,return_on_capital_employed_pct,5640.879828,436.624961,1443.957615,3.604160,High,True
+INDIGO,Interglobe Aviation Ltd,Consumer Discretionary,ROE,return_on_equity_pct,892.568306,86.724106,223.661476,3.602964,High,True
+TRENT,Trent Ltd,Consumer Discretionary,Revenue CAGR 5Y,revenue_cagr_5yr,36.306916,13.604579,8.479908,2.677192,High,True
+BRITANNIA,Britannia Industries Ltd,Consumer Staples,Debt to Equity,debt_to_equity,0.523979,0.181566,0.163339,2.096328,High,True
+ITC,"ITC Ltd
+",Consumer Staples,Interest Coverage,interest_coverage,362.962500,76.224278,118.155368,2.426790,High,True
+HINDUNILVR,"Hindustan Unilever Ltd
+",Consumer Staples,Operating Profit Margin,operating_profit_margin_pct,76.316725,30.199530,19.910686,2.316203,High,True
+NESTLEIND,Nestle India Ltd,Consumer Staples,ROCE,return_on_capital_employed_pct,157.747626,55.275451,48.525663,2.111711,High,True
+NESTLEIND,Nestle India Ltd,Consumer Staples,ROE,return_on_equity_pct,117.754491,34.471273,37.934221,2.195464,High,True
+BPCL,Bharat Petroleum Corporation Ltd,Energy,Asset Turnover,asset_turnover,2.213652,0.653519,0.590086,2.643906,High,True
+ADANIGREEN,Adani Green Energy Ltd,Energy,Debt to Equity,debt_to_equity,6.595282,1.459648,1.574614,3.261518,High,True
+GAIL,GAIL (India) Ltd,Energy,Interest Coverage,interest_coverage,23.624478,8.107871,5.573490,2.784002,High,True
+ADANIPOWER,Adani Power Ltd,Energy,Net Profit Margin,net_profit_margin_pct,41.367599,16.022672,12.509467,2.026060,High,True
+NHPC,"NHPC Ltd
+",Energy,Net Profit Margin,net_profit_margin_pct,41.818937,16.022672,12.509467,2.062139,High,True
+POWERGRID,Power Grid Corporation of India Ltd,Energy,Operating Profit Margin,operating_profit_margin_pct,86.874768,33.596854,23.762117,2.242137,High,True
+ADANIPOWER,Adani Power Ltd,Energy,ROA,return_on_assets_pct,22.638003,7.141684,5.390298,2.874854,High,True
+BPCL,Bharat Petroleum Corporation Ltd,Energy,ROCE,return_on_capital_employed_pct,33.848304,16.697962,7.091212,2.418534,High,True
+ADANIPOWER,Adani Power Ltd,Energy,ROE,return_on_equity_pct,48.276741,17.933799,10.834956,2.800467,High,True
+ADANIGREEN,Adani Green Energy Ltd,Energy,Revenue CAGR 5Y,revenue_cagr_5yr,34.976173,12.446835,8.185447,2.752365,High,True
+PNB,Punjab National Bank,Financials,Asset Turnover,asset_turnover,1.507026,0.198326,0.302017,4.333205,High,True
+CANBK,Canara Bank,Financials,Debt to Equity,debt_to_equity,14.867420,4.821046,4.127991,2.433720,High,True
+SBIN,State Bank of India,Financials,EPS CAGR 5Y,eps_cagr_5yr,90.365394,25.740670,21.723962,2.974813,High,True
+BAJFINANCE,Bajaj Finance Ltd,Financials,Interest Coverage,interest_coverage,2689.166667,366.032263,948.410914,2.449502,High,True
+BAJAJHLDNG,Bajaj Holdings & Investment Ltd,Financials,Interest Coverage,interest_coverage,3764.500000,366.032263,948.410914,3.583328,High,True
+BAJAJHLDNG,Bajaj Holdings & Investment Ltd,Financials,Net Profit Margin,net_profit_margin_pct,432.726204,39.256348,87.570573,4.493174,High,True
+BAJAJHLDNG,Bajaj Holdings & Investment Ltd,Financials,ROA,return_on_assets_pct,11.302773,2.725884,3.073268,2.790804,High,True
+PNB,Punjab National Bank,Financials,ROA,return_on_assets_pct,12.652858,2.725884,3.073268,3.230104,High,True
+HDFCLIFE,HDFC Life Insurance Company Ltd,Financials,ROCE,return_on_capital_employed_pct,646.458760,79.277676,204.619971,2.771876,High,True
+ICICIPRULI,ICICI Prudential Life Insurance Company Ltd,Financials,ROCE,return_on_capital_employed_pct,754.903728,79.277676,204.619971,3.301858,High,True
+LICI,Life Insurance Corporation of India,Financials,ROE,return_on_equity_pct,49.447110,19.007093,12.722059,2.392696,High,True
+PNB,Punjab National Bank,Financials,ROE,return_on_equity_pct,61.320565,19.007093,12.722059,3.325992,High,True
+BAJAJHLDNG,Bajaj Holdings & Investment Ltd,Financials,Revenue CAGR 5Y,revenue_cagr_5yr,31.612293,17.744843,5.182545,2.675799,High,True
+DIVISLAB,Divis Laboratories Ltd,Healthcare,EPS CAGR 5Y,eps_cagr_5yr,3.303780,23.130098,9.439159,-2.100433,Low,True
+DIVISLAB,Divis Laboratories Ltd,Healthcare,Interest Coverage,interest_coverage,636.250000,132.853426,225.967733,2.227737,High,True
+APOLLOHOSP,"Apollo Hospitals
+Chain of Indian private hospitals",Healthcare,Net Profit Margin,net_profit_margin_pct,4.905819,16.097250,5.362658,-2.086919,Low,True
+CIPLA,"Cipla Ltd
+",Healthcare,Operating Profit Margin,operating_profit_margin_pct,75.591682,33.813647,19.636419,2.127579,High,True
+CIPLA,"Cipla Ltd
+",Healthcare,ROCE,return_on_capital_employed_pct,71.457913,30.646629,18.890145,2.160454,High,True
+BEL,Bharat Electronics Ltd,Industrials,Asset Turnover,asset_turnover,125.888199,20.647597,40.264190,2.613752,High,True
+BHEL,"Bharat Heavy Electricals Limited
+",Industrials,EPS CAGR 5Y,eps_cagr_5yr,-19.725844,15.108299,13.971542,-2.493221,Low,True
+BEL,Bharat Electronics Ltd,Industrials,Interest Coverage,interest_coverage,476.750000,99.874265,150.410167,2.505653,High,True
+ADANIPORTS,"Adani Ports & Special Economic Zone Ltd
+",Industrials,Operating Profit Margin,operating_profit_margin_pct,58.361724,21.333371,14.770373,2.506934,High,True
+BEL,Bharat Electronics Ltd,Industrials,ROA,return_on_assets_pct,2475.155280,427.535442,845.643010,2.421376,High,True
+BEL,Bharat Electronics Ltd,Industrials,ROCE,return_on_capital_employed_pct,3977.165354,726.287374,1404.661991,2.314349,High,True
+BEL,Bharat Electronics Ltd,Industrials,ROE,return_on_equity_pct,4744.047619,874.176985,1715.767025,2.255476,High,True
+BHEL,"Bharat Heavy Electricals Limited
+",Industrials,Revenue CAGR 5Y,revenue_cagr_5yr,-4.728642,10.876325,6.298222,-2.477678,Low,True
+HINDALCO,Hindalco Industries Ltd,Materials,Interest Coverage,interest_coverage,126.465438,32.773630,37.059228,2.528164,High,True
+COALINDIA,Coal India Ltd,Materials,Net Profit Margin,net_profit_margin_pct,26.256288,10.916177,7.666048,2.001046,High,True
+HINDALCO,Hindalco Industries Ltd,Materials,Operating Profit Margin,operating_profit_margin_pct,88.946203,31.761388,25.348532,2.255942,High,True
+COALINDIA,Coal India Ltd,Materials,ROE,return_on_equity_pct,45.169830,16.069204,13.592911,2.140868,High,True

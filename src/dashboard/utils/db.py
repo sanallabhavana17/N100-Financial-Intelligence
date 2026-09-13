@@ -1,7 +1,8 @@
-﻿import sqlite3
+import sqlite3
 from pathlib import Path
-import streamlit as st
+
 import pandas as pd
+import streamlit as st
 
 DB_PATH = Path(__file__).resolve().parents[3] / "data" / "nifty100.db"
 
@@ -16,7 +17,9 @@ def _read_sql(query, params=()):
 
 @st.cache_data(ttl=600)
 def get_companies():
-    return _read_sql("""
+    """Get companies."""
+    return _read_sql(
+        """
         SELECT
             c.id AS company_id,
             c.company_name,
@@ -35,60 +38,82 @@ def get_companies():
         LEFT JOIN sectors s
             ON c.id = s.company_id
         ORDER BY c.company_name
-    """)
+    """
+    )
 
 
 @st.cache_data(ttl=600)
 def get_ratios(ticker, year=None):
+    """Get ratios."""
     if year is None:
-        return _read_sql("""
+        return _read_sql(
+            """
             SELECT *
             FROM financial_ratios
             WHERE company_id = ?
             ORDER BY year
-        """, (ticker,))
+        """,
+            (ticker,),
+        )
 
-    return _read_sql("""
+    return _read_sql(
+        """
         SELECT *
         FROM financial_ratios
         WHERE company_id = ? AND year = ?
         ORDER BY year
-    """, (ticker, year))
+    """,
+        (ticker, year),
+    )
 
 
 @st.cache_data(ttl=600)
 def get_pl(ticker):
-    return _read_sql("""
+    """Get pl."""
+    return _read_sql(
+        """
         SELECT *
         FROM profitandloss
         WHERE company_id = ?
         ORDER BY year
-    """, (ticker,))
+    """,
+        (ticker,),
+    )
 
 
 @st.cache_data(ttl=600)
 def get_bs(ticker):
-    return _read_sql("""
+    """Get bs."""
+    return _read_sql(
+        """
         SELECT *
         FROM balancesheet
         WHERE company_id = ?
         ORDER BY year
-    """, (ticker,))
+    """,
+        (ticker,),
+    )
 
 
 @st.cache_data(ttl=600)
 def get_cf(ticker):
-    return _read_sql("""
+    """Get cf."""
+    return _read_sql(
+        """
         SELECT *
         FROM cashflow
         WHERE company_id = ?
         ORDER BY year
-    """, (ticker,))
+    """,
+        (ticker,),
+    )
 
 
 @st.cache_data(ttl=600)
 def get_sectors():
-    return _read_sql("""
+    """Get sectors."""
+    return _read_sql(
+        """
         SELECT
             company_id,
             broad_sector,
@@ -97,12 +122,15 @@ def get_sectors():
             market_cap_category
         FROM sectors
         ORDER BY broad_sector, sub_sector, company_id
-    """)
+    """
+    )
 
 
 @st.cache_data(ttl=600)
 def get_peers(group_name):
-    return _read_sql("""
+    """Get peers."""
+    return _read_sql(
+        """
         SELECT
             pg.peer_group_name,
             pg.company_id,
@@ -117,12 +145,16 @@ def get_peers(group_name):
             ON pg.company_id = s.company_id
         WHERE pg.peer_group_name = ?
         ORDER BY pg.is_benchmark DESC, c.company_name
-    """, (group_name,))
+    """,
+        (group_name,),
+    )
 
 
 @st.cache_data(ttl=600)
 def get_valuation(ticker):
-    return _read_sql("""
+    """Get valuation."""
+    return _read_sql(
+        """
         SELECT
             company_id,
             year,
@@ -135,12 +167,16 @@ def get_valuation(ticker):
         FROM market_cap
         WHERE company_id = ?
         ORDER BY year
-    """, (ticker,))
+    """,
+        (ticker,),
+    )
 
 
 @st.cache_data(ttl=600)
 def get_documents(ticker):
-    return _read_sql("""
+    """Get documents."""
+    return _read_sql(
+        """
         SELECT
             company_id,
             year,
@@ -148,94 +184,129 @@ def get_documents(ticker):
         FROM documents
         WHERE company_id = ?
         ORDER BY year DESC
-    """, (ticker,))
+    """,
+        (ticker,),
+    )
 
 
 @st.cache_data(ttl=600)
 def get_pros_cons(ticker):
-    return _read_sql("""
+    """Get pros cons."""
+    return _read_sql(
+        """
         SELECT
             company_id,
             pros,
             cons
         FROM prosandcons
         WHERE company_id = ?
-    """, (ticker,))
+    """,
+        (ticker,),
+    )
 
 
 @st.cache_data(ttl=600)
 def get_stock_prices(ticker):
-    return _read_sql("""
+    """Get stock prices."""
+    return _read_sql(
+        """
         SELECT *
         FROM stock_prices
         WHERE company_id = ?
         ORDER BY date
-    """, (ticker,))
+    """,
+        (ticker,),
+    )
 
 
 @st.cache_data(ttl=600)
 def get_peer_percentiles(ticker, group_name=None, year=None):
+    """Get peer percentiles."""
     if group_name is not None and year is not None:
-        return _read_sql("""
+        return _read_sql(
+            """
             SELECT *
             FROM peer_percentiles
             WHERE company_id = ?
               AND peer_group_name = ?
               AND year = ?
             ORDER BY metric
-        """, (ticker, group_name, year))
+        """,
+            (ticker, group_name, year),
+        )
 
     if group_name is not None:
-        return _read_sql("""
+        return _read_sql(
+            """
             SELECT *
             FROM peer_percentiles
             WHERE company_id = ?
               AND peer_group_name = ?
             ORDER BY year, metric
-        """, (ticker, group_name))
+        """,
+            (ticker, group_name),
+        )
 
-    return _read_sql("""
+    return _read_sql(
+        """
         SELECT *
         FROM peer_percentiles
         WHERE company_id = ?
         ORDER BY year, peer_group_name, metric
-    """, (ticker,))
+    """,
+        (ticker,),
+    )
 
 
 @st.cache_data(ttl=600)
 def get_analysis(ticker):
-    return _read_sql("""
+    """Get analysis."""
+    return _read_sql(
+        """
         SELECT *
         FROM analysis
         WHERE company_id = ?
-    """, (ticker,))
+    """,
+        (ticker,),
+    )
 
 
 @st.cache_data(ttl=600)
 def get_years():
-    return _read_sql("""
+    """Get years."""
+    return _read_sql(
+        """
         SELECT DISTINCT year
         FROM financial_ratios
         WHERE year IS NOT NULL
         ORDER BY year
-    """)
+    """
+    )
 
 
 @st.cache_data(ttl=600)
 def get_peer_group_names():
-    return _read_sql("""
+    """Get peer group names."""
+    return _read_sql(
+        """
         SELECT DISTINCT peer_group_name
         FROM peer_groups
         ORDER BY peer_group_name
-    """)["peer_group_name"].tolist()
+    """
+    )["peer_group_name"].tolist()
 
 
 def clear_cache():
+    """Clear cache."""
     st.cache_data.clear()
+
+
 @st.cache_data(ttl=600)
 def get_peer_group_percentiles(group_name, year=None):
+    """Get peer group percentiles."""
     if year is None:
-        return _read_sql("""
+        return _read_sql(
+            """
             SELECT
                 company_id,
                 peer_group_name,
@@ -246,9 +317,12 @@ def get_peer_group_percentiles(group_name, year=None):
             FROM peer_percentiles
             WHERE peer_group_name = ?
             ORDER BY year, company_id, metric
-        """, (group_name,))
+        """,
+            (group_name,),
+        )
 
-    return _read_sql("""
+    return _read_sql(
+        """
         SELECT
             company_id,
             peer_group_name,
@@ -260,4 +334,6 @@ def get_peer_group_percentiles(group_name, year=None):
         WHERE peer_group_name = ?
           AND year = ?
         ORDER BY company_id, metric
-    """, (group_name, year))
+    """,
+        (group_name, year),
+    )

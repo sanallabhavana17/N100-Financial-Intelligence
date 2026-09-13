@@ -1,3 +1,6 @@
+import math
+
+
 def net_profit_margin(net_profit, sales):
     """
     Net Profit Margin = Net Profit / Sales × 100
@@ -49,22 +52,13 @@ def return_on_equity(net_profit, equity_capital, reserves):
     return (net_profit / equity) * 100
 
 
-def return_on_capital_employed(
-    ebit,
-    equity_capital,
-    reserves,
-    borrowings
-):
+def return_on_capital_employed(ebit, equity_capital, reserves, borrowings):
     """
     ROCE = EBIT / (Equity + Reserves + Borrowings) × 100
 
     Returns None if capital employed <= 0.
     """
-    capital_employed = (
-        equity_capital
-        + reserves
-        + borrowings
-    )
+    capital_employed = equity_capital + reserves + borrowings
 
     if capital_employed <= 0:
         return None
@@ -89,11 +83,7 @@ def return_on_assets(net_profit, total_assets):
 # ==========================================================
 
 
-def debt_to_equity(
-    borrowings,
-    equity_capital,
-    reserves
-):
+def debt_to_equity(borrowings, equity_capital, reserves):
     """
     Debt-to-Equity = Borrowings / (Equity Capital + Reserves)
 
@@ -113,10 +103,7 @@ def debt_to_equity(
     return borrowings / equity
 
 
-def high_leverage_flag(
-    debt_equity,
-    is_financials_sector
-):
+def high_leverage_flag(debt_equity, is_financials_sector):
     """
     High leverage flag.
 
@@ -135,11 +122,7 @@ def high_leverage_flag(
     return debt_equity > 5
 
 
-def interest_coverage_ratio(
-    operating_profit,
-    other_income,
-    interest
-):
+def interest_coverage_ratio(operating_profit, other_income, interest):
     """
     Interest Coverage Ratio (ICR)
 
@@ -150,10 +133,7 @@ def interest_coverage_ratio(
     if interest == 0:
         return None
 
-    return (
-        (operating_profit + other_income)
-        / interest
-    )
+    return (operating_profit + other_income) / interest
 
 
 def icr_label(interest_coverage):
@@ -167,7 +147,7 @@ def icr_label(interest_coverage):
         return "Debt Free"
 
     try:
-        if interest_coverage != interest_coverage:
+        if math.isnan(interest_coverage):
             return "Debt Free"
     except TypeError:
         return None
@@ -188,10 +168,7 @@ def icr_warning_flag(interest_coverage):
     return interest_coverage < 1.5
 
 
-def net_debt(
-    borrowings,
-    investments
-):
+def net_debt(borrowings, investments):
     """
     Net Debt = Borrowings - Investments
 
@@ -200,10 +177,7 @@ def net_debt(
     return borrowings - investments
 
 
-def asset_turnover(
-    sales,
-    total_assets
-):
+def asset_turnover(sales, total_assets):
     """
     Asset Turnover = Sales / Total Assets
 
@@ -213,3 +187,4 @@ def asset_turnover(
         return None
 
     return sales / total_assets
+

@@ -2,7 +2,6 @@ from pathlib import Path
 
 import pandas as pd
 
-
 OUTPUT_DIR = Path("output")
 OUTPUT_DIR.mkdir(exist_ok=True)
 
@@ -30,6 +29,7 @@ def record_failure(
 # DQ-01: Company PK Uniqueness
 # ---------------------------------------------------------------------
 
+
 def validate_pk_uniqueness(df, table_name, failures):
     """DQ-01: Primary-key values must be unique."""
 
@@ -52,17 +52,14 @@ def validate_pk_uniqueness(df, table_name, failures):
 # DQ-02: Annual PK Uniqueness
 # ---------------------------------------------------------------------
 
+
 def validate_company_year_pk(df, table_name, failures):
     """DQ-02: No duplicate (company_id, year) records."""
 
     if "company_id" not in df.columns or "year" not in df.columns:
         return
 
-    duplicate_count = int(
-        df.duplicated(
-            subset=["company_id", "year"]
-        ).sum()
-    )
+    duplicate_count = int(df.duplicated(subset=["company_id", "year"]).sum())
 
     if duplicate_count > 0:
         record_failure(
@@ -77,6 +74,7 @@ def validate_company_year_pk(df, table_name, failures):
 # ---------------------------------------------------------------------
 # DQ-03: Foreign-Key Integrity
 # ---------------------------------------------------------------------
+
 
 def validate_fk_integrity(
     child_df,
@@ -95,25 +93,11 @@ def validate_fk_integrity(
     if "id" not in companies_df.columns:
         return
 
-    valid_ids = set(
-        companies_df["id"]
-        .dropna()
-        .astype(str)
-        .str.strip()
-        .str.upper()
-    )
+    valid_ids = set(companies_df["id"].dropna().astype(str).str.strip().str.upper())
 
-    child_ids = (
-        child_df["company_id"]
-        .dropna()
-        .astype(str)
-        .str.strip()
-        .str.upper()
-    )
+    child_ids = child_df["company_id"].dropna().astype(str).str.strip().str.upper()
 
-    orphan_ids = sorted(
-        set(child_ids) - valid_ids
-    )
+    orphan_ids = sorted(set(child_ids) - valid_ids)
 
     if orphan_ids:
         record_failure(
@@ -129,6 +113,7 @@ def validate_fk_integrity(
 # ---------------------------------------------------------------------
 # DQ-04: Balance Sheet Balance
 # ---------------------------------------------------------------------
+
 
 def validate_balance_sheet_balance(
     df,
@@ -160,9 +145,7 @@ def validate_balance_sheet_balance(
 
     valid = assets.notna() & liabilities.notna() & (assets != 0)
 
-    difference = (
-        (assets - liabilities).abs() / assets.abs()
-    )
+    difference = (assets - liabilities).abs() / assets.abs()
 
     violations = valid & (difference >= 0.01)
 
@@ -174,14 +157,14 @@ def validate_balance_sheet_balance(
             "DQ-04",
             "WARNING",
             table_name,
-            f"{count} balance-sheet rows exceed the 1% "
-            "asset/liability tolerance",
+            f"{count} balance-sheet rows exceed the 1% " "asset/liability tolerance",
         )
 
 
 # ---------------------------------------------------------------------
 # DQ-05: OPM Cross-Check
 # ---------------------------------------------------------------------
+
 
 def validate_opm_cross_check(
     df,
@@ -217,24 +200,11 @@ def validate_opm_cross_check(
         errors="coerce",
     )
 
-    valid = (
-        sales.notna()
-        & operating_profit.notna()
-        & source_opm.notna()
-        & (sales != 0)
-    )
+    valid = sales.notna() & operating_profit.notna() & source_opm.notna() & (sales != 0)
 
-    computed_opm = (
-        operating_profit / sales * 100
-    )
+    computed_opm = operating_profit / sales * 100
 
-    violations = (
-        valid
-        & (
-            (source_opm - computed_opm).abs()
-            >= 1.0
-        )
-    )
+    violations = valid & ((source_opm - computed_opm).abs() >= 1.0)
 
     count = int(violations.sum())
 
@@ -251,6 +221,7 @@ def validate_opm_cross_check(
 # ---------------------------------------------------------------------
 # DQ-06: Positive Sales
 # ---------------------------------------------------------------------
+
 
 def validate_positive_sales(
     df,
@@ -291,6 +262,7 @@ def validate_positive_sales(
 # DQ-07: Year Format
 # ---------------------------------------------------------------------
 
+
 def validate_year_format(
     df,
     table_name,
@@ -327,6 +299,7 @@ def validate_year_format(
 # DQ-08: Ticker Format
 # ---------------------------------------------------------------------
 
+
 def validate_ticker_format(
     df,
     table_name,
@@ -341,18 +314,9 @@ def validate_ticker_format(
     if "company_id" not in df.columns:
         return
 
-    tickers = (
-        df["company_id"]
-        .astype("string")
-        .str.strip()
-        .str.upper()
-    )
+    tickers = df["company_id"].astype("string").str.strip().str.upper()
 
-    invalid = (
-        tickers.isna()
-        | (tickers.str.len() < 2)
-        | (tickers.str.len() > 12)
-    )
+    invalid = tickers.isna() | (tickers.str.len() < 2) | (tickers.str.len() > 12)
 
     count = int(invalid.sum())
 
@@ -369,6 +333,7 @@ def validate_ticker_format(
 # ---------------------------------------------------------------------
 # DQ-09: Net Cash Check
 # ---------------------------------------------------------------------
+
 
 def validate_net_cash(
     df,
@@ -413,15 +378,9 @@ def validate_net_cash(
 
     expected = cfo + cfi + cff
 
-    valid = (
-        net_cash.notna()
-        & expected.notna()
-    )
+    valid = net_cash.notna() & expected.notna()
 
-    violations = (
-        valid
-        & ((net_cash - expected).abs() > tolerance)
-    )
+    violations = valid & ((net_cash - expected).abs() > tolerance)
 
     count = int(violations.sum())
 
@@ -431,14 +390,14 @@ def validate_net_cash(
             "DQ-09",
             "WARNING",
             table_name,
-            f"{count} rows have net cash-flow mismatch "
-            f"greater than {tolerance} Cr",
+            f"{count} rows have net cash-flow mismatch " f"greater than {tolerance} Cr",
         )
 
 
 # ---------------------------------------------------------------------
 # DQ-10: Non-Negative Fixed Assets
 # ---------------------------------------------------------------------
+
 
 def validate_fixed_assets(
     df,
@@ -455,10 +414,7 @@ def validate_fixed_assets(
         errors="coerce",
     )
 
-    violations = (
-        fixed_assets.notna()
-        & (fixed_assets < 0)
-    )
+    violations = fixed_assets.notna() & (fixed_assets < 0)
 
     count = int(violations.sum())
 
@@ -476,6 +432,7 @@ def validate_fixed_assets(
 # DQ-11: Tax Rate Range
 # ---------------------------------------------------------------------
 
+
 def validate_tax_rate(
     df,
     table_name,
@@ -491,13 +448,7 @@ def validate_tax_rate(
         errors="coerce",
     )
 
-    violations = (
-        tax.notna()
-        & (
-            (tax < 0)
-            | (tax > 60)
-        )
-    )
+    violations = tax.notna() & ((tax < 0) | (tax > 60))
 
     count = int(violations.sum())
 
@@ -515,6 +466,7 @@ def validate_tax_rate(
 # DQ-12: Dividend Payout Cap
 # ---------------------------------------------------------------------
 
+
 def validate_dividend_payout(
     df,
     table_name,
@@ -530,10 +482,7 @@ def validate_dividend_payout(
         errors="coerce",
     )
 
-    violations = (
-        payout.notna()
-        & (payout > 200)
-    )
+    violations = payout.notna() & (payout > 200)
 
     count = int(violations.sum())
 
@@ -550,6 +499,7 @@ def validate_dividend_payout(
 # ---------------------------------------------------------------------
 # DQ-13: URL Validity
 # ---------------------------------------------------------------------
+
 
 def validate_document_urls(
     df,
@@ -594,7 +544,7 @@ def validate_document_urls(
             if response.status_code != 200:
                 invalid_count += 1
 
-        except Exception:
+        except Exception:  # noqa: BLE001
             invalid_count += 1
 
     if invalid_count > 0:
@@ -610,6 +560,7 @@ def validate_document_urls(
 # ---------------------------------------------------------------------
 # DQ-14: EPS Sign Consistency
 # ---------------------------------------------------------------------
+
 
 def validate_eps_sign(
     df,
@@ -639,12 +590,7 @@ def validate_eps_sign(
         errors="coerce",
     )
 
-    violations = (
-        net_profit.notna()
-        & eps.notna()
-        & (net_profit > 0)
-        & (eps <= 0)
-    )
+    violations = net_profit.notna() & eps.notna() & (net_profit > 0) & (eps <= 0)
 
     count = int(violations.sum())
 
@@ -661,6 +607,7 @@ def validate_eps_sign(
 # ---------------------------------------------------------------------
 # Validation runners
 # ---------------------------------------------------------------------
+
 
 def run_validation():
     """Validate raw source datasets against DQ-01 through DQ-14."""
@@ -777,14 +724,62 @@ def run_validation():
             failures,
         )
 
-    failures_df = pd.DataFrame(failures)
+        failures_df = pd.DataFrame(failures)
 
     output_file = OUTPUT_DIR / "validation_failures.csv"
 
-    failures_df.to_csv(
+    # AC19 acceptance format:
+    # company_id, field, issue, severity
+    if failures_df.empty:
+        acceptance_df = pd.DataFrame(
+            columns=[
+                "company_id",
+                "field",
+                "issue",
+                "severity",
+            ]
+        )
+    else:
+        acceptance_df = pd.DataFrame(
+            {
+                "company_id": "ALL",
+                "field": failures_df["rule_id"].map(
+                    {
+                        "DQ-01": "id",
+                        "DQ-02": "company_id,year",
+                        "DQ-03": "company_id",
+                        "DQ-04": "total_assets,total_liabilities",
+                        "DQ-05": "opm_percentage,operating_profit,sales",
+                        "DQ-06": "sales",
+                        "DQ-07": "year",
+                        "DQ-08": "company_id",
+                        "DQ-09": "net_cash_flow",
+                        "DQ-10": "fixed_assets",
+                        "DQ-11": "tax_percentage",
+                        "DQ-12": "dividend_payout",
+                        "DQ-13": "Annual_Report",
+                        "DQ-14": "eps,net_profit",
+                    }
+                ).fillna("unknown"),
+                "issue": (
+                    failures_df["table"].astype(str)
+                    + ": "
+                    + failures_df["message"].astype(str)
+                ),
+                "severity": failures_df["severity"],
+            }
+        )
+
+    acceptance_df.to_csv(
         output_file,
         index=False,
     )
+
+    print("\nRaw-data validation completed.")
+    print(f"Failures found: {len(acceptance_df)}")
+    print(f"Output: {output_file}")
+
+    return acceptance_df
 
     print("\nRaw-data validation completed.")
     print(f"Failures found: {len(failures_df)}")
@@ -799,14 +794,9 @@ def load_processed_files():
     processed_dir = Path("data/processed")
 
     files = {
-        "profitandloss_cleaned.csv":
-            processed_dir / "profitandloss_cleaned.csv",
-
-        "balancesheet_cleaned.csv":
-            processed_dir / "balancesheet_cleaned.csv",
-
-        "cashflow_cleaned.csv":
-            processed_dir / "cashflow_cleaned.csv",
+        "profitandloss_cleaned.csv": processed_dir / "profitandloss_cleaned.csv",
+        "balancesheet_cleaned.csv": processed_dir / "balancesheet_cleaned.csv",
+        "cashflow_cleaned.csv": processed_dir / "cashflow_cleaned.csv",
     }
 
     datasets = {}
@@ -815,9 +805,7 @@ def load_processed_files():
 
         if not filepath.exists():
 
-            print(
-                f"WARNING: Missing processed file: {filepath}"
-            )
+            print(f"WARNING: Missing processed file: {filepath}")
 
             continue
 
@@ -911,9 +899,7 @@ def run_processed_validation():
 
     failures_df = pd.DataFrame(failures)
 
-    output_file = (
-        OUTPUT_DIR / "processed_validation_failures.csv"
-    )
+    output_file = OUTPUT_DIR / "processed_validation_failures.csv"
 
     failures_df.to_csv(
         output_file,
@@ -928,9 +914,7 @@ def run_processed_validation():
         print("\nProcessed-data failures:")
         print(failures_df.to_string(index=False))
     else:
-        print(
-            "All processed datasets passed validation. OK"
-        )
+        print("All processed datasets passed validation. OK")
 
     return failures_df
 
@@ -938,3 +922,4 @@ def run_processed_validation():
 if __name__ == "__main__":
     run_validation()
     run_processed_validation()
+

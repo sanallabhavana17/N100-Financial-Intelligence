@@ -18,7 +18,6 @@ from pathlib import Path
 
 import pandas as pd
 
-
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
@@ -34,6 +33,7 @@ DISTRESS_FILE = OUTPUT_DIR / "distress_alerts.csv"
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def to_float(value):
     """Safely convert a value to float."""
@@ -65,12 +65,14 @@ def to_float(value):
 
 
 def is_valid(value):
+    """Is valid."""
     return value is not None and math.isfinite(value)
 
 
 # ---------------------------------------------------------------------------
 # Classification functions
 # ---------------------------------------------------------------------------
+
 
 def classify_cfo_quality(cfo_pat):
     """
@@ -109,9 +111,9 @@ def calculate_capex_intensity(investing_activity, sales):
 
 def classify_capex(capex_intensity):
     """
-        < 3%       Asset Light
-        3 - 8%     Moderate
-        > 8%       Capital Intensive
+    < 3%       Asset Light
+    3 - 8%     Moderate
+    > 8%       Capital Intensive
     """
 
     if not is_valid(capex_intensity):
@@ -149,7 +151,9 @@ def calculate_cagr(start_value, end_value, years=5):
 # Capital allocation
 # ---------------------------------------------------------------------------
 
+
 def sign(value):
+    """Sign."""
     if not is_valid(value):
         return "0"
 
@@ -183,10 +187,7 @@ def capital_allocation_pattern(cfo, cfi, cff, cfo_pat_ratio=None):
     )
 
     if pattern == ("+", "-", "-"):
-        if (
-            is_valid(cfo_pat_ratio)
-            and cfo_pat_ratio > 1.0
-        ):
+        if is_valid(cfo_pat_ratio) and cfo_pat_ratio > 1.0:
             return "Shareholder Returns"
 
         return "Reinvestor"
@@ -207,7 +208,9 @@ def capital_allocation_pattern(cfo, cfi, cff, cfo_pat_ratio=None):
 # Load data
 # ---------------------------------------------------------------------------
 
+
 def load_data():
+    """Load data."""
     conn = sqlite3.connect(DB_PATH)
 
     try:
@@ -297,6 +300,7 @@ def load_data():
 # Sales lookup
 # ---------------------------------------------------------------------------
 
+
 def find_sales_column(df):
     """
     Identify the sales/revenue column in profitandloss.
@@ -312,10 +316,7 @@ def find_sales_column(df):
         "total_revenue",
     ]
 
-    lower_map = {
-        str(column).lower(): column
-        for column in df.columns
-    }
+    lower_map = {str(column).lower(): column for column in df.columns}
 
     for name in preferred:
         if name in lower_map:
@@ -334,6 +335,7 @@ def find_sales_column(df):
 # Build intelligence
 # ---------------------------------------------------------------------------
 
+
 def build_intelligence(
     cashflow,
     ratios,
@@ -341,6 +343,7 @@ def build_intelligence(
     sectors,
     profit_loss,
 ):
+    """Build intelligence."""
     cashflow = cashflow.copy()
     ratios = ratios.copy()
     balancesheet = balancesheet.copy()
@@ -392,16 +395,12 @@ def build_intelligence(
         ]
     ].copy()
 
-    fcf_data = fcf_data.sort_values(
-        ["company_id", "year"]
-    )
+    fcf_data = fcf_data.sort_values(["company_id", "year"])
 
     fcf_cagr = {}
 
     for company_id, group in fcf_data.groupby("company_id"):
-        group = group.dropna(
-            subset=["year", "free_cash_flow_cr"]
-        ).sort_values("year")
+        group = group.dropna(subset=["year", "free_cash_flow_cr"]).sort_values("year")
 
         if group.empty:
             fcf_cagr[str(company_id)] = None
@@ -411,9 +410,7 @@ def build_intelligence(
 
         target_year = latest["year"] - 5
 
-        prior = group[
-            group["year"] <= target_year
-        ]
+        prior = group[group["year"] <= target_year]
 
         if prior.empty:
             fcf_cagr[str(company_id)] = None
@@ -433,8 +430,7 @@ def build_intelligence(
     # -----------------------------------------------------------------------
 
     latest_cashflow = (
-        cashflow
-        .sort_values(["company_id", "year"])
+        cashflow.sort_values(["company_id", "year"])
         .groupby("company_id", as_index=False)
         .tail(1)
         .copy()
@@ -445,8 +441,7 @@ def build_intelligence(
     # -----------------------------------------------------------------------
 
     latest_ratios = (
-        ratios
-        .sort_values(["company_id", "year"])
+        ratios.sort_values(["company_id", "year"])
         .groupby("company_id", as_index=False)
         .tail(1)
         .copy()
@@ -456,16 +451,12 @@ def build_intelligence(
     # Borrowings / deleveraging
     # -----------------------------------------------------------------------
 
-    bs = balancesheet.sort_values(
-        ["company_id", "year"]
-    )
+    bs = balancesheet.sort_values(["company_id", "year"])
 
     deleveraging = {}
 
     for company_id, group in bs.groupby("company_id"):
-        group = group.dropna(
-            subset=["year"]
-        ).sort_values("year")
+        group = group.dropna(subset=["year"]).sort_values("year")
 
         if len(group) < 2:
             deleveraging[str(company_id)] = False
@@ -473,9 +464,7 @@ def build_intelligence(
 
         latest = group.iloc[-1]
 
-        previous = group[
-            group["year"] < latest["year"]
-        ]
+        previous = group[group["year"] < latest["year"]]
 
         if previous.empty:
             deleveraging[str(company_id)] = False
@@ -487,10 +476,7 @@ def build_intelligence(
         previous_borrowings = previous["borrowings"]
 
         # Need both values to be known.
-        if (
-            not is_valid(latest_borrowings)
-            or not is_valid(previous_borrowings)
-        ):
+        if not is_valid(latest_borrowings) or not is_valid(previous_borrowings):
             deleveraging[str(company_id)] = False
             continue
 
@@ -504,13 +490,10 @@ def build_intelligence(
 
         if not latest_cff.empty:
             cff = latest_cff.iloc[0]["financing_activity"]
-            cff_negative = (
-                is_valid(cff) and cff < 0
-            )
+            cff_negative = is_valid(cff) and cff < 0
 
         deleveraging[str(company_id)] = (
-            cff_negative
-            and latest_borrowings < previous_borrowings
+            cff_negative and latest_borrowings < previous_borrowings
         )
 
     # -----------------------------------------------------------------------
@@ -535,8 +518,7 @@ def build_intelligence(
         company_id = str(ratio_row["company_id"])
 
         cf_match = latest_cashflow[
-            latest_cashflow["company_id"].astype(str)
-            == company_id
+            latest_cashflow["company_id"].astype(str) == company_id
         ]
 
         if cf_match.empty:
@@ -544,48 +526,29 @@ def build_intelligence(
 
         cf_row = cf_match.iloc[0]
 
-        cfo = to_float(
-            cf_row["operating_activity"]
-        )
+        cfo = to_float(cf_row["operating_activity"])
 
-        cfi = to_float(
-            cf_row["investing_activity"]
-        )
+        cfi = to_float(cf_row["investing_activity"])
 
-        cff = to_float(
-            cf_row["financing_activity"]
-        )
+        cff = to_float(cf_row["financing_activity"])
 
         # Existing ratio-engine values are preferred because they
         # preserve consistency with earlier sprints.
-        cfo_quality_score = to_float(
-            ratio_row["cfo_quality_ratio"]
-        )
+        cfo_quality_score = to_float(ratio_row["cfo_quality_ratio"])
 
         if cfo_quality_score is None:
             # Fall back to CFO/PAT only when available elsewhere.
             cfo_quality_score = None
 
-        cfo_label = classify_cfo_quality(
-            cfo_quality_score
-        )
+        cfo_label = classify_cfo_quality(cfo_quality_score)
 
-        capex_pct = to_float(
-            ratio_row["capex_intensity_pct"]
-        )
+        capex_pct = to_float(ratio_row["capex_intensity_pct"])
 
-        capex_label = classify_capex(
-            capex_pct
-        )
+        capex_label = classify_capex(capex_pct)
 
         # Distress:
         # latest CFO < 0 AND latest CFF > 0
-        distress_flag = bool(
-            is_valid(cfo)
-            and is_valid(cff)
-            and cfo < 0
-            and cff > 0
-        )
+        distress_flag = bool(is_valid(cfo) and is_valid(cff) and cfo < 0 and cff > 0)
 
         # Capital allocation
         allocation_label = capital_allocation_pattern(
@@ -596,9 +559,7 @@ def build_intelligence(
         )
 
         # Existing FCF conversion calculation.
-        fcf_conversion = to_float(
-            ratio_row["fcf_conversion_pct"]
-        )
+        fcf_conversion = to_float(ratio_row["fcf_conversion_pct"])
 
         records.append(
             {
@@ -611,9 +572,7 @@ def build_intelligence(
                 "cfo_quality_label": cfo_label,
                 "capex_intensity_pct": capex_pct,
                 "capex_label": capex_label,
-                "fcf_cagr_5yr": fcf_cagr.get(
-                    company_id
-                ),
+                "fcf_cagr_5yr": fcf_cagr.get(company_id),
                 "fcf_conversion_pct": fcf_conversion,
                 "distress_flag": distress_flag,
                 "deleveraging_flag": bool(
@@ -633,14 +592,14 @@ def build_intelligence(
 # Main
 # ---------------------------------------------------------------------------
 
+
 def main():
+    """Main."""
     print("N100 CASH FLOW INTELLIGENCE")
     print("=" * 70)
 
     if not DB_PATH.exists():
-        raise FileNotFoundError(
-            f"Database not found: {DB_PATH}"
-        )
+        raise FileNotFoundError(f"Database not found: {DB_PATH}")
 
     OUTPUT_DIR.mkdir(
         parents=True,
@@ -684,17 +643,13 @@ def main():
 
     result = result[expected_columns]
 
-    result = result.sort_values(
-        ["sector", "company_id"]
-    ).reset_index(drop=True)
+    result = result.sort_values(["sector", "company_id"]).reset_index(drop=True)
 
     # -----------------------------------------------------------------------
     # Distress alerts
     # -----------------------------------------------------------------------
 
-    distress = result[
-        result["distress_flag"] == True
-    ].copy()
+    distress = result[result["distress_flag"] == True].copy()
 
     # -----------------------------------------------------------------------
     # Save Excel
@@ -726,30 +681,12 @@ def main():
                 ],
                 "Count": [
                     result["company_id"].nunique(),
-                    (
-                        result["cfo_quality_label"]
-                        == "High Quality"
-                    ).sum(),
-                    (
-                        result["cfo_quality_label"]
-                        == "Moderate"
-                    ).sum(),
-                    (
-                        result["cfo_quality_label"]
-                        == "Accrual Risk"
-                    ).sum(),
-                    (
-                        result["capex_label"]
-                        == "Asset Light"
-                    ).sum(),
-                    (
-                        result["capex_label"]
-                        == "Moderate"
-                    ).sum(),
-                    (
-                        result["capex_label"]
-                        == "Capital Intensive"
-                    ).sum(),
+                    (result["cfo_quality_label"] == "High Quality").sum(),
+                    (result["cfo_quality_label"] == "Moderate").sum(),
+                    (result["cfo_quality_label"] == "Accrual Risk").sum(),
+                    (result["capex_label"] == "Asset Light").sum(),
+                    (result["capex_label"] == "Moderate").sum(),
+                    (result["capex_label"] == "Capital Intensive").sum(),
                     result["distress_flag"].sum(),
                     result["deleveraging_flag"].sum(),
                 ],
@@ -780,49 +717,25 @@ def main():
     print("OUTPUT VALIDATION")
     print("-" * 70)
 
-    print(
-        f"Companies in intelligence: "
-        f"{result['company_id'].nunique()}"
-    )
+    print(f"Companies in intelligence: " f"{result['company_id'].nunique()}")
 
-    print(
-        f"Output rows:               "
-        f"{len(result)}"
-    )
+    print(f"Output rows:               " f"{len(result)}")
 
-    print(
-        f"Distress alerts:           "
-        f"{len(distress)}"
-    )
+    print(f"Distress alerts:           " f"{len(distress)}")
 
-    print(
-        f"Deleveraging companies:    "
-        f"{result['deleveraging_flag'].sum()}"
-    )
+    print(f"Deleveraging companies:    " f"{result['deleveraging_flag'].sum()}")
 
     print()
     print("CFO Quality:")
-    print(
-        result["cfo_quality_label"]
-        .value_counts(dropna=False)
-        .to_string()
-    )
+    print(result["cfo_quality_label"].value_counts(dropna=False).to_string())
 
     print()
     print("CapEx:")
-    print(
-        result["capex_label"]
-        .value_counts(dropna=False)
-        .to_string()
-    )
+    print(result["capex_label"].value_counts(dropna=False).to_string())
 
     print()
     print("Capital Allocation:")
-    print(
-        result["capital_allocation_label"]
-        .value_counts(dropna=False)
-        .to_string()
-    )
+    print(result["capital_allocation_label"].value_counts(dropna=False).to_string())
 
     print()
     print("Distress / Deleveraging:")
@@ -843,8 +756,7 @@ def main():
 
     if missing_companies != 0:
         raise RuntimeError(
-            f"Expected 92 companies but found "
-            f"{result['company_id'].nunique()}."
+            f"Expected 92 companies but found " f"{result['company_id'].nunique()}."
         )
 
     print(f"Saved: {INTELLIGENCE_FILE}")

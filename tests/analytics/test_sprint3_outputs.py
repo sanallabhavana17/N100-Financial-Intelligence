@@ -1,10 +1,9 @@
-﻿from pathlib import Path
-import sqlite3
+﻿import sqlite3
+from pathlib import Path
 
 import pandas as pd
 import pytest
 from openpyxl import load_workbook
-
 
 # ============================================================
 # PATHS
@@ -58,11 +57,10 @@ EXPECTED_PEER_METRICS = {
 # FIXTURE
 # ============================================================
 
+
 @pytest.fixture(scope="module")
 def peer_data():
-    assert PEER_CSV.exists(), (
-        f"Peer percentile CSV not found: {PEER_CSV}"
-    )
+    assert PEER_CSV.exists(), f"Peer percentile CSV not found: {PEER_CSV}"
 
     return pd.read_csv(PEER_CSV)
 
@@ -70,6 +68,7 @@ def peer_data():
 # ============================================================
 # CSV DATA QUALITY TESTS
 # ============================================================
+
 
 def test_peer_csv_exists():
     assert PEER_CSV.exists()
@@ -80,12 +79,7 @@ def test_peer_csv_row_count(peer_data):
 
 
 def test_peer_csv_peer_group_count(peer_data):
-    peer_groups = set(
-        peer_data["peer_group_name"]
-        .dropna()
-        .astype(str)
-        .unique()
-    )
+    peer_groups = set(peer_data["peer_group_name"].dropna().astype(str).unique())
 
     assert len(peer_groups) == EXPECTED_PEER_GROUPS
     assert peer_groups == EXPECTED_PEER_GROUP_NAMES
@@ -110,9 +104,7 @@ def test_peer_csv_required_columns(peer_data):
 
     missing_columns = required_columns - set(peer_data.columns)
 
-    assert not missing_columns, (
-        f"Missing required columns: {sorted(missing_columns)}"
-    )
+    assert not missing_columns, f"Missing required columns: {sorted(missing_columns)}"
 
 
 def test_peer_percentiles_are_valid(peer_data):
@@ -126,8 +118,7 @@ def test_peer_percentiles_are_valid(peer_data):
     percentile_columns = [
         column
         for column in peer_data.columns
-        if column.endswith("_percentile")
-        and column != "vs_benchmark_percentile"
+        if column.endswith("_percentile") and column != "vs_benchmark_percentile"
     ]
 
     assert percentile_columns
@@ -138,9 +129,9 @@ def test_peer_percentiles_are_valid(peer_data):
             errors="coerce",
         ).dropna()
 
-        assert ((values >= 0) & (values <= 100)).all(), (
-            f"Invalid percentile values found in {column}"
-        )
+        assert (
+            (values >= 0) & (values <= 100)
+        ).all(), f"Invalid percentile values found in {column}"
 
 
 def test_peer_group_company_year_has_no_duplicates(peer_data):
@@ -155,9 +146,7 @@ def test_peer_group_company_year_has_no_duplicates(peer_data):
         keep=False,
     )
 
-    assert not duplicates.any(), (
-        "Duplicate peer/company/year records found"
-    )
+    assert not duplicates.any(), "Duplicate peer/company/year records found"
 
 
 def test_peer_rank_values_are_valid(peer_data):
@@ -180,6 +169,7 @@ def test_peer_rank_values_are_valid(peer_data):
 # ============================================================
 # EXCEL OUTPUT TESTS
 # ============================================================
+
 
 def test_peer_excel_exists():
     assert PEER_XLSX.exists()
@@ -232,6 +222,7 @@ def test_peer_excel_has_659_data_rows():
 # ============================================================
 # ADDITIONAL SPRINT 3 DQ TESTS
 # ============================================================
+
 
 def test_sqlite_peer_percentiles_has_required_metrics():
     assert DB_FILE.exists()
@@ -301,20 +292,13 @@ def test_sqlite_peer_percentiles_integrity():
 
 
 def test_radar_chart_outputs():
-    assert RADAR_DIR.exists(), (
-        f"Radar chart directory not found: {RADAR_DIR}"
-    )
+    assert RADAR_DIR.exists(), f"Radar chart directory not found: {RADAR_DIR}"
 
-    radar_files = list(
-        RADAR_DIR.glob("*_radar.png")
-    )
+    radar_files = list(RADAR_DIR.glob("*_radar.png"))
 
     assert len(radar_files) == EXPECTED_RADAR_CHARTS
 
-    company_ids = {
-        file.stem.removesuffix("_radar")
-        for file in radar_files
-    }
+    company_ids = {file.stem.removesuffix("_radar") for file in radar_files}
 
     assert len(company_ids) == EXPECTED_RADAR_CHARTS
 
@@ -335,20 +319,14 @@ def test_peer_excel_required_metrics_and_median_rows():
         for sheet_name in workbook.sheetnames:
             worksheet = workbook[sheet_name]
 
-            headers = [
-                cell.value
-                for cell in worksheet[4]
-            ]
+            headers = [cell.value for cell in worksheet[4]]
 
             header_set = set(headers)
 
-            missing_metrics = (
-                required_metric_columns - header_set
-            )
+            missing_metrics = required_metric_columns - header_set
 
             assert not missing_metrics, (
-                f"{sheet_name}: missing metrics "
-                f"{sorted(missing_metrics)}"
+                f"{sheet_name}: missing metrics " f"{sorted(missing_metrics)}"
             )
 
             percentile_metric_columns = {
@@ -359,7 +337,8 @@ def test_peer_excel_required_metrics_and_median_rows():
                 and header.replace(
                     "_percentile",
                     "",
-                ) in required_metric_columns
+                )
+                in required_metric_columns
             }
 
             assert len(percentile_metric_columns) == 10, (
@@ -378,9 +357,7 @@ def test_peer_excel_required_metrics_and_median_rows():
                     assert row[2] == "Peer Group Median"
                     break
 
-            assert median_found, (
-                f"{sheet_name}: median row not found"
-            )
+            assert median_found, f"{sheet_name}: median row not found"
 
             found_median_rows += 1
 

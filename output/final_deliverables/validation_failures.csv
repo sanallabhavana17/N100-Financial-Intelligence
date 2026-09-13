@@ -1,0 +1,23 @@
+company_id,field,issue,severity
+ALL,company_id,analysis: 1 orphan company_id values found: WIPRO,CRITICAL
+ALL,"company_id,year","balancesheet: 175 duplicate (company_id, year) records found",CRITICAL
+ALL,company_id,"balancesheet: 7 orphan company_id values found: ULTRACEMCO, UNIONBANK, UNITDSPR, VEDL, WIPRO, ZOMATO, ZYDUSLIFE",CRITICAL
+ALL,year,balancesheet: 1312 rows contain invalid year format,CRITICAL
+ALL,"company_id,year","cashflow: 35 duplicate (company_id, year) records found",CRITICAL
+ALL,company_id,"cashflow: 9 orphan company_id values found: AGTL, ULTRACEMCO, UNIONBANK, UNITDSPR, VBL, VEDL, WIPRO, ZOMATO, ZYDUSLIFE",CRITICAL
+ALL,year,cashflow: 1187 rows contain invalid year format,CRITICAL
+ALL,net_cash_flow,cashflow: 1 rows have net cash-flow mismatch greater than 10.0 Cr,WARNING
+ALL,company_id,"documents: 8 orphan company_id values found: ULTRACEMCO, UNIONBANK, UNITDSPR, VBL, VEDL, WIPRO, ZOMATO, ZYDUSLIFE",CRITICAL
+ALL,"company_id,year","financial_ratios: 119 duplicate (company_id, year) records found",CRITICAL
+ALL,company_id,"financial_ratios: 2 orphan company_id values found: ULTRACEMCO, UNIONBANK",CRITICAL
+ALL,year,financial_ratios: 1184 rows contain invalid year format,CRITICAL
+ALL,year,market_cap: 552 rows contain invalid year format,CRITICAL
+ALL,"company_id,year","profitandloss: 13 duplicate (company_id, year) records found",CRITICAL
+ALL,company_id,"profitandloss: 8 orphan company_id values found: ULTRACEMCO, UNIONBANK, UNITDSPR, VBL, VEDL, WIPRO, ZOMATO, ZYDUSLIFE",CRITICAL
+ALL,"opm_percentage,operating_profit,sales",profitandloss: 234 rows failed the OPM cross-check,WARNING
+ALL,sales,profitandloss: 1 rows have sales <= 0,WARNING
+ALL,year,profitandloss: 1276 rows contain invalid year format,CRITICAL
+ALL,tax_percentage,profitandloss: 108 rows contain tax rates outside 0-60%,WARNING
+ALL,dividend_payout,profitandloss: 7 rows contain dividend payout > 200%,WARNING
+ALL,"eps,net_profit",profitandloss: 5 rows have positive net profit but non-positive EPS,WARNING
+ALL,company_id,prosandcons: 1 orphan company_id values found: WIPRO,CRITICAL

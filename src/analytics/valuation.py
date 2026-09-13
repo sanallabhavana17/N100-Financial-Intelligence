@@ -1,10 +1,9 @@
-﻿from pathlib import Path
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
 from src.dashboard.utils.db import _read_sql
-
 
 # ============================================================
 # OUTPUT DIRECTORY
@@ -24,7 +23,9 @@ OUTPUT_DIR.mkdir(
 # HELPERS
 # ============================================================
 
+
 def safe_numeric(series):
+    """Safe numeric."""
     return pd.to_numeric(
         series,
         errors="coerce",
@@ -35,8 +36,9 @@ def safe_numeric(series):
 # BUILD VALUATION SUMMARY
 # ============================================================
 
-def build_valuation_summary():
 
+def build_valuation_summary():
+    """Build valuation summary."""
     query = """
     SELECT
         m.company_id,
@@ -68,10 +70,7 @@ def build_valuation_summary():
     df = _read_sql(query)
 
     if df.empty:
-        raise ValueError(
-            "No valuation data found in the database."
-        )
-
+        raise ValueError("No valuation data found in the database.")
 
     # ========================================================
     # NUMERIC CONVERSION
@@ -88,10 +87,7 @@ def build_valuation_summary():
 
     for column in numeric_columns:
 
-        df[column] = safe_numeric(
-            df[column]
-        )
-
+        df[column] = safe_numeric(df[column])
 
     # ========================================================
     # INVALID VALUATION MULTIPLES
@@ -108,14 +104,12 @@ def build_valuation_summary():
             column,
         ] = np.nan
 
-
     # ========================================================
     # LATEST VALUATION YEAR FOR EACH COMPANY
     # ========================================================
 
     current = (
-        df
-        .sort_values(
+        df.sort_values(
             [
                 "company_id",
                 "year",
@@ -128,7 +122,6 @@ def build_valuation_summary():
         .tail(1)
         .copy()
     )
-
 
     current = current[
         [
@@ -144,38 +137,24 @@ def build_valuation_summary():
         ]
     ]
 
-
     # ========================================================
     # FIVE-YEAR MEDIAN P/E
     # ========================================================
 
     five_year_medians = []
 
-    for company_id, company_df in df.groupby(
-        "company_id"
-    ):
+    for company_id, company_df in df.groupby("company_id"):
 
-        company_df = (
-            company_df
-            .sort_values("year")
-            .tail(5)
-        )
+        company_df = company_df.sort_values("year").tail(5)
 
         five_year_medians.append(
             {
                 "company_id": company_id,
-                "5yr_median_PE":
-                    company_df[
-                        "pe_ratio"
-                    ].median(),
+                "5yr_median_PE": company_df["pe_ratio"].median(),
             }
         )
 
-
-    historical = pd.DataFrame(
-        five_year_medians
-    )
-
+    historical = pd.DataFrame(five_year_medians)
 
     # ========================================================
     # MERGE FIVE-YEAR MEDIAN
@@ -187,7 +166,6 @@ def build_valuation_summary():
         how="left",
     )
 
-
     # ========================================================
     # SECTOR MEDIAN P/E
     #
@@ -196,8 +174,7 @@ def build_valuation_summary():
     # ========================================================
 
     sector_medians = (
-        current
-        .groupby(
+        current.groupby(
             "sector",
             dropna=False,
         )
@@ -210,13 +187,11 @@ def build_valuation_summary():
         .reset_index()
     )
 
-
     result = result.merge(
         sector_medians,
         on="sector",
         how="left",
     )
-
 
     # ========================================================
     # FCF YIELD
@@ -226,30 +201,10 @@ def build_valuation_summary():
     # ========================================================
 
     result["FCF_yield_pct"] = np.where(
-
-        (
-            result[
-                "market_cap_crore"
-            ] > 0
-        )
-        &
-        result[
-            "free_cash_flow_cr"
-        ].notna(),
-
-        (
-            result[
-                "free_cash_flow_cr"
-            ]
-            /
-            result[
-                "market_cap_crore"
-            ]
-        ) * 100,
-
+        (result["market_cap_crore"] > 0) & result["free_cash_flow_cr"].notna(),
+        (result["free_cash_flow_cr"] / result["market_cap_crore"]) * 100,
         np.nan,
     )
-
 
     # ========================================================
     # P/E VS SECTOR MEDIAN
@@ -258,40 +213,13 @@ def build_valuation_summary():
     # ((Company PE / Sector Median PE) - 1) * 100
     # ========================================================
 
-    result[
-        "PE_vs_sector_median_pct"
-    ] = np.where(
-
-        result[
-            "pe_ratio"
-        ].notna()
-        &
-        result[
-            "sector_median_PE"
-        ].notna()
-        &
-        (
-            result[
-                "sector_median_PE"
-            ] > 0
-        ),
-
-        (
-            (
-                result[
-                    "pe_ratio"
-                ]
-                /
-                result[
-                    "sector_median_PE"
-                ]
-            )
-            - 1
-        ) * 100,
-
+    result["PE_vs_sector_median_pct"] = np.where(
+        result["pe_ratio"].notna()
+        & result["sector_median_PE"].notna()
+        & (result["sector_median_PE"] > 0),
+        ((result["pe_ratio"] / result["sector_median_PE"]) - 1) * 100,
         np.nan,
     )
-
 
     # ========================================================
     # VALUATION FLAG
@@ -303,60 +231,27 @@ def build_valuation_summary():
 
     result["flag"] = "Fair"
 
-
     caution_mask = (
-        result[
-            "pe_ratio"
-        ].notna()
-        &
-        result[
-            "sector_median_PE"
-        ].notna()
-        &
-        (
-            result[
-                "pe_ratio"
-            ]
-            >
-            result[
-                "sector_median_PE"
-            ] * 1.5
-        )
+        result["pe_ratio"].notna()
+        & result["sector_median_PE"].notna()
+        & (result["pe_ratio"] > result["sector_median_PE"] * 1.5)
     )
-
 
     discount_mask = (
-        result[
-            "pe_ratio"
-        ].notna()
-        &
-        result[
-            "sector_median_PE"
-        ].notna()
-        &
-        (
-            result[
-                "pe_ratio"
-            ]
-            <
-            result[
-                "sector_median_PE"
-            ] * 0.7
-        )
+        result["pe_ratio"].notna()
+        & result["sector_median_PE"].notna()
+        & (result["pe_ratio"] < result["sector_median_PE"] * 0.7)
     )
-
 
     result.loc[
         caution_mask,
         "flag",
     ] = "Caution"
 
-
     result.loc[
         discount_mask,
         "flag",
     ] = "Discount"
-
 
     # ========================================================
     # FINAL REQUIRED COLUMNS
@@ -369,7 +264,6 @@ def build_valuation_summary():
             "ev_ebitda": "EV/EBITDA",
         }
     )
-
 
     required_columns = [
         "company_id",
@@ -384,27 +278,18 @@ def build_valuation_summary():
         "flag",
     ]
 
-
-    result = result[
-        required_columns
-    ].copy()
-
+    result = result[required_columns].copy()
 
     # ========================================================
     # SORT
     # ========================================================
 
-    result = (
-        result
-        .sort_values(
-            [
-                "flag",
-                "company_name",
-            ]
-        )
-        .reset_index(drop=True)
-    )
-
+    result = result.sort_values(
+        [
+            "flag",
+            "company_name",
+        ]
+    ).reset_index(drop=True)
 
     return result
 
@@ -413,22 +298,16 @@ def build_valuation_summary():
 # WRITE OUTPUT FILES
 # ============================================================
 
+
 def main():
-
+    """Main."""
     result = build_valuation_summary()
-
 
     # ========================================================
     # VALIDATE 92-COMPANY REQUIREMENT
     # ========================================================
 
-    company_count = (
-        result[
-            "company_id"
-        ]
-        .nunique()
-    )
-
+    company_count = result["company_id"].nunique()
 
     if company_count != 92:
 
@@ -437,7 +316,6 @@ def main():
             f"92 companies, but found "
             f"{company_count}."
         )
-
 
     # ========================================================
     # VALIDATE REQUIRED COLUMNS
@@ -456,23 +334,13 @@ def main():
         "flag",
     ]
 
-
     missing_columns = [
-        column
-        for column in required_columns
-        if column not in result.columns
+        column for column in required_columns if column not in result.columns
     ]
-
 
     if missing_columns:
 
-        raise ValueError(
-            "Missing required columns: "
-            + ", ".join(
-                missing_columns
-            )
-        )
-
+        raise ValueError("Missing required columns: " + ", ".join(missing_columns))
 
     # ========================================================
     # VALIDATE FLAGS
@@ -484,52 +352,29 @@ def main():
         "Fair",
     }
 
-
-    invalid_flags = set(
-        result[
-            "flag"
-        ]
-        .dropna()
-        .unique()
-    ) - valid_flags
-
+    invalid_flags = set(result["flag"].dropna().unique()) - valid_flags
 
     if invalid_flags:
 
-        raise ValueError(
-            "Invalid valuation flags: "
-            + ", ".join(
-                sorted(
-                    invalid_flags
-                )
-            )
-        )
-
+        raise ValueError("Invalid valuation flags: " + ", ".join(sorted(invalid_flags)))
 
     # ========================================================
     # VALUATION SUMMARY EXCEL
     # ========================================================
 
-    summary_path = (
-        OUTPUT_DIR
-        / "valuation_summary.xlsx"
-    )
-
+    summary_path = OUTPUT_DIR / "valuation_summary.xlsx"
 
     result.to_excel(
         summary_path,
         index=False,
     )
 
-
     # ========================================================
     # FLAGGED COMPANIES ONLY
     # ========================================================
 
     flags = result[
-        result[
-            "flag"
-        ].isin(
+        result["flag"].isin(
             [
                 "Caution",
                 "Discount",
@@ -537,72 +382,42 @@ def main():
         )
     ].copy()
 
-
-    flags_path = (
-        OUTPUT_DIR
-        / "valuation_flags.csv"
-    )
-
+    flags_path = OUTPUT_DIR / "valuation_flags.csv"
 
     flags.to_csv(
         flags_path,
         index=False,
     )
 
-
     # ========================================================
     # CONSOLE OUTPUT
     # ========================================================
 
     print()
-    print(
-        "N100 VALUATION ENGINE"
-    )
-    print(
-        "=" * 60
-    )
+    print("N100 VALUATION ENGINE")
+    print("=" * 60)
 
-    print(
-        f"Companies: {company_count}"
-    )
+    print(f"Companies: {company_count}")
 
-    print(
-        f"Summary file: {summary_path}"
-    )
+    print(f"Summary file: {summary_path}")
 
-    print(
-        f"Flags file:   {flags_path}"
-    )
+    print(f"Flags file:   {flags_path}")
 
     print()
 
-    print(
-        "Required columns:"
-    )
+    print("Required columns:")
 
-    print(
-        result.columns.tolist()
-    )
+    print(result.columns.tolist())
 
     print()
 
-    print(
-        "Valuation flags:"
-    )
+    print("Valuation flags:")
 
-    print(
-        result[
-            "flag"
-        ]
-        .value_counts()
-        .to_string()
-    )
+    print(result["flag"].value_counts().to_string())
 
     print()
 
-    print(
-        "Flagged companies:"
-    )
+    print("Flagged companies:")
 
     print(
         flags[
@@ -615,9 +430,7 @@ def main():
                 "PE_vs_sector_median_pct",
                 "flag",
             ]
-        ].to_string(
-            index=False
-        )
+        ].to_string(index=False)
     )
 
 

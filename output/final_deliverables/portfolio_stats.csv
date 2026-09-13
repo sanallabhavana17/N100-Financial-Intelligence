@@ -1,0 +1,93 @@
+statistic_group,metric,statistic,value
+Portfolio KPI,ROE,count,91.000000
+Portfolio KPI,ROE,mean,123.897152
+Portfolio KPI,ROE,median,16.716052
+Portfolio KPI,ROE,min,-5.334927
+Portfolio KPI,ROE,max,4744.047619
+Portfolio KPI,ROCE,count,90.000000
+Portfolio KPI,ROCE,mean,182.679569
+Portfolio KPI,ROCE,median,19.479784
+Portfolio KPI,ROCE,min,1.120398
+Portfolio KPI,ROCE,max,5640.879828
+Portfolio KPI,ROA,count,91.000000
+Portfolio KPI,ROA,mean,61.726136
+Portfolio KPI,ROA,median,6.208612
+Portfolio KPI,ROA,min,-3.050239
+Portfolio KPI,ROA,max,2475.155280
+Portfolio KPI,Debt to Equity,count,91.000000
+Portfolio KPI,Debt to Equity,mean,1.668832
+Portfolio KPI,Debt to Equity,median,0.434916
+Portfolio KPI,Debt to Equity,min,0.000000
+Portfolio KPI,Debt to Equity,max,14.867420
+Portfolio KPI,Interest Coverage,count,90.000000
+Portfolio KPI,Interest Coverage,mean,127.526964
+Portfolio KPI,Interest Coverage,median,11.358399
+Portfolio KPI,Interest Coverage,min,0.580415
+Portfolio KPI,Interest Coverage,max,3764.500000
+Portfolio KPI,Asset Turnover,count,91.000000
+Portfolio KPI,Asset Turnover,mean,3.504463
+Portfolio KPI,Asset Turnover,median,0.678853
+Portfolio KPI,Asset Turnover,min,0.012805
+Portfolio KPI,Asset Turnover,max,125.888199
+Portfolio KPI,Net Profit Margin,count,91.000000
+Portfolio KPI,Net Profit Margin,mean,20.061868
+Portfolio KPI,Net Profit Margin,median,14.128209
+Portfolio KPI,Net Profit Margin,min,-3.979852
+Portfolio KPI,Net Profit Margin,max,432.726204
+Portfolio KPI,Operating Profit Margin,count,90.000000
+Portfolio KPI,Operating Profit Margin,mean,35.206671
+Portfolio KPI,Operating Profit Margin,median,26.006451
+Portfolio KPI,Operating Profit Margin,min,0.186381
+Portfolio KPI,Operating Profit Margin,max,102.025314
+Portfolio KPI,Revenue CAGR 5Y,count,91.000000
+Portfolio KPI,Revenue CAGR 5Y,mean,12.950318
+Portfolio KPI,Revenue CAGR 5Y,median,11.836370
+Portfolio KPI,Revenue CAGR 5Y,min,-5.136731
+Portfolio KPI,Revenue CAGR 5Y,max,36.306916
+Portfolio KPI,PAT CAGR 5Y,count,84.000000
+Portfolio KPI,PAT CAGR 5Y,mean,21.107413
+Portfolio KPI,PAT CAGR 5Y,median,16.278106
+Portfolio KPI,PAT CAGR 5Y,min,-22.397399
+Portfolio KPI,PAT CAGR 5Y,max,120.692509
+Portfolio KPI,EPS CAGR 5Y,count,83.000000
+Portfolio KPI,EPS CAGR 5Y,mean,18.995889
+Portfolio KPI,EPS CAGR 5Y,median,14.869835
+Portfolio KPI,EPS CAGR 5Y,min,-19.725844
+Portfolio KPI,EPS CAGR 5Y,max,121.235682
+Portfolio KPI,FCF CAGR 5Y,count,50.000000
+Portfolio KPI,FCF CAGR 5Y,mean,14.813654
+Portfolio KPI,FCF CAGR 5Y,median,12.587456
+Portfolio KPI,FCF CAGR 5Y,min,-51.261667
+Portfolio KPI,FCF CAGR 5Y,max,228.750366
+Portfolio KPI,CFO Quality Ratio,count,92.000000
+Portfolio KPI,CFO Quality Ratio,mean,0.749716
+Portfolio KPI,CFO Quality Ratio,median,1.104889
+Portfolio KPI,CFO Quality Ratio,min,-13.166667
+Portfolio KPI,CFO Quality Ratio,max,15.375924
+Portfolio KPI,CapEx Intensity,count,92.000000
+Portfolio KPI,CapEx Intensity,mean,15.355659
+Portfolio KPI,CapEx Intensity,median,7.946276
+Portfolio KPI,CapEx Intensity,min,0.030024
+Portfolio KPI,CapEx Intensity,max,228.416486
+Portfolio KPI,FCF Conversion,count,91.000000
+Portfolio KPI,FCF Conversion,mean,-18.251857
+Portfolio KPI,FCF Conversion,median,19.173525
+Portfolio KPI,FCF Conversion,min,-853.252033
+Portfolio KPI,FCF Conversion,max,112.250333
+Portfolio KPI,Composite Quality Score,count,92.000000
+Portfolio KPI,Composite Quality Score,mean,53.859986
+Portfolio KPI,Composite Quality Score,median,54.619691
+Portfolio KPI,Composite Quality Score,min,3.591861
+Portfolio KPI,Composite Quality Score,max,84.506558
+Sector Distribution,Communication Services,company_count,2.000000
+Sector Distribution,Consumer Discretionary,company_count,14.000000
+Sector Distribution,Consumer Staples,company_count,7.000000
+Sector Distribution,Energy,company_count,14.000000
+Sector Distribution,Financials,company_count,23.000000
+Sector Distribution,Healthcare,company_count,6.000000
+Sector Distribution,Industrials,company_count,10.000000
+Sector Distribution,Information Technology,company_count,5.000000
+Sector Distribution,Materials,company_count,9.000000
+Sector Distribution,Real Estate,company_count,2.000000
+Market Cap Distribution,Large Cap,company_count,82.000000
+Market Cap Distribution,Mid Cap,company_count,10.000000

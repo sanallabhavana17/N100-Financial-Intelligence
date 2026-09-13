@@ -4,7 +4,6 @@ import pandas as pd
 
 from src.analytics.cashflow_kpis import capital_allocation_pattern
 
-
 INPUT_FILE = Path("data/processed/cashflow_cleaned.csv")
 OUTPUT_FILE = Path("output/capital_allocation.csv")
 
@@ -45,9 +44,7 @@ def generate_capital_allocation():
     missing_columns = required_columns - set(df.columns)
 
     if missing_columns:
-        raise ValueError(
-            f"Missing required columns: {sorted(missing_columns)}"
-        )
+        raise ValueError(f"Missing required columns: {sorted(missing_columns)}")
 
     records = []
 
@@ -83,10 +80,7 @@ def generate_capital_allocation():
         index=False,
     )
 
-    print(
-        f"Capital allocation file created: "
-        f"{OUTPUT_FILE}"
-    )
+    print(f"Capital allocation file created: " f"{OUTPUT_FILE}")
     print(f"Rows: {len(result)}")
     print(f"Companies: {result['company_id'].nunique()}")
     print(

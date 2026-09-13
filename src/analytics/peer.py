@@ -16,7 +16,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-
 # ============================================================
 # PATHS
 # ============================================================
@@ -58,13 +57,12 @@ PEER_METRICS = list(HIGHER_IS_BETTER.keys())
 # DATABASE CONNECTION
 # ============================================================
 
+
 def get_connection():
     """Create SQLite database connection."""
 
     if not DB_PATH.exists():
-        raise FileNotFoundError(
-            f"Database not found: {DB_PATH}"
-        )
+        raise FileNotFoundError(f"Database not found: {DB_PATH}")
 
     return sqlite3.connect(DB_PATH)
 
@@ -72,6 +70,7 @@ def get_connection():
 # ============================================================
 # LOAD DATA
 # ============================================================
+
 
 def load_peer_data():
     """
@@ -122,6 +121,7 @@ def load_peer_data():
 # INPUT VALIDATION
 # ============================================================
 
+
 def validate_input_data(df):
     """Validate input peer-group data."""
 
@@ -134,20 +134,14 @@ def validate_input_data(df):
     ]
 
     missing_columns = [
-        column
-        for column in required_columns
-        if column not in df.columns
+        column for column in required_columns if column not in df.columns
     ]
 
     if missing_columns:
-        raise ValueError(
-            f"Missing required columns: {missing_columns}"
-        )
+        raise ValueError(f"Missing required columns: {missing_columns}")
 
     if df.empty:
-        raise ValueError(
-            "Peer input data is empty."
-        )
+        raise ValueError("Peer input data is empty.")
 
     duplicate_count = (
         df.groupby(
@@ -168,24 +162,17 @@ def validate_input_data(df):
             "peer-group/company/year combinations."
         )
 
-    print(
-        f"Peer groups found: "
-        f"{df['peer_group_name'].nunique()}"
-    )
+    print(f"Peer groups found: " f"{df['peer_group_name'].nunique()}")
 
-    print(
-        f"Companies in peer memberships: "
-        f"{df['company_id'].nunique()}"
-    )
+    print(f"Companies in peer memberships: " f"{df['company_id'].nunique()}")
 
-    print(
-        f"Rows loaded: {len(df)}"
-    )
+    print(f"Rows loaded: {len(df)}")
 
 
 # ============================================================
 # PERCENTILE CALCULATION
 # ============================================================
+
 
 def calculate_percentile(
     series,
@@ -262,34 +249,23 @@ def calculate_peer_percentiles(df):
 
     for metric in PEER_METRICS:
 
-        percentile_column = (
-            f"{metric}_percentile"
-        )
+        percentile_column = f"{metric}_percentile"
 
-        result[percentile_column] = (
-            result.groupby(
-                group_columns,
-                group_keys=False,
-            )[metric]
-            .transform(
-                lambda series: calculate_percentile(
-                    series,
-                    HIGHER_IS_BETTER[metric],
-                )
+        result[percentile_column] = result.groupby(
+            group_columns,
+            group_keys=False,
+        )[metric].transform(
+            lambda series, metric=metric: calculate_percentile(
+                series,
+                HIGHER_IS_BETTER[metric],
             )
         )
 
-    percentile_columns = [
-        f"{metric}_percentile"
-        for metric in PEER_METRICS
-    ]
+    percentile_columns = [f"{metric}_percentile" for metric in PEER_METRICS]
 
-    result["peer_composite_percentile"] = (
-        result[percentile_columns]
-        .mean(
-            axis=1,
-            skipna=True,
-        )
+    result["peer_composite_percentile"] = result[percentile_columns].mean(
+        axis=1,
+        skipna=True,
     )
 
     return result
@@ -299,33 +275,30 @@ def calculate_peer_percentiles(df):
 # PEER RANKING
 # ============================================================
 
+
 def add_peer_rank(df):
     """Add peer rank and peer-group size."""
 
     result = df.copy()
 
-    result["peer_rank"] = (
-        result.groupby(
-            [
-                "peer_group_name",
-                "year",
-            ]
-        )["peer_composite_percentile"]
-        .rank(
-            method="min",
-            ascending=False,
-        )
+    result["peer_rank"] = result.groupby(
+        [
+            "peer_group_name",
+            "year",
+        ]
+    )["peer_composite_percentile"].rank(
+        method="min",
+        ascending=False,
     )
 
-    result["peer_group_size"] = (
-        result.groupby(
-            [
-                "peer_group_name",
-                "year",
-            ]
-        )["company_id"]
-        .transform("count")
-    )
+    result["peer_group_size"] = result.groupby(
+        [
+            "peer_group_name",
+            "year",
+        ]
+    )[
+        "company_id"
+    ].transform("count")
 
     return result
 
@@ -333,6 +306,7 @@ def add_peer_rank(df):
 # ============================================================
 # BENCHMARK COMPARISON
 # ============================================================
+
 
 def add_benchmark_comparison(df):
     """
@@ -351,26 +325,20 @@ def add_benchmark_comparison(df):
         .astype(int)
     )
 
-    benchmark_rows = result[
-        result["is_benchmark"] == 1
-    ].copy()
+    benchmark_rows = result[result["is_benchmark"] == 1].copy()
 
-    benchmark_lookup = (
-        benchmark_rows[
-            [
-                "peer_group_name",
-                "year",
-                "company_id",
-                "peer_composite_percentile",
-            ]
+    benchmark_lookup = benchmark_rows[
+        [
+            "peer_group_name",
+            "year",
+            "company_id",
+            "peer_composite_percentile",
         ]
-        .rename(
-            columns={
-                "company_id": "benchmark_company_id",
-                "peer_composite_percentile":
-                    "benchmark_composite_percentile",
-            }
-        )
+    ].rename(
+        columns={
+            "company_id": "benchmark_company_id",
+            "peer_composite_percentile": "benchmark_composite_percentile",
+        }
     )
 
     result = result.merge(
@@ -383,13 +351,11 @@ def add_benchmark_comparison(df):
     )
 
     result["vs_benchmark_percentile"] = (
-        result["peer_composite_percentile"]
-        - result["benchmark_composite_percentile"]
+        result["peer_composite_percentile"] - result["benchmark_composite_percentile"]
     )
 
     result["above_benchmark"] = (
-        result["peer_composite_percentile"]
-        > result["benchmark_composite_percentile"]
+        result["peer_composite_percentile"] > result["benchmark_composite_percentile"]
     )
 
     return result
@@ -398,6 +364,7 @@ def add_benchmark_comparison(df):
 # ============================================================
 # SQLITE PERSISTENCE
 # ============================================================
+
 
 def save_percentiles_to_sqlite(df):
     """
@@ -479,9 +446,7 @@ def save_percentiles_to_sqlite(df):
             """
         )
 
-        conn.execute(
-            "DELETE FROM peer_percentiles"
-        )
+        conn.execute("DELETE FROM peer_percentiles")
 
         sqlite_output.to_sql(
             "peer_percentiles",
@@ -499,23 +464,18 @@ def save_percentiles_to_sqlite(df):
             """
         )
 
-    print(
-        f"SQLite peer_percentiles rows saved: "
-        f"{len(sqlite_output)}"
-    )
+    print(f"SQLite peer_percentiles rows saved: " f"{len(sqlite_output)}")
 
 
 # ============================================================
 # OUTPUT FORMATTING
 # ============================================================
 
+
 def format_output(df):
     """Select and order final output columns."""
 
-    percentile_columns = [
-        f"{metric}_percentile"
-        for metric in PEER_METRICS
-    ]
+    percentile_columns = [f"{metric}_percentile" for metric in PEER_METRICS]
 
     output_columns = [
         "peer_group_name",
@@ -529,15 +489,11 @@ def format_output(df):
         "benchmark_composite_percentile",
         "vs_benchmark_percentile",
         "above_benchmark",
-
         *PEER_METRICS,
-
         *percentile_columns,
     ]
 
-    output = df[
-        output_columns
-    ].copy()
+    output = df[output_columns].copy()
 
     output = output.sort_values(
         [
@@ -555,6 +511,7 @@ def format_output(df):
 # ============================================================
 # OUTPUT VALIDATION
 # ============================================================
+
 
 def validate_output(df):
     """Validate generated peer percentile table."""
@@ -579,16 +536,10 @@ def validate_output(df):
         .sum()
     )
 
-    print(
-        f"Duplicate peer/company/year groups: "
-        f"{duplicate_count}"
-    )
+    print(f"Duplicate peer/company/year groups: " f"{duplicate_count}")
 
     if duplicate_count != 0:
-        raise ValueError(
-            "Output contains duplicate "
-            "peer/company/year rows."
-        )
+        raise ValueError("Output contains duplicate " "peer/company/year rows.")
 
     # --------------------------------------------------------
     # Percentile validation
@@ -598,10 +549,7 @@ def validate_output(df):
     # vs_benchmark_percentile is intentionally excluded
     # because it can legitimately be negative.
 
-    percentile_columns = [
-        f"{metric}_percentile"
-        for metric in PEER_METRICS
-    ]
+    percentile_columns = [f"{metric}_percentile" for metric in PEER_METRICS]
 
     invalid_percentiles = 0
 
@@ -612,39 +560,22 @@ def validate_output(df):
             errors="coerce",
         ).dropna()
 
-        invalid = (
-            (values < 0)
-            | (values > 100)
-        ).sum()
+        invalid = ((values < 0) | (values > 100)).sum()
 
         invalid_percentiles += int(invalid)
 
-    print(
-        f"Invalid metric percentile values: "
-        f"{invalid_percentiles}"
-    )
+    print(f"Invalid metric percentile values: " f"{invalid_percentiles}")
 
     if invalid_percentiles != 0:
-        raise ValueError(
-            "Metric percentile values outside "
-            "0-100 detected."
-        )
+        raise ValueError("Metric percentile values outside " "0-100 detected.")
 
     # --------------------------------------------------------
     # Peer group validation
     # --------------------------------------------------------
 
-    total_peer_groups = (
-        df["peer_group_name"]
-        .nunique()
-    )
+    total_peer_groups = df["peer_group_name"].nunique()
 
-    benchmark_peer_groups = (
-        df[
-            df["is_benchmark"] == 1
-        ]["peer_group_name"]
-        .nunique()
-    )
+    benchmark_peer_groups = df[df["is_benchmark"] == 1]["peer_group_name"].nunique()
 
     print(
         f"Peer groups with benchmark: "
@@ -656,29 +587,17 @@ def validate_output(df):
     # Composite percentile validation
     # --------------------------------------------------------
 
-    composite_values = (
-        pd.to_numeric(
-            df["peer_composite_percentile"],
-            errors="coerce",
-        )
-        .dropna()
-    )
+    composite_values = pd.to_numeric(
+        df["peer_composite_percentile"],
+        errors="coerce",
+    ).dropna()
 
-    invalid_composite = (
-        (composite_values < 0)
-        | (composite_values > 100)
-    ).sum()
+    invalid_composite = ((composite_values < 0) | (composite_values > 100)).sum()
 
-    print(
-        f"Invalid composite percentile values: "
-        f"{invalid_composite}"
-    )
+    print(f"Invalid composite percentile values: " f"{invalid_composite}")
 
     if invalid_composite != 0:
-        raise ValueError(
-            "Composite percentile values outside "
-            "0-100 detected."
-        )
+        raise ValueError("Composite percentile values outside " "0-100 detected.")
 
     # --------------------------------------------------------
     # Range
@@ -692,17 +611,16 @@ def validate_output(df):
             f"{composite_values.max():.2f}"
         )
 
-    print(
-        f"Final rows: {len(df)}"
-    )
+    print(f"Final rows: {len(df)}")
 
 
 # ============================================================
 # MAIN
 # ============================================================
 
-def main():
 
+def main():
+    """Main."""
     print("=" * 60)
     print("NIFTY100 PEER COMPARISON MODULE")
     print("SPRINT 3 - DAY 18")
@@ -712,10 +630,7 @@ def main():
     # Load
     # --------------------------------------------------------
 
-    print(
-        "\nLoading peer-group and financial "
-        "ratio data..."
-    )
+    print("\nLoading peer-group and financial " "ratio data...")
 
     df = load_peer_data()
 
@@ -725,9 +640,7 @@ def main():
     # Percentiles
     # --------------------------------------------------------
 
-    print(
-        "\nCalculating peer-group percentiles..."
-    )
+    print("\nCalculating peer-group percentiles...")
 
     df = calculate_peer_percentiles(df)
 
@@ -735,9 +648,7 @@ def main():
     # Rank
     # --------------------------------------------------------
 
-    print(
-        "Adding peer ranks..."
-    )
+    print("Adding peer ranks...")
 
     df = add_peer_rank(df)
 
@@ -745,9 +656,7 @@ def main():
     # Benchmark
     # --------------------------------------------------------
 
-    print(
-        "Adding benchmark comparison..."
-    )
+    print("Adding benchmark comparison...")
 
     df = add_benchmark_comparison(df)
 
@@ -788,26 +697,19 @@ def main():
     print("PEER COMPARISON COMPLETE")
     print("=" * 60)
 
-    print(
-        f"Output: {OUTPUT_FILE}"
-    )
+    print(f"Output: {OUTPUT_FILE}")
 
-    print(
-        f"Rows: {len(output)}"
-    )
+    print(f"Rows: {len(output)}")
 
-    print(
-        f"Peer groups: "
-        f"{output['peer_group_name'].nunique()}"
-    )
+    print(f"Peer groups: " f"{output['peer_group_name'].nunique()}")
 
-    print(
-        f"Companies: "
-        f"{output['company_id'].nunique()}"
-    )
+    print(f"Companies: " f"{output['company_id'].nunique()}")
 
     print("=" * 60)
 
 
 if __name__ == "__main__":
     main()
+
+
+

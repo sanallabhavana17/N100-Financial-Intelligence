@@ -36,7 +36,6 @@ import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 
-
 # ==============================================================
 # PROJECT PATHS
 # ==============================================================
@@ -179,14 +178,10 @@ def load_latest_financial_data() -> pd.DataFrame:
     # Convert FCF to numeric
     # ----------------------------------------------------------
 
-    fcf_history["free_cash_flow_cr"] = to_numeric(
-        fcf_history["free_cash_flow_cr"]
-    )
+    fcf_history["free_cash_flow_cr"] = to_numeric(fcf_history["free_cash_flow_cr"])
 
     # Remove rows where FCF is unavailable.
-    fcf_history = fcf_history.dropna(
-        subset=["free_cash_flow_cr"]
-    )
+    fcf_history = fcf_history.dropna(subset=["free_cash_flow_cr"])
 
     # ----------------------------------------------------------
     # Calculate 5-year FCF CAGR
@@ -196,9 +191,9 @@ def load_latest_financial_data() -> pd.DataFrame:
 
     for company_id in latest["company_id"]:
 
-        company_fcf = fcf_history[
-            fcf_history["company_id"] == company_id
-        ].sort_values("year")
+        company_fcf = fcf_history[fcf_history["company_id"] == company_id].sort_values(
+            "year"
+        )
 
         # Not enough data.
         if len(company_fcf) < 2:
@@ -208,17 +203,13 @@ def load_latest_financial_data() -> pd.DataFrame:
         latest_row = company_fcf.iloc[-1]
 
         latest_year = int(latest_row["year"])
-        latest_fcf = float(
-            latest_row["free_cash_flow_cr"]
-        )
+        latest_fcf = float(latest_row["free_cash_flow_cr"])
 
         target_year = latest_year - 5
 
         # Find the closest available historical year
         # at or before the five-year target.
-        previous_candidates = company_fcf[
-            company_fcf["year"] <= target_year
-        ]
+        previous_candidates = company_fcf[company_fcf["year"] <= target_year]
 
         if previous_candidates.empty:
             fcf_cagr_values.append(np.nan)
@@ -227,9 +218,7 @@ def load_latest_financial_data() -> pd.DataFrame:
         previous_row = previous_candidates.iloc[-1]
 
         previous_year = int(previous_row["year"])
-        previous_fcf = float(
-            previous_row["free_cash_flow_cr"]
-        )
+        previous_fcf = float(previous_row["free_cash_flow_cr"])
 
         actual_years = latest_year - previous_year
 
@@ -243,15 +232,9 @@ def load_latest_financial_data() -> pd.DataFrame:
             fcf_cagr_values.append(np.nan)
             continue
 
-        fcf_cagr = (
-            (latest_fcf / previous_fcf)
-            ** (1.0 / actual_years)
-            - 1.0
-        ) * 100.0
+        fcf_cagr = ((latest_fcf / previous_fcf) ** (1.0 / actual_years) - 1.0) * 100.0
 
-        fcf_cagr_values.append(
-            float(fcf_cagr)
-        )
+        fcf_cagr_values.append(float(fcf_cagr))
 
     latest["fcf_cagr_5yr"] = fcf_cagr_values
 
@@ -270,9 +253,7 @@ def clean_features(df: pd.DataFrame) -> pd.DataFrame:
 
     for feature in FEATURES:
 
-        result[feature] = to_numeric(
-            result[feature]
-        )
+        result[feature] = to_numeric(result[feature])
 
     return result
 
@@ -298,32 +279,19 @@ def impute_sector_medians(
 
         if pd.isna(global_median):
 
-            raise ValueError(
-                f"No usable values found for feature: {feature}"
-            )
+            raise ValueError(f"No usable values found for feature: {feature}")
 
-        global_medians[feature] = float(
-            global_median
-        )
+        global_medians[feature] = float(global_median)
 
         # Calculate median within each sector.
-        sector_medians = (
-            result.groupby(
-                "broad_sector"
-            )[feature]
-            .transform("median")
-        )
+        sector_medians = result.groupby("broad_sector")[feature].transform("median")
 
         # First use sector median.
-        result[feature] = result[feature].fillna(
-            sector_medians
-        )
+        result[feature] = result[feature].fillna(sector_medians)
 
         # If sector median itself is unavailable,
         # use the overall median.
-        result[feature] = result[feature].fillna(
-            global_median
-        )
+        result[feature] = result[feature].fillna(global_median)
 
     return result, global_medians
 
@@ -340,9 +308,7 @@ def scale_features(
 
     scaler = StandardScaler()
 
-    X_scaled = scaler.fit_transform(
-        df[FEATURES]
-    )
+    X_scaled = scaler.fit_transform(df[FEATURES])
 
     return scaler, X_scaled
 
@@ -371,9 +337,7 @@ def calculate_elbow(
 
         model.fit(X_scaled)
 
-        inertias.append(
-            float(model.inertia_)
-        )
+        inertias.append(float(model.inertia_))
 
     return k_values, inertias
 
@@ -389,9 +353,7 @@ def save_elbow_plot(
         exist_ok=True,
     )
 
-    plt.figure(
-        figsize=(9, 6)
-    )
+    plt.figure(figsize=(9, 6))
 
     plt.plot(
         k_values,
@@ -399,21 +361,13 @@ def save_elbow_plot(
         marker="o",
     )
 
-    plt.xlabel(
-        "Number of clusters (k)"
-    )
+    plt.xlabel("Number of clusters (k)")
 
-    plt.ylabel(
-        "Inertia"
-    )
+    plt.ylabel("Inertia")
 
-    plt.title(
-        "N100 Financial Intelligence - KMeans Elbow Plot"
-    )
+    plt.title("N100 Financial Intelligence - KMeans Elbow Plot")
 
-    plt.xticks(
-        k_values
-    )
+    plt.xticks(k_values)
 
     plt.grid(
         True,
@@ -445,13 +399,7 @@ def calculate_cluster_profile(
 
     profile["cluster_id"] = labels
 
-    return (
-        profile.groupby(
-            "cluster_id"
-        )[FEATURES]
-        .mean()
-        .sort_index()
-    )
+    return profile.groupby("cluster_id")[FEATURES].mean().sort_index()
 
 
 def calculate_cluster_medians(
@@ -464,13 +412,7 @@ def calculate_cluster_medians(
 
     profile["cluster_id"] = labels
 
-    return (
-        profile.groupby(
-            "cluster_id"
-        )[FEATURES]
-        .median()
-        .sort_index()
-    )
+    return profile.groupby("cluster_id")[FEATURES].median().sort_index()
 
 
 # ==============================================================
@@ -496,10 +438,8 @@ def assign_cluster_names(
     def safe_zscore(
         series: pd.Series,
     ) -> pd.Series:
-
-        std = series.std(
-            ddof=0
-        )
+        """Safe zscore."""
+        std = series.std(ddof=0)
 
         if std == 0 or pd.isna(std):
 
@@ -508,57 +448,23 @@ def assign_cluster_names(
                 index=series.index,
             )
 
-        return (
-            series - series.mean()
-        ) / std
+        return (series - series.mean()) / std
 
-    scoring[
-        "roe_score"
-    ] = safe_zscore(
-        scoring[
-            "return_on_equity_pct"
-        ]
-    )
+    scoring["roe_score"] = safe_zscore(scoring["return_on_equity_pct"])
 
-    scoring[
-        "debt_score"
-    ] = safe_zscore(
-        scoring[
-            "debt_to_equity"
-        ]
-    )
+    scoring["debt_score"] = safe_zscore(scoring["debt_to_equity"])
 
-    scoring[
-        "revenue_growth_score"
-    ] = safe_zscore(
-        scoring[
-            "revenue_cagr_5yr"
-        ]
-    )
+    scoring["revenue_growth_score"] = safe_zscore(scoring["revenue_cagr_5yr"])
 
-    scoring[
-        "fcf_growth_score"
-    ] = safe_zscore(
-        scoring[
-            "fcf_cagr_5yr"
-        ]
-    )
+    scoring["fcf_growth_score"] = safe_zscore(scoring["fcf_cagr_5yr"])
 
-    scoring[
-        "margin_score"
-    ] = safe_zscore(
-        scoring[
-            "operating_profit_margin_pct"
-        ]
-    )
+    scoring["margin_score"] = safe_zscore(scoring["operating_profit_margin_pct"])
 
     # ----------------------------------------------------------
     # Composite scores.
     # ----------------------------------------------------------
 
-    scoring[
-        "quality_score"
-    ] = (
+    scoring["quality_score"] = (
         scoring["roe_score"]
         + scoring["margin_score"]
         + scoring["fcf_growth_score"]
@@ -566,25 +472,17 @@ def assign_cluster_names(
         - scoring["debt_score"]
     )
 
-    scoring[
-        "growth_score"
-    ] = (
+    scoring["growth_score"] = (
         scoring["revenue_growth_score"]
         + scoring["fcf_growth_score"]
         + scoring["margin_score"]
     )
 
-    scoring[
-        "defensive_score"
-    ] = (
-        scoring["roe_score"]
-        + scoring["margin_score"]
-        - scoring["debt_score"]
+    scoring["defensive_score"] = (
+        scoring["roe_score"] + scoring["margin_score"] - scoring["debt_score"]
     )
 
-    scoring[
-        "distress_score"
-    ] = (
+    scoring["distress_score"] = (
         scoring["debt_score"]
         - scoring["roe_score"]
         - scoring["margin_score"]
@@ -595,10 +493,7 @@ def assign_cluster_names(
     # Assign five unique archetype names.
     # ----------------------------------------------------------
 
-    remaining = set(
-        int(x)
-        for x in scoring.index
-    )
+    remaining = {int(x) for x in scoring.index}
 
     names: dict[int, str] = {}
 
@@ -612,13 +507,9 @@ def assign_cluster_names(
             ].idxmax()
         )
 
-        names[
-            cluster
-        ] = "High-Quality Compounders"
+        names[cluster] = "High-Quality Compounders"
 
-        remaining.remove(
-            cluster
-        )
+        remaining.remove(cluster)
 
     # 2. Highest growth.
     if remaining:
@@ -630,13 +521,9 @@ def assign_cluster_names(
             ].idxmax()
         )
 
-        names[
-            cluster
-        ] = "Emerging Growth"
+        names[cluster] = "Emerging Growth"
 
-        remaining.remove(
-            cluster
-        )
+        remaining.remove(cluster)
 
     # 3. Strong defensive characteristics.
     if remaining:
@@ -648,13 +535,9 @@ def assign_cluster_names(
             ].idxmax()
         )
 
-        names[
-            cluster
-        ] = "Defensive Dividend Payers"
+        names[cluster] = "Defensive Dividend Payers"
 
-        remaining.remove(
-            cluster
-        )
+        remaining.remove(cluster)
 
     # 4. Weakest / highest financial stress.
     if remaining:
@@ -666,20 +549,14 @@ def assign_cluster_names(
             ].idxmax()
         )
 
-        names[
-            cluster
-        ] = "Distressed or Turnaround"
+        names[cluster] = "Distressed or Turnaround"
 
-        remaining.remove(
-            cluster
-        )
+        remaining.remove(cluster)
 
     # 5. Remaining profile.
     for cluster in remaining:
 
-        names[
-            int(cluster)
-        ] = "Value Cyclicals"
+        names[int(cluster)] = "Value Cyclicals"
 
     return names
 
@@ -701,18 +578,11 @@ def calculate_centroid_distances(
         dtype=float,
     )
 
-    for index in range(
-        len(X_scaled)
-    ):
+    for index in range(len(X_scaled)):
 
-        cluster_id = int(
-            labels[index]
-        )
+        cluster_id = int(labels[index])
 
-        distances[index] = np.linalg.norm(
-            X_scaled[index]
-            - centroids[cluster_id]
-        )
+        distances[index] = np.linalg.norm(X_scaled[index] - centroids[cluster_id])
 
     return distances
 
@@ -725,13 +595,9 @@ def calculate_centroid_distances(
 def main() -> None:
     """Run the complete Day 36 KMeans clustering pipeline."""
 
-    print(
-        "N100 KMEANS CLUSTERING"
-    )
+    print("N100 KMEANS CLUSTERING")
 
-    print(
-        "=" * 70
-    )
+    print("=" * 70)
 
     # ----------------------------------------------------------
     # Check database.
@@ -739,9 +605,7 @@ def main() -> None:
 
     if not DB_PATH.exists():
 
-        raise FileNotFoundError(
-            f"Database not found: {DB_PATH}"
-        )
+        raise FileNotFoundError(f"Database not found: {DB_PATH}")
 
     OUTPUT_DIR.mkdir(
         parents=True,
@@ -753,17 +617,11 @@ def main() -> None:
         exist_ok=True,
     )
 
-    print(
-        f"Database : {DB_PATH}"
-    )
+    print(f"Database : {DB_PATH}")
 
-    print(
-        f"Output   : {CLUSTER_OUTPUT}"
-    )
+    print(f"Output   : {CLUSTER_OUTPUT}")
 
-    print(
-        f"Elbow    : {ELBOW_OUTPUT}"
-    )
+    print(f"Elbow    : {ELBOW_OUTPUT}")
 
     print()
 
@@ -773,104 +631,59 @@ def main() -> None:
 
     df = load_latest_financial_data()
 
-    print(
-        f"Companies loaded: {len(df)}"
-    )
+    print(f"Companies loaded: {len(df)}")
 
     # Sprint 6 requires all 92 companies.
     if len(df) != 92:
 
-        raise ValueError(
-            "Expected 92 companies, "
-            f"but loaded {len(df)}."
-        )
+        raise ValueError("Expected 92 companies, " f"but loaded {len(df)}.")
 
     if df["company_id"].nunique() != 92:
 
-        raise ValueError(
-            "Expected 92 unique company IDs."
-        )
+        raise ValueError("Expected 92 unique company IDs.")
 
     # ----------------------------------------------------------
     # Clean feature values.
     # ----------------------------------------------------------
 
-    df = clean_features(
-        df
-    )
+    df = clean_features(df)
 
     print()
 
-    print(
-        "Missing values BEFORE "
-        "sector-median imputation:"
-    )
+    print("Missing values BEFORE " "sector-median imputation:")
 
-    print(
-        df[FEATURES]
-        .isna()
-        .sum()
-        .to_string()
-    )
+    print(df[FEATURES].isna().sum().to_string())
 
     # ----------------------------------------------------------
     # Sector median imputation.
     # ----------------------------------------------------------
 
-    df, global_medians = (
-        impute_sector_medians(
-            df
-        )
-    )
+    df, _global_medians = impute_sector_medians(df)
 
     print()
 
-    print(
-        "Missing values AFTER "
-        "sector-median imputation:"
-    )
+    print("Missing values AFTER " "sector-median imputation:")
 
-    print(
-        df[FEATURES]
-        .isna()
-        .sum()
-        .to_string()
-    )
+    print(df[FEATURES].isna().sum().to_string())
 
-    if (
-        df[FEATURES]
-        .isna()
-        .any()
-        .any()
-    ):
+    if df[FEATURES].isna().any().any():
 
-        raise ValueError(
-            "Missing values remain "
-            "after imputation."
-        )
+        raise ValueError("Missing values remain " "after imputation.")
 
     # ----------------------------------------------------------
     # StandardScaler.
     # ----------------------------------------------------------
 
-    scaler, X_scaled = (
-        scale_features(
-            df
-        )
-    )
+    _scaler, X_scaled = scale_features(df)
 
     print()
 
-    print(
-        "StandardScaler applied."
-    )
+    print("StandardScaler applied.")
 
     print(
         "Scaled means:",
         np.round(
-            X_scaled.mean(
-                axis=0
-            ),
+            X_scaled.mean(axis=0),
             6,
         ),
     )
@@ -878,9 +691,7 @@ def main() -> None:
     print(
         "Scaled standard deviations:",
         np.round(
-            X_scaled.std(
-                axis=0
-            ),
+            X_scaled.std(axis=0),
             6,
         ),
     )
@@ -889,11 +700,7 @@ def main() -> None:
     # Elbow analysis.
     # ----------------------------------------------------------
 
-    k_values, inertias = (
-        calculate_elbow(
-            X_scaled
-        )
-    )
+    k_values, inertias = calculate_elbow(X_scaled)
 
     save_elbow_plot(
         k_values,
@@ -902,19 +709,14 @@ def main() -> None:
 
     print()
 
-    print(
-        "Elbow analysis:"
-    )
+    print("Elbow analysis:")
 
     for k, inertia in zip(
         k_values,
         inertias,
     ):
 
-        print(
-            f"  k={k}: "
-            f"inertia={inertia:.4f}"
-        )
+        print(f"  k={k}: " f"inertia={inertia:.4f}")
 
     # ----------------------------------------------------------
     # KMeans with exactly 5 clusters.
@@ -926,49 +728,37 @@ def main() -> None:
         n_init=10,
     )
 
-    labels = model.fit_predict(
-        X_scaled
-    )
+    labels = model.fit_predict(X_scaled)
 
     # ----------------------------------------------------------
     # Distance from centroid.
     # ----------------------------------------------------------
 
-    distances = (
-        calculate_centroid_distances(
-            X_scaled,
-            labels,
-            model.cluster_centers_,
-        )
+    distances = calculate_centroid_distances(
+        X_scaled,
+        labels,
+        model.cluster_centers_,
     )
 
     # ----------------------------------------------------------
     # Cluster profiles.
     # ----------------------------------------------------------
 
-    mean_profile = (
-        calculate_cluster_profile(
-            df,
-            labels,
-        )
+    mean_profile = calculate_cluster_profile(
+        df,
+        labels,
     )
 
-    median_profile = (
-        calculate_cluster_medians(
-            df,
-            labels,
-        )
+    median_profile = calculate_cluster_medians(
+        df,
+        labels,
     )
 
     # ----------------------------------------------------------
     # Cluster names.
     # ----------------------------------------------------------
 
-    cluster_names = (
-        assign_cluster_names(
-            mean_profile
-        )
-    )
+    cluster_names = assign_cluster_names(mean_profile)
 
     # ----------------------------------------------------------
     # Build output.
@@ -976,30 +766,14 @@ def main() -> None:
 
     output = pd.DataFrame(
         {
-            "company_id": df[
-                "company_id"
-            ],
-            "cluster_id": labels.astype(
-                int
-            ),
-            "cluster_name": [
-                cluster_names[
-                    int(label)
-                ]
-                for label in labels
-            ],
+            "company_id": df["company_id"],
+            "cluster_id": labels.astype(int),
+            "cluster_name": [cluster_names[int(label)] for label in labels],
             "distance_from_centroid": distances,
         }
     )
 
-    output = (
-        output.sort_values(
-            "company_id"
-        )
-        .reset_index(
-            drop=True
-        )
-    )
+    output = output.sort_values("company_id").reset_index(drop=True)
 
     # ----------------------------------------------------------
     # Save cluster labels.
@@ -1022,12 +796,8 @@ def main() -> None:
             ]
         )
         .size()
-        .reset_index(
-            name="company_count"
-        )
-        .sort_values(
-            "cluster_id"
-        )
+        .reset_index(name="company_count")
+        .sort_values("cluster_id")
     )
 
     # ----------------------------------------------------------
@@ -1036,45 +806,24 @@ def main() -> None:
 
     print()
 
-    print(
-        "=" * 70
-    )
+    print("=" * 70)
 
-    print(
-        "CLUSTER SUMMARY"
-    )
+    print("CLUSTER SUMMARY")
 
-    print(
-        "=" * 70
-    )
+    print("=" * 70)
 
-    print(
-        counts.to_string(
-            index=False
-        )
-    )
+    print(counts.to_string(index=False))
 
     print()
 
-    print(
-        "CLUSTER PROFILES - MEAN"
-    )
+    print("CLUSTER PROFILES - MEAN")
 
-    print(
-        "=" * 70
-    )
+    print("=" * 70)
 
-    mean_display = (
-        mean_profile.copy()
-    )
+    mean_display = mean_profile.copy()
 
-    mean_display[
-        "cluster_name"
-    ] = [
-        cluster_names[
-            int(cluster)
-        ]
-        for cluster in mean_display.index
+    mean_display["cluster_name"] = [
+        cluster_names[int(cluster)] for cluster in mean_display.index
     ]
 
     mean_display = mean_display[
@@ -1084,33 +833,18 @@ def main() -> None:
         ]
     ]
 
-    print(
-        mean_display.round(
-            2
-        ).to_string()
-    )
+    print(mean_display.round(2).to_string())
 
     print()
 
-    print(
-        "CLUSTER PROFILES - MEDIAN"
-    )
+    print("CLUSTER PROFILES - MEDIAN")
 
-    print(
-        "=" * 70
-    )
+    print("=" * 70)
 
-    median_display = (
-        median_profile.copy()
-    )
+    median_display = median_profile.copy()
 
-    median_display[
-        "cluster_name"
-    ] = [
-        cluster_names[
-            int(cluster)
-        ]
-        for cluster in median_display.index
+    median_display["cluster_name"] = [
+        cluster_names[int(cluster)] for cluster in median_display.index
     ]
 
     median_display = median_display[
@@ -1120,11 +854,7 @@ def main() -> None:
         ]
     ]
 
-    print(
-        median_display.round(
-            2
-        ).to_string()
-    )
+    print(median_display.round(2).to_string())
 
     print()
 
@@ -1132,44 +862,23 @@ def main() -> None:
     # Final validation.
     # ----------------------------------------------------------
 
-    print(
-        "=" * 70
-    )
+    print("=" * 70)
 
-    print(
-        "VALIDATION"
-    )
+    print("VALIDATION")
 
-    print(
-        "=" * 70
-    )
+    print("=" * 70)
 
-    print(
-        f"Output rows      : {len(output)}"
-    )
+    print(f"Output rows      : {len(output)}")
 
-    print(
-        "Unique companies : "
-        f"{output['company_id'].nunique()}"
-    )
+    print("Unique companies : " f"{output['company_id'].nunique()}")
 
-    print(
-        "Unique clusters  : "
-        f"{output['cluster_id'].nunique()}"
-    )
+    print("Unique clusters  : " f"{output['cluster_id'].nunique()}")
 
-    print(
-        "Cluster IDs      : "
-        f"{sorted(output['cluster_id'].unique())}"
-    )
+    print("Cluster IDs      : " f"{sorted(output['cluster_id'].unique())}")
 
-    print(
-        f"Cluster output   : {CLUSTER_OUTPUT}"
-    )
+    print(f"Cluster output   : {CLUSTER_OUTPUT}")
 
-    print(
-        f"Elbow plot       : {ELBOW_OUTPUT}"
-    )
+    print(f"Elbow plot       : {ELBOW_OUTPUT}")
 
     # ----------------------------------------------------------
     # Hard validation checks.
@@ -1177,20 +886,11 @@ def main() -> None:
 
     if len(output) != 92:
 
-        raise ValueError(
-            "Cluster output does not contain 92 rows."
-        )
+        raise ValueError("Cluster output does not contain 92 rows.")
 
-    if (
-        output["company_id"]
-        .nunique()
-        != 92
-    ):
+    if output["company_id"].nunique() != 92:
 
-        raise ValueError(
-            "Cluster output does not contain "
-            "92 unique companies."
-        )
+        raise ValueError("Cluster output does not contain " "92 unique companies.")
 
     expected_clusters = {
         0,
@@ -1200,69 +900,35 @@ def main() -> None:
         4,
     }
 
-    actual_clusters = set(
-        output[
-            "cluster_id"
-        ].unique()
-    )
+    actual_clusters = set(output["cluster_id"].unique())
 
     if actual_clusters != expected_clusters:
 
-        raise ValueError(
-            "Cluster IDs are not exactly "
-            "0, 1, 2, 3, 4."
-        )
+        raise ValueError("Cluster IDs are not exactly " "0, 1, 2, 3, 4.")
 
-    if (
-        output[
-            "cluster_name"
-        ].isna()
-        .any()
-    ):
+    if output["cluster_name"].isna().any():
 
-        raise ValueError(
-            "Missing cluster names detected."
-        )
+        raise ValueError("Missing cluster names detected.")
 
-    if (
-        output[
-            "distance_from_centroid"
-        ]
-        .isna()
-        .any()
-    ):
+    if output["distance_from_centroid"].isna().any():
 
-        raise ValueError(
-            "Missing centroid distances detected."
-        )
+        raise ValueError("Missing centroid distances detected.")
 
     if not CLUSTER_OUTPUT.exists():
 
-        raise FileNotFoundError(
-            "cluster_labels.csv "
-            "was not created."
-        )
+        raise FileNotFoundError("cluster_labels.csv " "was not created.")
 
     if not ELBOW_OUTPUT.exists():
 
-        raise FileNotFoundError(
-            "elbow_plot.png "
-            "was not created."
-        )
+        raise FileNotFoundError("elbow_plot.png " "was not created.")
 
     print()
 
-    print(
-        "=" * 70
-    )
+    print("=" * 70)
 
-    print(
-        "Day 36 clustering completed successfully."
-    )
+    print("Day 36 clustering completed successfully.")
 
-    print(
-        "=" * 70
-    )
+    print("=" * 70)
 
 
 # ==============================================================

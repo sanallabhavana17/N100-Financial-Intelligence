@@ -23,14 +23,13 @@ Requirements:
     - Formatted and sortable workbook
 """
 
+import sqlite3
 from pathlib import Path
 
 import pandas as pd
-import sqlite3
 from openpyxl import load_workbook
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
-
 
 # ============================================================
 # PATHS
@@ -38,17 +37,9 @@ from openpyxl.utils import get_column_letter
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 
-INPUT_FILE = (
-    BASE_DIR
-    / "output"
-    / "peer_percentile_table.csv"
-)
+INPUT_FILE = BASE_DIR / "output" / "peer_percentile_table.csv"
 
-OUTPUT_FILE = (
-    BASE_DIR
-    / "output"
-    / "peer_comparison.xlsx"
-)
+OUTPUT_FILE = BASE_DIR / "output" / "peer_comparison.xlsx"
 
 
 # ============================================================
@@ -75,7 +66,6 @@ DISPLAY_COLUMNS = [
     "benchmark_composite_percentile",
     "vs_benchmark_percentile",
     "above_benchmark",
-
     # Required 10 financial metrics
     "return_on_equity_pct",
     "return_on_capital_employed_pct",
@@ -87,7 +77,6 @@ DISPLAY_COLUMNS = [
     "eps_cagr_5yr",
     "interest_coverage",
     "asset_turnover",
-
     # Required 10 percentile metrics
     "return_on_equity_pct_percentile",
     "return_on_capital_employed_pct_percentile",
@@ -106,42 +95,23 @@ DISPLAY_COLUMNS = [
 # STYLING
 # ============================================================
 
-HEADER_FILL = PatternFill(
-    fill_type="solid",
-    fgColor="1F4E78"
-)
+HEADER_FILL = PatternFill(fill_type="solid", fgColor="1F4E78")
 
-HEADER_FONT = Font(
-    bold=True,
-    color="FFFFFF"
-)
+HEADER_FONT = Font(bold=True, color="FFFFFF")
 
-TITLE_FONT = Font(
-    bold=True,
-    size=14
-)
+TITLE_FONT = Font(bold=True, size=14)
 
-SUBTITLE_FONT = Font(
-    italic=True,
-    size=10
-)
+SUBTITLE_FONT = Font(italic=True, size=10)
 
-BENCHMARK_FILL = PatternFill(
-    fill_type="solid",
-    fgColor="FFF2CC"
-)
+BENCHMARK_FILL = PatternFill(fill_type="solid", fgColor="FFF2CC")
 
-THIN_BORDER = Border(
-    bottom=Side(
-        style="thin",
-        color="D9E1F2"
-    )
-)
+THIN_BORDER = Border(bottom=Side(style="thin", color="D9E1F2"))
 
 
 # ============================================================
 # COMPANY NAMES
 # ============================================================
+
 
 def add_company_names(df):
     """Add company names from the SQLite companies table."""
@@ -164,10 +134,7 @@ def add_company_names(df):
     )
 
     result["company_name"] = (
-        result["company_name"]
-        .fillna(result["company_id"])
-        .astype(str)
-        .str.strip()
+        result["company_name"].fillna(result["company_id"]).astype(str).str.strip()
     )
 
     return result
@@ -176,6 +143,7 @@ def add_company_names(df):
 # ============================================================
 # LOAD DATA
 # ============================================================
+
 
 def load_peer_data():
     """
@@ -186,40 +154,23 @@ def load_peer_data():
     print(f"Input: {INPUT_FILE}")
 
     if not INPUT_FILE.exists():
-        raise FileNotFoundError(
-            f"Input file not found: {INPUT_FILE}"
-        )
+        raise FileNotFoundError(f"Input file not found: {INPUT_FILE}")
 
     df = pd.read_csv(INPUT_FILE)
 
     print(f"Rows loaded: {len(df):,}")
 
     if "peer_group_name" not in df.columns:
-        raise ValueError(
-            "peer_group_name column is missing."
-        )
+        raise ValueError("peer_group_name column is missing.")
 
     if "company_id" not in df.columns:
-        raise ValueError(
-            "company_id column is missing."
-        )
+        raise ValueError("company_id column is missing.")
 
-    peer_groups = (
-        df["peer_group_name"]
-        .dropna()
-        .astype(str)
-        .unique()
-    )
+    peer_groups = df["peer_group_name"].dropna().astype(str).unique()
 
-    print(
-        f"Peer groups found: "
-        f"{len(peer_groups)}"
-    )
+    print(f"Peer groups found: " f"{len(peer_groups)}")
 
-    print(
-        f"Companies represented: "
-        f"{df['company_id'].nunique()}"
-    )
+    print(f"Companies represented: " f"{df['company_id'].nunique()}")
 
     return df
 
@@ -227,6 +178,7 @@ def load_peer_data():
 # ============================================================
 # PREPARE DATA
 # ============================================================
+
 
 def prepare_data(df):
     """
@@ -236,10 +188,7 @@ def prepare_data(df):
     data = df.copy()
 
     if "year" in data.columns:
-        data["year"] = pd.to_numeric(
-            data["year"],
-            errors="coerce"
-        )
+        data["year"] = pd.to_numeric(data["year"], errors="coerce")
 
     # Convert numeric-looking columns.
     for column in data.columns:
@@ -251,10 +200,7 @@ def prepare_data(df):
         }:
             continue
 
-        data[column] = pd.to_numeric(
-            data[column],
-            errors="ignore"
-        )
+        data[column] = pd.to_numeric(data[column], errors="ignore")
 
     return data
 
@@ -262,6 +208,7 @@ def prepare_data(df):
 # ============================================================
 # SHEET NAME
 # ============================================================
+
 
 def make_sheet_name(peer_group, used_names):
     """
@@ -287,9 +234,7 @@ def make_sheet_name(peer_group, used_names):
     if not name:
         name = "Peer_Group"
 
-    name = name[
-        :MAX_EXCEL_SHEET_NAME_LENGTH
-    ]
+    name = name[:MAX_EXCEL_SHEET_NAME_LENGTH]
 
     original = name
     counter = 1
@@ -297,13 +242,7 @@ def make_sheet_name(peer_group, used_names):
     while name in used_names:
         suffix = f"_{counter}"
 
-        name = (
-            original[
-                :MAX_EXCEL_SHEET_NAME_LENGTH
-                - len(suffix)
-            ]
-            + suffix
-        )
+        name = original[: MAX_EXCEL_SHEET_NAME_LENGTH - len(suffix)] + suffix
 
         counter += 1
 
@@ -316,6 +255,7 @@ def make_sheet_name(peer_group, used_names):
 # WRITE SHEET
 # ============================================================
 
+
 def write_peer_sheet(
     writer,
     peer_group,
@@ -327,46 +267,33 @@ def write_peer_sheet(
     """
 
     available_columns = [
-        column
-        for column in DISPLAY_COLUMNS
-        if column in peer_df.columns
+        column for column in DISPLAY_COLUMNS if column in peer_df.columns
     ]
 
-    sheet_df = peer_df[
-        available_columns
-    ].copy()
+    sheet_df = peer_df[available_columns].copy()
 
     # Sort benchmark first, then peer rank.
     sort_columns = []
 
     if "is_benchmark" in sheet_df.columns:
-        sort_columns.append(
-            "is_benchmark"
-        )
+        sort_columns.append("is_benchmark")
 
     if "peer_rank" in sheet_df.columns:
-        sort_columns.append(
-            "peer_rank"
-        )
+        sort_columns.append("peer_rank")
 
     if sort_columns:
         ascending = [
-            False
-            if column == "is_benchmark"
-            else True
-            for column in sort_columns
+            column != "is_benchmark" for column in sort_columns
         ]
 
-        sheet_df = sheet_df.sort_values(
-            sort_columns,
-            ascending=ascending
-        )
+        sheet_df = sheet_df.sort_values(sort_columns, ascending=ascending)
 
     # Add a median row for the peer group.
     numeric_columns = [
         column
         for column in sheet_df.columns
-        if column not in {
+        if column
+        not in {
             "peer_group_name",
             "company_id",
             "company_name",
@@ -376,10 +303,7 @@ def write_peer_sheet(
         }
     ]
 
-    median_row = {
-        column: ""
-        for column in sheet_df.columns
-    }
+    median_row = {column: "" for column in sheet_df.columns}
 
     median_row["peer_group_name"] = peer_group
     median_row["company_id"] = "MEDIAN"
@@ -400,17 +324,13 @@ def write_peer_sheet(
     )
 
     # Write data starting at row 4.
-    sheet_df.to_excel(
-        writer,
-        sheet_name=sheet_name,
-        index=False,
-        startrow=3
-    )
+    sheet_df.to_excel(writer, sheet_name=sheet_name, index=False, startrow=3)
 
 
 # ============================================================
 # FORMAT WORKBOOK
 # ============================================================
+
 
 def format_workbook(
     output_file,
@@ -433,17 +353,11 @@ def format_workbook(
         # Title
         # ----------------------------------------------------
 
-        ws["A1"] = (
-            f"NIFTY100 Peer Comparison - "
-            f"{peer_group}"
-        )
+        ws["A1"] = f"NIFTY100 Peer Comparison - " f"{peer_group}"
 
         ws["A1"].font = TITLE_FONT
 
-        ws["A2"] = (
-            "Peer-ranked financial KPI comparison "
-            "with benchmark reference"
-        )
+        ws["A2"] = "Peer-ranked financial KPI comparison " "with benchmark reference"
 
         ws["A2"].font = SUBTITLE_FONT
 
@@ -458,15 +372,11 @@ def format_workbook(
             cell.fill = HEADER_FILL
             cell.font = HEADER_FONT
             cell.alignment = Alignment(
-                horizontal="center",
-                vertical="center",
-                wrap_text=True
+                horizontal="center", vertical="center", wrap_text=True
             )
             cell.border = THIN_BORDER
 
-        ws.row_dimensions[
-            header_row
-        ].height = 36
+        ws.row_dimensions[header_row].height = 36
 
         # ----------------------------------------------------
         # Freeze panes
@@ -480,9 +390,7 @@ def format_workbook(
 
         if ws.max_row >= header_row:
             ws.auto_filter.ref = (
-                f"A{header_row}:"
-                f"{get_column_letter(ws.max_column)}"
-                f"{ws.max_row}"
+                f"A{header_row}:" f"{get_column_letter(ws.max_column)}" f"{ws.max_row}"
             )
 
         # ----------------------------------------------------
@@ -491,85 +399,50 @@ def format_workbook(
 
         for column_cells in ws.columns:
 
-            column_letter = (
-                get_column_letter(
-                    column_cells[0].column
-                )
-            )
+            column_letter = get_column_letter(column_cells[0].column)
 
             max_length = 0
 
             for cell in column_cells:
 
                 try:
-                    value_length = len(
-                        str(cell.value)
-                    )
-                except Exception:
+                    value_length = len(str(cell.value))
+                except TypeError:
                     value_length = 0
 
-                max_length = max(
-                    max_length,
-                    value_length
-                )
+                max_length = max(max_length, value_length)
 
-            width = min(
-                max(max_length + 2, 12),
-                28
-            )
+            width = min(max(max_length + 2, 12), 28)
 
-            ws.column_dimensions[
-                column_letter
-            ].width = width
+            ws.column_dimensions[column_letter].width = width
 
         # ----------------------------------------------------
         # Format numeric cells
         # ----------------------------------------------------
 
-        for row in ws.iter_rows(
-            min_row=header_row + 1,
-            max_row=ws.max_row
-        ):
+        for row in ws.iter_rows(min_row=header_row + 1, max_row=ws.max_row):
 
             for cell in row:
 
-                if isinstance(
-                    cell.value,
-                    (int, float)
-                ):
+                if isinstance(cell.value, (int, float)):
 
-                    cell.number_format = (
-                        "0.00"
-                    )
+                    cell.number_format = "0.00"
 
         # ----------------------------------------------------
         # Highlight benchmark rows
         # ----------------------------------------------------
 
-        headers = {
-            cell.value: cell.column
-            for cell in ws[header_row]
-        }
+        headers = {cell.value: cell.column for cell in ws[header_row]}
 
-        benchmark_column = headers.get(
-            "is_benchmark"
-        )
+        benchmark_column = headers.get("is_benchmark")
 
         if benchmark_column:
 
-            for row_number in range(
-                header_row + 1,
-                ws.max_row + 1
-            ):
+            for row_number in range(header_row + 1, ws.max_row + 1):
 
-                cell = ws.cell(
-                    row=row_number,
-                    column=benchmark_column
-                )
+                cell = ws.cell(row=row_number, column=benchmark_column)
 
-                value = str(
-                    cell.value
-                ).lower()
+                value = str(cell.value).lower()
 
                 if value in {
                     "true",
@@ -577,15 +450,11 @@ def format_workbook(
                     "yes",
                 }:
 
-                    for column_number in range(
-                        1,
-                        ws.max_column + 1
-                    ):
+                    for column_number in range(1, ws.max_column + 1):
 
-                        ws.cell(
-                            row=row_number,
-                            column=column_number
-                        ).fill = BENCHMARK_FILL
+                        ws.cell(row=row_number, column=column_number).fill = (
+                            BENCHMARK_FILL
+                        )
 
         # ----------------------------------------------------
         # Exact percentile bands
@@ -599,14 +468,8 @@ def format_workbook(
 
         for cell in ws[header_row]:
 
-            if (
-                cell.value
-                and "percentile"
-                in str(cell.value).lower()
-            ):
-                percentile_columns.append(
-                    cell.column
-                )
+            if cell.value and "percentile" in str(cell.value).lower():
+                percentile_columns.append(cell.column)
 
         green_fill = PatternFill(
             fill_type="solid",
@@ -640,9 +503,7 @@ def format_workbook(
 
         for column_number in percentile_columns:
 
-            column_letter = get_column_letter(
-                column_number
-            )
+            column_letter = get_column_letter(column_number)
 
             cell_range = (
                 f"{column_letter}"
@@ -658,7 +519,7 @@ def format_workbook(
                     formula=["75"],
                     fill=green_fill,
                     font=green_font,
-                )
+                ),
             )
 
             ws.conditional_formatting.add(
@@ -668,7 +529,7 @@ def format_workbook(
                     formula=["25", "74.999999"],
                     fill=yellow_fill,
                     font=yellow_font,
-                )
+                ),
             )
 
             ws.conditional_formatting.add(
@@ -678,20 +539,15 @@ def format_workbook(
                     formula=["25"],
                     fill=red_fill,
                     font=red_font,
-                )
+                ),
             )
 
         # ----------------------------------------------------
         # Row heights
         # ----------------------------------------------------
 
-        for row_number in range(
-            header_row + 1,
-            ws.max_row + 1
-        ):
-            ws.row_dimensions[
-                row_number
-            ].height = 20
+        for row_number in range(header_row + 1, ws.max_row + 1):
+            ws.row_dimensions[row_number].height = 20
 
     # --------------------------------------------------------
     # Save
@@ -699,15 +555,13 @@ def format_workbook(
 
     wb.save(output_file)
 
-    print(
-        f"Formatted workbook saved: "
-        f"{output_file}"
-    )
+    print(f"Formatted workbook saved: " f"{output_file}")
 
 
 # ============================================================
 # VALIDATE WORKBOOK
 # ============================================================
+
 
 def validate_workbook(
     output_file,
@@ -722,25 +576,15 @@ def validate_workbook(
     print("-" * 60)
 
     if not output_file.exists():
-        raise FileNotFoundError(
-            "Excel output file was not created."
-        )
+        raise FileNotFoundError("Excel output file was not created.")
 
-    wb = load_workbook(
-        output_file,
-        read_only=True
-    )
+    wb = load_workbook(output_file, read_only=True)
 
     sheet_names = wb.sheetnames
 
-    print(
-        f"Sheets generated: "
-        f"{len(sheet_names)}"
-    )
+    print(f"Sheets generated: " f"{len(sheet_names)}")
 
-    print(
-        "Sheet names:"
-    )
+    print("Sheet names:")
 
     for sheet in sheet_names:
         print(f"  - {sheet}")
@@ -751,8 +595,7 @@ def validate_workbook(
 
     if len(sheet_names) != expected_peer_groups:
         raise ValueError(
-            f"Expected {expected_peer_groups} sheets, "
-            f"but found {len(sheet_names)}."
+            f"Expected {expected_peer_groups} sheets, " f"but found {len(sheet_names)}."
         )
 
     # --------------------------------------------------------
@@ -767,24 +610,15 @@ def validate_workbook(
 
         # Header at row 4.
         if ws.max_row < 5:
-            raise ValueError(
-                f"Sheet '{sheet_name}' "
-                "contains no company data."
-            )
+            raise ValueError(f"Sheet '{sheet_name}' " "contains no company data.")
 
         data_rows = ws.max_row - 4
 
         total_data_rows += data_rows
 
-        print(
-            f"  {sheet_name}: "
-            f"{data_rows} company rows"
-        )
+        print(f"  {sheet_name}: " f"{data_rows} company rows")
 
-    print(
-        f"Total company rows exported: "
-        f"{total_data_rows}"
-    )
+    print(f"Total company rows exported: " f"{total_data_rows}")
 
     wb.close()
 
@@ -796,8 +630,9 @@ def validate_workbook(
 # MAIN
 # ============================================================
 
-def main():
 
+def main():
+    """Main."""
     print("=" * 60)
     print("NIFTY100 PEER COMPARISON EXCEL EXPORT")
     print("SPRINT 3 - DAY 20")
@@ -822,12 +657,7 @@ def main():
     # 3. Get peer groups
     # --------------------------------------------------------
 
-    peer_groups = sorted(
-        df["peer_group_name"]
-        .dropna()
-        .astype(str)
-        .unique()
-    )
+    peer_groups = sorted(df["peer_group_name"].dropna().astype(str).unique())
 
     if len(peer_groups) != EXPECTED_PEER_GROUPS:
         raise ValueError(
@@ -838,81 +668,46 @@ def main():
     print()
     print("Peer groups:")
     for peer_group in peer_groups:
-        count = (
-            df.loc[
-                df["peer_group_name"].astype(str)
-                == peer_group,
-                "company_id"
-            ]
-            .nunique()
-        )
+        count = df.loc[
+            df["peer_group_name"].astype(str) == peer_group, "company_id"
+        ].nunique()
 
-        print(
-            f"  - {peer_group}: "
-            f"{count} companies"
-        )
+        print(f"  - {peer_group}: " f"{count} companies")
 
     # --------------------------------------------------------
     # 4. Create Excel workbook
     # --------------------------------------------------------
 
-    OUTPUT_FILE.parent.mkdir(
-        parents=True,
-        exist_ok=True
-    )
+    OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
 
     used_sheet_names = set()
 
     print()
     print("Creating Excel workbook...")
 
-    with pd.ExcelWriter(
-        OUTPUT_FILE,
-        engine="openpyxl"
-    ) as writer:
+    with pd.ExcelWriter(OUTPUT_FILE, engine="openpyxl") as writer:
 
         for peer_group in peer_groups:
 
-            peer_df = df[
-                df["peer_group_name"]
-                .astype(str)
-                == peer_group
-            ].copy()
+            peer_df = df[df["peer_group_name"].astype(str) == peer_group].copy()
 
-            sheet_name = make_sheet_name(
-                peer_group,
-                used_sheet_names
-            )
+            sheet_name = make_sheet_name(peer_group, used_sheet_names)
 
-            write_peer_sheet(
-                writer,
-                peer_group,
-                peer_df,
-                sheet_name
-            )
+            write_peer_sheet(writer, peer_group, peer_df, sheet_name)
 
-            print(
-                f"  Created sheet: "
-                f"{sheet_name}"
-            )
+            print(f"  Created sheet: " f"{sheet_name}")
 
     # --------------------------------------------------------
     # 5. Format workbook
     # --------------------------------------------------------
 
-    format_workbook(
-        OUTPUT_FILE,
-        peer_groups
-    )
+    format_workbook(OUTPUT_FILE, peer_groups)
 
     # --------------------------------------------------------
     # 6. Validate workbook
     # --------------------------------------------------------
 
-    validate_workbook(
-        OUTPUT_FILE,
-        EXPECTED_PEER_GROUPS
-    )
+    validate_workbook(OUTPUT_FILE, EXPECTED_PEER_GROUPS)
 
     # --------------------------------------------------------
     # 7. Final message
@@ -923,20 +718,15 @@ def main():
     print("D20 PEER COMPARISON EXPORT COMPLETE")
     print("=" * 60)
 
-    print(
-        f"Output: {OUTPUT_FILE}"
-    )
+    print(f"Output: {OUTPUT_FILE}")
 
-    print(
-        f"Peer groups: {len(peer_groups)}"
-    )
+    print(f"Peer groups: {len(peer_groups)}")
 
-    print(
-        f"Sheets: {len(peer_groups)}"
-    )
+    print(f"Sheets: {len(peer_groups)}")
 
     print("=" * 60)
 
 
 if __name__ == "__main__":
     main()
+

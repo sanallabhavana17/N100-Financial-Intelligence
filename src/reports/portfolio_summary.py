@@ -1,22 +1,20 @@
-from pathlib import Path
 import sqlite3
+from pathlib import Path
 
 import pandas as pd
-
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import mm
 from reportlab.platypus import (
-    SimpleDocTemplate,
+    PageBreak,
     Paragraph,
+    SimpleDocTemplate,
     Spacer,
     Table,
     TableStyle,
-    PageBreak,
 )
-
 
 # ==============================================================
 # PATHS
@@ -33,11 +31,14 @@ OUTPUT_PATH = OUTPUT_DIR / "portfolio_summary.pdf"
 # DATABASE
 # ==============================================================
 
+
 def get_connection():
+    """Get connection."""
     return sqlite3.connect(DB_PATH)
 
 
 def load_companies():
+    """Load companies."""
     conn = get_connection()
 
     query = """
@@ -56,6 +57,7 @@ def load_companies():
 
 
 def load_sectors():
+    """Load sectors."""
     conn = get_connection()
 
     query = """
@@ -75,6 +77,7 @@ def load_sectors():
 
 
 def load_latest_ratios(company_ids):
+    """Load latest ratios."""
     if not company_ids:
         return pd.DataFrame()
 
@@ -142,6 +145,7 @@ def load_latest_ratios(company_ids):
 
 
 def load_historical_ratios(company_ids):
+    """Load historical ratios."""
     if not company_ids:
         return pd.DataFrame()
 
@@ -187,7 +191,9 @@ def load_historical_ratios(company_ids):
 # FORMATTING HELPERS
 # ==============================================================
 
+
 def fmt(value, decimals=1):
+    """Fmt."""
     if value is None or pd.isna(value):
         return "—"
 
@@ -198,6 +204,7 @@ def fmt(value, decimals=1):
 
 
 def fmt_pct(value, decimals=1):
+    """Fmt pct."""
     if value is None or pd.isna(value):
         return "—"
 
@@ -208,6 +215,7 @@ def fmt_pct(value, decimals=1):
 
 
 def numeric(value):
+    """Numeric."""
     if value is None or pd.isna(value):
         return None
 
@@ -245,7 +253,9 @@ def trend_arrow(current, previous):
 # REPORT STYLES
 # ==============================================================
 
+
 def build_styles():
+    """Build styles."""
     styles = getSampleStyleSheet()
 
     return {
@@ -258,7 +268,6 @@ def build_styles():
             textColor=colors.HexColor("#0B1F3A"),
             spaceAfter=3 * mm,
         ),
-
         "company": ParagraphStyle(
             "PortfolioCompany",
             parent=styles["Heading2"],
@@ -267,7 +276,6 @@ def build_styles():
             alignment=TA_CENTER,
             spaceAfter=2 * mm,
         ),
-
         "subtitle": ParagraphStyle(
             "PortfolioSubtitle",
             parent=styles["Normal"],
@@ -277,7 +285,6 @@ def build_styles():
             textColor=colors.HexColor("#555555"),
             spaceAfter=7 * mm,
         ),
-
         "heading": ParagraphStyle(
             "PortfolioHeading",
             parent=styles["Heading2"],
@@ -287,14 +294,12 @@ def build_styles():
             spaceBefore=3 * mm,
             spaceAfter=3 * mm,
         ),
-
         "body": ParagraphStyle(
             "PortfolioBody",
             parent=styles["BodyText"],
             fontSize=8,
             leading=10,
         ),
-
         "small": ParagraphStyle(
             "PortfolioSmall",
             parent=styles["BodyText"],
@@ -309,7 +314,9 @@ def build_styles():
 # HEADER / FOOTER
 # ==============================================================
 
+
 def draw_header_footer(canvas, doc):
+    """Draw header footer."""
     canvas.saveState()
 
     width, height = A4
@@ -340,9 +347,7 @@ def draw_header_footer(canvas, doc):
     )
 
     # Footer
-    canvas.setFillColor(
-        colors.HexColor("#555555")
-    )
+    canvas.setFillColor(colors.HexColor("#555555"))
 
     canvas.setFont(
         "Helvetica",
@@ -368,6 +373,7 @@ def draw_header_footer(canvas, doc):
 # KPI TABLE
 # ==============================================================
 
+
 def make_kpi_table(row, previous):
     """
     Creates exactly six KPI tiles in a 2 x 3 grid.
@@ -376,70 +382,47 @@ def make_kpi_table(row, previous):
     kpis = [
         (
             "5Y Sales CAGR",
-            fmt_pct(
-                row.get("revenue_cagr_5yr")
-            ),
+            fmt_pct(row.get("revenue_cagr_5yr")),
             trend_arrow(
                 row.get("revenue_cagr_5yr"),
                 previous.get("revenue_cagr_5yr"),
             ),
         ),
-
         (
             "5Y PAT CAGR",
-            fmt_pct(
-                row.get("pat_cagr_5yr")
-            ),
+            fmt_pct(row.get("pat_cagr_5yr")),
             trend_arrow(
                 row.get("pat_cagr_5yr"),
                 previous.get("pat_cagr_5yr"),
             ),
         ),
-
         (
             "ROE",
-            fmt_pct(
-                row.get("return_on_equity_pct")
-            ),
+            fmt_pct(row.get("return_on_equity_pct")),
             trend_arrow(
                 row.get("return_on_equity_pct"),
                 previous.get("return_on_equity_pct"),
             ),
         ),
-
         (
             "ROCE",
-            fmt_pct(
-                row.get(
-                    "return_on_capital_employed_pct"
-                )
-            ),
+            fmt_pct(row.get("return_on_capital_employed_pct")),
             trend_arrow(
-                row.get(
-                    "return_on_capital_employed_pct"
-                ),
-                previous.get(
-                    "return_on_capital_employed_pct"
-                ),
+                row.get("return_on_capital_employed_pct"),
+                previous.get("return_on_capital_employed_pct"),
             ),
         ),
-
         (
             "CFO Quality",
-            fmt(
-                row.get("cfo_quality_ratio")
-            ),
+            fmt(row.get("cfo_quality_ratio")),
             trend_arrow(
                 row.get("cfo_quality_ratio"),
                 previous.get("cfo_quality_ratio"),
             ),
         ),
-
         (
             "FCF Conversion",
-            fmt_pct(
-                row.get("fcf_conversion_pct")
-            ),
+            fmt_pct(row.get("fcf_conversion_pct")),
             trend_arrow(
                 row.get("fcf_conversion_pct"),
                 previous.get("fcf_conversion_pct"),
@@ -503,7 +486,6 @@ def make_kpi_table(row, previous):
                     (-1, -1),
                     colors.HexColor("#F5F7FA"),
                 ),
-
                 (
                     "BOX",
                     (0, 0),
@@ -511,7 +493,6 @@ def make_kpi_table(row, previous):
                     0.6,
                     colors.HexColor("#AAB4C3"),
                 ),
-
                 (
                     "INNERGRID",
                     (0, 0),
@@ -519,42 +500,36 @@ def make_kpi_table(row, previous):
                     0.5,
                     colors.HexColor("#CBD2DC"),
                 ),
-
                 (
                     "VALIGN",
                     (0, 0),
                     (-1, -1),
                     "MIDDLE",
                 ),
-
                 (
                     "ALIGN",
                     (0, 0),
                     (-1, -1),
                     "CENTER",
                 ),
-
                 (
                     "LEFTPADDING",
                     (0, 0),
                     (-1, -1),
                     5,
                 ),
-
                 (
                     "RIGHTPADDING",
                     (0, 0),
                     (-1, -1),
                     5,
                 ),
-
                 (
                     "TOPPADDING",
                     (0, 0),
                     (-1, -1),
                     5,
                 ),
-
                 (
                     "BOTTOMPADDING",
                     (0, 0),
@@ -572,13 +547,14 @@ def make_kpi_table(row, previous):
 # FINANCIAL INTELLIGENCE TABLE
 # ==============================================================
 
+
 def make_intelligence_table(row):
+    """Make intelligence table."""
     data = [
         [
             "Metric",
             "Current Value",
         ],
-
         [
             "CFO Quality",
             (
@@ -586,7 +562,6 @@ def make_intelligence_table(row):
                 f"{row.get('cfo_quality_label') or '—'}"
             ),
         ],
-
         [
             "CapEx Intensity",
             (
@@ -594,47 +569,25 @@ def make_intelligence_table(row):
                 f"{row.get('capex_intensity_label') or '—'}"
             ),
         ],
-
         [
             "Capital Allocation",
-            str(
-                row.get(
-                    "capital_allocation_pattern"
-                )
-                or "—"
-            ),
+            str(row.get("capital_allocation_pattern") or "—"),
         ],
-
         [
             "Debt / Equity",
-            fmt(
-                row.get("debt_to_equity")
-            ),
+            fmt(row.get("debt_to_equity")),
         ],
-
         [
             "Interest Coverage",
-            fmt(
-                row.get("interest_coverage")
-            ),
+            fmt(row.get("interest_coverage")),
         ],
-
         [
             "Dividend Payout",
-            fmt_pct(
-                row.get(
-                    "dividend_payout_ratio_pct"
-                )
-            ),
+            fmt_pct(row.get("dividend_payout_ratio_pct")),
         ],
-
         [
             "Composite Quality Score",
-            fmt(
-                row.get(
-                    "composite_quality_score"
-                )
-            ),
+            fmt(row.get("composite_quality_score")),
         ],
     ]
 
@@ -656,35 +609,30 @@ def make_intelligence_table(row):
                     (-1, 0),
                     colors.HexColor("#0B1F3A"),
                 ),
-
                 (
                     "TEXTCOLOR",
                     (0, 0),
                     (-1, 0),
                     colors.white,
                 ),
-
                 (
                     "FONTNAME",
                     (0, 0),
                     (-1, 0),
                     "Helvetica-Bold",
                 ),
-
                 (
                     "FONTNAME",
                     (0, 1),
                     (-1, -1),
                     "Helvetica",
                 ),
-
                 (
                     "FONTSIZE",
                     (0, 0),
                     (-1, -1),
                     8,
                 ),
-
                 (
                     "GRID",
                     (0, 0),
@@ -692,7 +640,6 @@ def make_intelligence_table(row):
                     0.35,
                     colors.HexColor("#B8C0CC"),
                 ),
-
                 (
                     "ROWBACKGROUNDS",
                     (0, 1),
@@ -702,21 +649,18 @@ def make_intelligence_table(row):
                         colors.HexColor("#F5F7FA"),
                     ],
                 ),
-
                 (
                     "VALIGN",
                     (0, 0),
                     (-1, -1),
                     "MIDDLE",
                 ),
-
                 (
                     "TOPPADDING",
                     (0, 0),
                     (-1, -1),
                     5,
                 ),
-
                 (
                     "BOTTOMPADDING",
                     (0, 0),
@@ -734,23 +678,22 @@ def make_intelligence_table(row):
 # TREND LEGEND
 # ==============================================================
 
+
 def make_trend_table():
+    """Make trend table."""
     data = [
         [
             "Indicator",
             "Meaning",
         ],
-
         [
             "↑",
             "Improved versus previous available year",
         ],
-
         [
             "↓",
             "Declined versus previous available year",
         ],
-
         [
             "→",
             "Flat or previous value unavailable",
@@ -774,35 +717,30 @@ def make_trend_table():
                     (-1, 0),
                     colors.HexColor("#0B1F3A"),
                 ),
-
                 (
                     "TEXTCOLOR",
                     (0, 0),
                     (-1, 0),
                     colors.white,
                 ),
-
                 (
                     "FONTNAME",
                     (0, 0),
                     (-1, 0),
                     "Helvetica-Bold",
                 ),
-
                 (
                     "FONTNAME",
                     (0, 1),
                     (-1, -1),
                     "Helvetica",
                 ),
-
                 (
                     "FONTSIZE",
                     (0, 0),
                     (-1, -1),
                     8,
                 ),
-
                 (
                     "GRID",
                     (0, 0),
@@ -810,21 +748,18 @@ def make_trend_table():
                     0.35,
                     colors.HexColor("#B8C0CC"),
                 ),
-
                 (
                     "VALIGN",
                     (0, 0),
                     (-1, -1),
                     "MIDDLE",
                 ),
-
                 (
                     "TOPPADDING",
                     (0, 0),
                     (-1, -1),
                     4,
                 ),
-
                 (
                     "BOTTOMPADDING",
                     (0, 0),
@@ -842,6 +777,7 @@ def make_trend_table():
 # COMPANY PAGE
 # ==============================================================
 
+
 def build_company_page(
     story,
     company,
@@ -850,6 +786,7 @@ def build_company_page(
     previous_row,
     styles,
 ):
+    """Build company page."""
     ticker = company["company_id"]
     company_name = company["company_name"]
 
@@ -864,9 +801,7 @@ def build_company_page(
             "Unknown",
         )
 
-        index_weight = sector_row.get(
-            "index_weight_pct"
-        )
+        index_weight = sector_row.get("index_weight_pct")
 
     else:
         sector = "Unknown"
@@ -900,11 +835,7 @@ def build_company_page(
         )
     )
 
-    latest_year = (
-        str(int(year))
-        if pd.notna(year)
-        else "—"
-    )
+    latest_year = str(int(year)) if pd.notna(year) else "—"
 
     story.append(
         Paragraph(
@@ -951,11 +882,7 @@ def build_company_page(
         )
     )
 
-    story.append(
-        make_intelligence_table(
-            ratio_row
-        )
-    )
+    story.append(make_intelligence_table(ratio_row))
 
     story.append(
         Spacer(
@@ -975,9 +902,7 @@ def build_company_page(
         )
     )
 
-    story.append(
-        make_trend_table()
-    )
+    story.append(make_trend_table())
 
     story.append(
         Spacer(
@@ -1007,17 +932,15 @@ def build_company_page(
 # MAIN
 # ==============================================================
 
+
 def main():
+    """Main."""
     print("N100 PORTFOLIO SUMMARY GENERATOR")
     print("=" * 70)
 
-    print(
-        f"Database : {DB_PATH}"
-    )
+    print(f"Database : {DB_PATH}")
 
-    print(
-        f"Output   : {OUTPUT_PATH}"
-    )
+    print(f"Output   : {OUTPUT_PATH}")
 
     print()
 
@@ -1033,26 +956,15 @@ def main():
     companies = load_companies()
     sectors = load_sectors()
 
-    company_ids = (
-        companies["company_id"]
-        .tolist()
-    )
+    company_ids = companies["company_id"].tolist()
 
-    latest = load_latest_ratios(
-        company_ids
-    )
+    latest = load_latest_ratios(company_ids)
 
-    historical = load_historical_ratios(
-        company_ids
-    )
+    historical = load_historical_ratios(company_ids)
 
-    print(
-        f"Companies : {len(companies)}"
-    )
+    print(f"Companies : {len(companies)}")
 
-    print(
-        f"Latest ratio rows : {len(latest)}"
-    )
+    print(f"Latest ratio rows : {len(latest)}")
 
     print()
 
@@ -1065,13 +977,10 @@ def main():
     doc = SimpleDocTemplate(
         str(OUTPUT_PATH),
         pagesize=A4,
-
         rightMargin=15 * mm,
         leftMargin=15 * mm,
-
         topMargin=18 * mm,
         bottomMargin=14 * mm,
-
         title="N100 Portfolio Summary",
         author="N100 Financial Intelligence",
     )
@@ -1089,50 +998,31 @@ def main():
 
         ticker = company["company_id"]
 
-        ratio_matches = latest[
-            latest["company_id"] == ticker
-        ]
+        ratio_matches = latest[latest["company_id"] == ticker]
 
         if ratio_matches.empty:
 
-            missing_ratios.append(
-                ticker
-            )
+            missing_ratios.append(ticker)
 
             continue
 
-        ratio_row = (
-            ratio_matches
-            .iloc[0]
-        )
+        ratio_row = ratio_matches.iloc[0]
 
         # Previous available ratio year
-        historical_company = (
-            historical[
-                historical["company_id"]
-                == ticker
-            ]
-            .sort_values("year")
+        historical_company = historical[historical["company_id"] == ticker].sort_values(
+            "year"
         )
 
         if len(historical_company) >= 2:
 
-            previous_row = (
-                historical_company
-                .iloc[-2]
-            )
+            previous_row = historical_company.iloc[-2]
 
         else:
 
-            previous_row = (
-                pd.Series(dtype=object)
-            )
+            previous_row = pd.Series(dtype=object)
 
         # Sector information
-        sector_matches = sectors[
-            sectors["company_id"]
-            == ticker
-        ]
+        sector_matches = sectors[sectors["company_id"] == ticker]
 
         if sector_matches.empty:
 
@@ -1140,10 +1030,7 @@ def main():
 
         else:
 
-            sector_row = (
-                sector_matches
-                .iloc[0]
-            )
+            sector_row = sector_matches.iloc[0]
 
         build_company_page(
             story=story,
@@ -1158,9 +1045,7 @@ def main():
 
         # Exactly one page per company
         if generated < len(companies):
-            story.append(
-                PageBreak()
-            )
+            story.append(PageBreak())
 
     # ----------------------------------------------------------
     # BUILD PDF
@@ -1172,72 +1057,43 @@ def main():
         onLaterPages=draw_header_footer,
     )
 
-    size_kb = (
-        OUTPUT_PATH.stat().st_size
-        / 1024
-    )
+    size_kb = OUTPUT_PATH.stat().st_size / 1024
 
     # ----------------------------------------------------------
     # SUMMARY
     # ----------------------------------------------------------
 
-    print(
-        "=" * 70
-    )
+    print("=" * 70)
 
-    print(
-        f"Companies expected : {len(companies)}"
-    )
+    print(f"Companies expected : {len(companies)}")
 
-    print(
-        f"Company pages      : {generated}"
-    )
+    print(f"Company pages      : {generated}")
 
-    print(
-        f"Missing ratios     : {len(missing_ratios)}"
-    )
+    print(f"Missing ratios     : {len(missing_ratios)}")
 
-    print(
-        f"Output size        : {size_kb:,.1f} KB"
-    )
+    print(f"Output size        : {size_kb:,.1f} KB")
 
-    print(
-        f"Output             : {OUTPUT_PATH}"
-    )
+    print(f"Output             : {OUTPUT_PATH}")
 
     if missing_ratios:
 
         print()
 
-        print(
-            "Companies without ratio data:"
-        )
+        print("Companies without ratio data:")
 
-        print(
-            ", ".join(
-                missing_ratios
-            )
-        )
+        print(", ".join(missing_ratios))
 
     print()
 
-    print(
-        "=" * 70
-    )
+    print("=" * 70)
 
     if generated == len(companies):
 
-        print(
-            "Day 35 portfolio summary "
-            "generated successfully."
-        )
+        print("Day 35 portfolio summary " "generated successfully.")
 
     else:
 
-        print(
-            "Day 35 portfolio summary "
-            "generated with missing company pages."
-        )
+        print("Day 35 portfolio summary " "generated with missing company pages.")
 
 
 # ==============================================================

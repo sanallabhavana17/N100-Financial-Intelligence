@@ -1,9 +1,9 @@
-from pathlib import Path
 import sqlite3
+from pathlib import Path
+
 import pandas as pd
 
 from src.etl.loader import load_all_files
-
 
 DB_PATH = Path("data/nifty100.db")
 RAW_DATA_DIR = Path("data/raw")
@@ -57,41 +57,25 @@ def clean_dataframe(df):
     df = df.copy()
 
     # Normalize column names
-    df.columns = [
-        str(col).strip().lower()
-        for col in df.columns
-    ]
+    df.columns = [str(col).strip().lower() for col in df.columns]
 
     # Normalize company IDs
     if "company_id" in df.columns:
-        df["company_id"] = (
-            df["company_id"]
-            .astype(str)
-            .str.strip()
-            .str.upper()
-        )
+        df["company_id"] = df["company_id"].astype(str).str.strip().str.upper()
 
     # companies.id is the primary key
     if "id" in df.columns and "company_id" not in df.columns:
-        df["id"] = (
-            df["id"]
-            .astype(str)
-            .str.strip()
-            .str.upper()
-        )
+        df["id"] = df["id"].astype(str).str.strip().str.upper()
 
     # Normalize year
     if "year" in df.columns:
-        df["year"] = pd.to_numeric(
-            df["year"],
-            errors="coerce"
-        )
+        df["year"] = pd.to_numeric(df["year"], errors="coerce")
 
     return df
 
 
 def load_data():
-
+    """Load data."""
     print("\nLoading raw Excel files...")
 
     raw_data = load_all_files()
@@ -117,9 +101,7 @@ def load_data():
         path = PROCESSED_DATA_DIR / filename
 
         if not path.exists():
-            raise FileNotFoundError(
-                f"Required processed file not found: {path}"
-            )
+            raise FileNotFoundError(f"Required processed file not found: {path}")
 
         df = pd.read_csv(path)
 
@@ -129,17 +111,10 @@ def load_data():
     # 3. Official company IDs
     # ---------------------------------------------------------
     official_companies = set(
-        datasets["companies"]["id"]
-        .dropna()
-        .astype(str)
-        .str.strip()
-        .str.upper()
+        datasets["companies"]["id"].dropna().astype(str).str.strip().str.upper()
     )
 
-    print(
-        f"\nOfficial companies: "
-        f"{len(official_companies)}"
-    )
+    print(f"\nOfficial companies: " f"{len(official_companies)}")
 
     # ---------------------------------------------------------
     # 4. Filter invalid foreign-key records
@@ -159,19 +134,14 @@ def load_data():
 
         before = len(df)
 
-        df = df[
-            df["company_id"].isin(official_companies)
-        ].copy()
+        df = df[df["company_id"].isin(official_companies)].copy()
 
         removed = before - len(df)
 
         datasets[table_name] = df
 
         if removed > 0:
-            print(
-                f"{table_name}: removed "
-                f"{removed} invalid company records"
-            )
+            print(f"{table_name}: removed " f"{removed} invalid company records")
 
     # ---------------------------------------------------------
     # 5. Normalize and deduplicate financial ratios
@@ -181,52 +151,34 @@ def load_data():
     if "year" in ratios.columns:
 
         # Convert values such as "Mar 2014" -> 2014
-        ratios["year"] = (
-            ratios["year"]
-            .astype(str)
-            .str.extract(r"(\d{4})")[0]
-        )
+        ratios["year"] = ratios["year"].astype(str).str.extract(r"(\d{4})")[0]
 
-        ratios["year"] = pd.to_numeric(
-            ratios["year"],
-            errors="coerce"
-        )
+        ratios["year"] = pd.to_numeric(ratios["year"], errors="coerce")
 
     before = len(ratios)
 
     # Keep first record for each company-year.
-    ratios = ratios.drop_duplicates(
-        subset=["company_id", "year"],
-        keep="first"
-    ).copy()
+    ratios = ratios.drop_duplicates(subset=["company_id", "year"], keep="first").copy()
 
     removed = before - len(ratios)
 
     datasets["financial_ratios"] = ratios
 
-    print(
-        f"financial_ratios: removed "
-        f"{removed} duplicate company-year records"
-    )
+    print(f"financial_ratios: removed " f"{removed} duplicate company-year records")
 
     # ---------------------------------------------------------
     # 6. Remove invalid company IDs from ratios
     # ---------------------------------------------------------
     before = len(ratios)
 
-    ratios = ratios[
-        ratios["company_id"].isin(official_companies)
-    ].copy()
+    ratios = ratios[ratios["company_id"].isin(official_companies)].copy()
 
     removed = before - len(ratios)
 
     datasets["financial_ratios"] = ratios
 
     if removed > 0:
-        print(
-            f"financial_ratios: removed "
-            f"{removed} invalid company records"
-        )
+        print(f"financial_ratios: removed " f"{removed} invalid company records")
 
     return datasets
 
@@ -244,9 +196,7 @@ def reset_database(conn):
     for table_name in reversed(LOAD_ORDER):
 
         try:
-            conn.execute(
-                f"DELETE FROM [{table_name}]"
-            )
+            conn.execute(f"DELETE FROM [{table_name}]")
         except sqlite3.OperationalError:
             pass
 
@@ -256,7 +206,7 @@ def reset_database(conn):
 
 
 def main():
-
+    """Main."""
     print("\n========================================")
     print("NIFTY100 DATABASE LOAD")
     print("========================================\n")
@@ -271,16 +221,12 @@ def main():
     # SQLite foreign keys are connection-specific.
     conn.execute("PRAGMA foreign_keys = ON")
 
-    fk_status = conn.execute(
-        "PRAGMA foreign_keys"
-    ).fetchone()[0]
+    fk_status = conn.execute("PRAGMA foreign_keys").fetchone()[0]
 
     print("Foreign keys:", fk_status)
 
     if fk_status != 1:
-        raise RuntimeError(
-            "SQLite foreign keys could not be enabled."
-        )
+        raise RuntimeError("SQLite foreign keys could not be enabled.")
 
     # ---------------------------------------------------------
     # Clear previous data
@@ -302,10 +248,7 @@ def main():
         status = "OK"
         message = ""
 
-        print(
-            f"Loading {table_name:<20} "
-            f"rows={source_rows}"
-        )
+        print(f"Loading {table_name:<20} " f"rows={source_rows}")
 
         try:
 
@@ -318,7 +261,7 @@ def main():
 
             loaded_rows = len(df)
 
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
 
             conn.rollback()
 
@@ -326,9 +269,7 @@ def main():
             status = "FAILED"
             message = str(exc)
 
-            print(
-                f"  ERROR: {message}"
-            )
+            print(f"  ERROR: {message}")
 
         audit.append(
             {
@@ -344,9 +285,7 @@ def main():
     # ---------------------------------------------------------
     # Foreign key validation
     # ---------------------------------------------------------
-    fk_errors = list(
-        conn.execute("PRAGMA foreign_key_check")
-    )
+    fk_errors = list(conn.execute("PRAGMA foreign_key_check"))
 
     print("\n========================================")
     print("FOREIGN KEY CHECK")
@@ -366,22 +305,15 @@ def main():
     # ---------------------------------------------------------
     audit_path = OUTPUT_DIR / "load_audit.csv"
 
-    pd.DataFrame(audit).to_csv(
-        audit_path,
-        index=False
-    )
+    pd.DataFrame(audit).to_csv(audit_path, index=False)
 
     print("\n========================================")
     print("LOAD AUDIT")
     print("========================================")
 
-    print(
-        pd.DataFrame(audit).to_string(index=False)
-    )
+    print(pd.DataFrame(audit).to_string(index=False))
 
-    print(
-        f"\nAudit saved to: {audit_path}"
-    )
+    print(f"\nAudit saved to: {audit_path}")
 
     conn.commit()
     conn.close()
@@ -389,3 +321,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

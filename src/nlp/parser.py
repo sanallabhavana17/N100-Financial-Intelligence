@@ -1,9 +1,8 @@
-from pathlib import Path
 import re
 import sqlite3
+from pathlib import Path
 
 import pandas as pd
-
 
 # ============================================================
 # PATHS
@@ -38,14 +37,13 @@ TARGET_FIELDS = [
 #
 # The parser deliberately does NOT parse TTM or Last Year
 # because the Sprint 5 target is period-based CAGR text.
-PATTERN = re.compile(
-    r"(\d+)\s*Years?:?\s*(-?\d+(?:\.\d+)?)\s*%"
-)
+PATTERN = re.compile(r"(\d+)\s*Years?:?\s*(-?\d+(?:\.\d+)?)\s*%")
 
 
 # ============================================================
 # DATABASE
 # ============================================================
+
 
 def load_analysis() -> pd.DataFrame:
     """Load analysis records from SQLite."""
@@ -73,6 +71,7 @@ def load_analysis() -> pd.DataFrame:
 # ============================================================
 # PARSER
 # ============================================================
+
 
 def parse_value(text):
     """
@@ -107,6 +106,7 @@ def parse_value(text):
 # ============================================================
 # BUILD PARSED OUTPUT
 # ============================================================
+
 
 def build_parsed_output(df: pd.DataFrame):
     """Parse all target analysis fields."""
@@ -186,6 +186,7 @@ def build_parsed_output(df: pd.DataFrame):
 # CROSS VALIDATION
 # ============================================================
 
+
 def cross_validate(parsed_df: pd.DataFrame):
     """
     Compare parsed CAGR values against the financial ratio
@@ -234,8 +235,7 @@ def cross_validate(parsed_df: pd.DataFrame):
 
     # Use the latest available ratio record for each company.
     ratios = (
-        ratios
-        .sort_values(["company_id", "year"])
+        ratios.sort_values(["company_id", "year"])
         .groupby("company_id", as_index=False)
         .tail(1)
     )
@@ -270,9 +270,7 @@ def cross_validate(parsed_df: pd.DataFrame):
         if ratio_column is None:
             continue
 
-        company_ratios = ratios[
-            ratios["company_id"] == company_id
-        ]
+        company_ratios = ratios[ratios["company_id"] == company_id]
 
         if company_ratios.empty:
             continue
@@ -305,8 +303,9 @@ def cross_validate(parsed_df: pd.DataFrame):
 # MAIN
 # ============================================================
 
-def main():
 
+def main():
+    """Main."""
     print()
     print("N100 NLP ANALYSIS PARSER")
     print("=" * 60)
@@ -345,9 +344,7 @@ def main():
 
     comparison_df = cross_validate(parsed_df)
 
-    review_df = comparison_df[
-        comparison_df["review_flag"] == True
-    ].copy()
+    review_df = comparison_df[comparison_df["review_flag"] == True].copy()
 
     review_path = OUTPUT_DIR / "parse_divergence_review.csv"
 
@@ -375,26 +372,13 @@ def main():
     print("Metric distribution:")
 
     if not parsed_df.empty:
-        print(
-            parsed_df[
-                "metric_type"
-            ]
-            .value_counts()
-            .to_string()
-        )
+        print(parsed_df["metric_type"].value_counts().to_string())
 
     print()
     print("Period distribution:")
 
     if not parsed_df.empty:
-        print(
-            parsed_df[
-                "period_years"
-            ]
-            .value_counts()
-            .sort_index()
-            .to_string()
-        )
+        print(parsed_df["period_years"].value_counts().sort_index().to_string())
 
 
 if __name__ == "__main__":

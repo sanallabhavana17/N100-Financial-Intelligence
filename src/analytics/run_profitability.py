@@ -1,14 +1,13 @@
 import pandas as pd
 
 from src.analytics.ratios import (
+    check_opm_difference,
     net_profit_margin,
     operating_profit_margin,
-    check_opm_difference,
-    return_on_equity,
-    return_on_capital_employed,
     return_on_assets,
+    return_on_capital_employed,
+    return_on_equity,
 )
-
 
 # ==========================================================
 # CONFIGURATION
@@ -27,16 +26,12 @@ OPM_ANOMALIES_FILE = "output/opm_anomalies.csv"
 # HELPER FUNCTIONS
 # ==========================================================
 
+
 def normalize_company_id(series):
     """
     Normalize company identifiers.
     """
-    return (
-        series
-        .astype(str)
-        .str.strip()
-        .str.upper()
-    )
+    return series.astype(str).str.strip().str.upper()
 
 
 def normalize_year(value):
@@ -94,28 +89,15 @@ print("Balance Sheet rows loaded:", len(balance))
 # 2. LOAD COMPANIES
 # ==========================================================
 
-companies = pd.read_excel(
-    COMPANIES_FILE,
-    header=1
-)
+companies = pd.read_excel(COMPANIES_FILE, header=1)
 
-companies.columns = [
-    str(col).strip().lower()
-    for col in companies.columns
-]
+companies.columns = [str(col).strip().lower() for col in companies.columns]
 
-companies["id"] = normalize_company_id(
-    companies["id"]
-)
+companies["id"] = normalize_company_id(companies["id"])
 
-valid_companies = set(
-    companies["id"].dropna()
-)
+valid_companies = set(companies["id"].dropna())
 
-print(
-    "Official N100 companies:",
-    len(valid_companies)
-)
+print("Official N100 companies:", len(valid_companies))
 
 
 # ==========================================================
@@ -137,21 +119,11 @@ sectors = pd.read_excel(
     ],
 )
 
-sectors["company_id"] = normalize_company_id(
-    sectors["company_id"]
-)
+sectors["company_id"] = normalize_company_id(sectors["company_id"])
 
-sectors["broad_sector"] = (
-    sectors["broad_sector"]
-    .astype(str)
-    .str.strip()
-)
+sectors["broad_sector"] = sectors["broad_sector"].astype(str).str.strip()
 
-sectors["sector"] = (
-    sectors["sector"]
-    .astype(str)
-    .str.strip()
-)
+sectors["sector"] = sectors["sector"].astype(str).str.strip()
 
 
 # Keep only required sector columns.
@@ -167,43 +139,25 @@ sectors = sectors[
 
 # Remove duplicate company sector mappings.
 
-sectors = sectors.drop_duplicates(
-    subset=["company_id"],
-    keep="first"
-)
+sectors = sectors.drop_duplicates(subset=["company_id"], keep="first")
 
 
-print(
-    "Unique sector companies:",
-    sectors["company_id"].nunique()
-)
+print("Unique sector companies:", sectors["company_id"].nunique())
 
 
 # ==========================================================
 # 4. NORMALIZE P&L
 # ==========================================================
 
-pnl.columns = [
-    str(col).strip().lower()
-    for col in pnl.columns
-]
+pnl.columns = [str(col).strip().lower() for col in pnl.columns]
 
-pnl["company_id"] = normalize_company_id(
-    pnl["company_id"]
-)
+pnl["company_id"] = normalize_company_id(pnl["company_id"])
 
-pnl["year"] = pnl["year"].apply(
-    normalize_year
-)
+pnl["year"] = pnl["year"].apply(normalize_year)
 
-pnl["year"] = pd.to_numeric(
-    pnl["year"],
-    errors="coerce"
-)
+pnl["year"] = pd.to_numeric(pnl["year"], errors="coerce")
 
-pnl = pnl.dropna(
-    subset=["company_id", "year"]
-).copy()
+pnl = pnl.dropna(subset=["company_id", "year"]).copy()
 
 pnl["year"] = pnl["year"].astype(int)
 
@@ -212,27 +166,15 @@ pnl["year"] = pnl["year"].astype(int)
 # 5. NORMALIZE BALANCE SHEET
 # ==========================================================
 
-balance.columns = [
-    str(col).strip().lower()
-    for col in balance.columns
-]
+balance.columns = [str(col).strip().lower() for col in balance.columns]
 
-balance["company_id"] = normalize_company_id(
-    balance["company_id"]
-)
+balance["company_id"] = normalize_company_id(balance["company_id"])
 
-balance["year"] = balance["year"].apply(
-    normalize_year
-)
+balance["year"] = balance["year"].apply(normalize_year)
 
-balance["year"] = pd.to_numeric(
-    balance["year"],
-    errors="coerce"
-)
+balance["year"] = pd.to_numeric(balance["year"], errors="coerce")
 
-balance = balance.dropna(
-    subset=["company_id", "year"]
-).copy()
+balance = balance.dropna(subset=["company_id", "year"]).copy()
 
 balance["year"] = balance["year"].astype(int)
 
@@ -241,75 +183,42 @@ balance["year"] = balance["year"].astype(int)
 # 6. KEEP ONLY OFFICIAL N100 COMPANIES
 # ==========================================================
 
-pnl = pnl[
-    pnl["company_id"].isin(valid_companies)
-].copy()
+pnl = pnl[pnl["company_id"].isin(valid_companies)].copy()
 
-balance = balance[
-    balance["company_id"].isin(valid_companies)
-].copy()
+balance = balance[balance["company_id"].isin(valid_companies)].copy()
 
 
 print("\nAfter official-company filtering:")
 
-print(
-    "P&L rows:",
-    len(pnl)
-)
+print("P&L rows:", len(pnl))
 
-print(
-    "Balance Sheet rows:",
-    len(balance)
-)
+print("Balance Sheet rows:", len(balance))
 
-print(
-    "P&L companies:",
-    pnl["company_id"].nunique()
-)
+print("P&L companies:", pnl["company_id"].nunique())
 
-print(
-    "Balance Sheet companies:",
-    balance["company_id"].nunique()
-)
+print("Balance Sheet companies:", balance["company_id"].nunique())
 
 
 # ==========================================================
 # 7. VERIFY P&L UNIQUENESS
 # ==========================================================
 
-pnl_duplicates = pnl.duplicated(
-    subset=["company_id", "year"]
-).sum()
+pnl_duplicates = pnl.duplicated(subset=["company_id", "year"]).sum()
 
-print(
-    "\nP&L company-year duplicates:",
-    pnl_duplicates
-)
+print("\nP&L company-year duplicates:", pnl_duplicates)
 
 if pnl_duplicates > 0:
 
-    print(
-        "WARNING: duplicate P&L company-year records found."
-    )
+    print("WARNING: duplicate P&L company-year records found.")
 
     duplicate_pnl = pnl[
-        pnl.duplicated(
-            subset=["company_id", "year"],
-            keep=False
-        )
-    ].sort_values(
-        ["company_id", "year"]
-    )
+        pnl.duplicated(subset=["company_id", "year"], keep=False)
+    ].sort_values(["company_id", "year"])
 
-    print(
-        duplicate_pnl[
-            ["company_id", "year"]
-        ].head(30).to_string(index=False)
-    )
+    print(duplicate_pnl[["company_id", "year"]].head(30).to_string(index=False))
 
     raise ValueError(
-        "P&L cleaned data must contain unique "
-        "(company_id, year) records."
+        "P&L cleaned data must contain unique " "(company_id, year) records."
     )
 
 
@@ -317,40 +226,22 @@ if pnl_duplicates > 0:
 # 8. VERIFY BALANCE SHEET UNIQUENESS
 # ==========================================================
 
-balance_duplicates = balance.duplicated(
-    subset=["company_id", "year"]
-).sum()
+balance_duplicates = balance.duplicated(subset=["company_id", "year"]).sum()
 
-print(
-    "Balance Sheet company-year duplicates:",
-    balance_duplicates
-)
+print("Balance Sheet company-year duplicates:", balance_duplicates)
 
 if balance_duplicates > 0:
 
-    print(
-        "WARNING: duplicate Balance Sheet company-year "
-        "records found."
-    )
+    print("WARNING: duplicate Balance Sheet company-year " "records found.")
 
     duplicate_balance = balance[
-        balance.duplicated(
-            subset=["company_id", "year"],
-            keep=False
-        )
-    ].sort_values(
-        ["company_id", "year"]
-    )
+        balance.duplicated(subset=["company_id", "year"], keep=False)
+    ].sort_values(["company_id", "year"])
 
-    print(
-        duplicate_balance[
-            ["company_id", "year"]
-        ].head(30).to_string(index=False)
-    )
+    print(duplicate_balance[["company_id", "year"]].head(30).to_string(index=False))
 
     raise ValueError(
-        "Balance Sheet cleaned data must contain unique "
-        "(company_id, year) records."
+        "Balance Sheet cleaned data must contain unique " "(company_id, year) records."
     )
 
 
@@ -401,35 +292,23 @@ df = pd.merge(
 )
 
 
-print(
-    "\nRows after P&L + Balance Sheet merge:",
-    len(df)
-)
+print("\nRows after P&L + Balance Sheet merge:", len(df))
 
-print(
-    "Companies after merge:",
-    df["company_id"].nunique()
-)
+print("Companies after merge:", df["company_id"].nunique())
 
 
 # ==========================================================
 # 12. VERIFY MERGED UNIQUENESS
 # ==========================================================
 
-merged_duplicates = df.duplicated(
-    subset=["company_id", "year"]
-).sum()
+merged_duplicates = df.duplicated(subset=["company_id", "year"]).sum()
 
-print(
-    "Merged company-year duplicates:",
-    merged_duplicates
-)
+print("Merged company-year duplicates:", merged_duplicates)
 
 if merged_duplicates > 0:
 
     raise ValueError(
-        "Duplicate company-year records detected "
-        "after P&L + Balance Sheet merge."
+        "Duplicate company-year records detected " "after P&L + Balance Sheet merge."
     )
 
 
@@ -445,45 +324,24 @@ df = df.merge(
 )
 
 
-print(
-    "Rows after sector merge:",
-    len(df)
-)
+print("Rows after sector merge:", len(df))
 
-print(
-    "Companies with sector information:",
-    df["broad_sector"].notna().sum()
-)
+print("Companies with sector information:", df["broad_sector"].notna().sum())
 
-print(
-    "Companies without sector information:",
-    df["broad_sector"].isna().sum()
-)
+print("Companies without sector information:", df["broad_sector"].isna().sum())
 
 
 # ==========================================================
 # 14. FINANCIALS SECTOR IDENTIFICATION
 # ==========================================================
 
-df["is_financials_sector"] = (
-    df["broad_sector"]
-    .str.strip()
-    .str.lower()
-    .eq("financials")
-)
+df["is_financials_sector"] = df["broad_sector"].str.strip().str.lower().eq("financials")
 
+
+print("Financials company-year rows:", df["is_financials_sector"].sum())
 
 print(
-    "Financials company-year rows:",
-    df["is_financials_sector"].sum()
-)
-
-print(
-    "Financials companies:",
-    df.loc[
-        df["is_financials_sector"],
-        "company_id"
-    ].nunique()
+    "Financials companies:", df.loc[df["is_financials_sector"], "company_id"].nunique()
 )
 
 
@@ -568,19 +426,14 @@ df["opm_mismatch"] = df.apply(
 )
 
 
-df["opm_difference"] = (
-    df["operating_profit_margin_pct"]
-    - df["opm_percentage"]
-).abs()
+df["opm_difference"] = (df["operating_profit_margin_pct"] - df["opm_percentage"]).abs()
 
 
 # ==========================================================
 # 21. SAVE OPM ANOMALIES
 # ==========================================================
 
-opm_anomalies = df[
-    df["opm_difference"] > 1
-].copy()
+opm_anomalies = df[df["opm_difference"] > 1].copy()
 
 
 opm_anomalies[
@@ -597,10 +450,7 @@ opm_anomalies[
 )
 
 
-print(
-    "\nOPM anomalies (>1 percentage point):",
-    len(opm_anomalies)
-)
+print("\nOPM anomalies (>1 percentage point):", len(opm_anomalies))
 
 
 # ==========================================================
@@ -612,30 +462,16 @@ print("PROFITABILITY RATIO VALIDATION")
 print("========================================")
 
 
-print(
-    "Total companies:",
-    df["company_id"].nunique()
-)
+print("Total companies:", df["company_id"].nunique())
 
 
-print(
-    "Total company-year rows:",
-    len(df)
-)
+print("Total company-year rows:", len(df))
 
 
-print(
-    "Company-year duplicates:",
-    df.duplicated(
-        subset=["company_id", "year"]
-    ).sum()
-)
+print("Company-year duplicates:", df.duplicated(subset=["company_id", "year"]).sum())
 
 
-print(
-    "Expected official companies:",
-    len(valid_companies)
-)
+print("Expected official companies:", len(valid_companies))
 
 
 # ==========================================================
@@ -647,24 +483,17 @@ final_duplicates = df[
         subset=["company_id", "year"],
         keep=False,
     )
-].sort_values(
-    ["company_id", "year"]
-)
+].sort_values(["company_id", "year"])
 
 
 if len(final_duplicates) > 0:
 
     print("\nDuplicate company-year records:")
 
-    print(
-        final_duplicates[
-            ["company_id", "year"]
-        ].to_string(index=False)
-    )
+    print(final_duplicates[["company_id", "year"]].to_string(index=False))
 
     raise ValueError(
-        "Final profitability output contains "
-        "duplicate company-year records."
+        "Final profitability output contains " "duplicate company-year records."
     )
 
 
@@ -672,41 +501,23 @@ if len(final_duplicates) > 0:
 # 24. CHECK MISSING OFFICIAL COMPANIES
 # ==========================================================
 
-output_companies = set(
-    df["company_id"].unique()
-)
+output_companies = set(df["company_id"].unique())
 
-missing_companies = sorted(
-    valid_companies - output_companies
-)
+missing_companies = sorted(valid_companies - output_companies)
 
 
-print(
-    "\nMissing official companies:",
-    missing_companies
-)
+print("\nMissing official companies:", missing_companies)
 
-print(
-    "Missing company count:",
-    len(missing_companies)
-)
+print("Missing company count:", len(missing_companies))
 
 
 # ==========================================================
 # 25. OPM VALIDATION
 # ==========================================================
 
-print(
-    "\nOPM mismatches:",
-    df["opm_mismatch"].sum()
-)
+print("\nOPM mismatches:", df["opm_mismatch"].sum())
 
-print(
-    "OPM differences > 1:",
-    (
-        df["opm_difference"] > 1
-    ).sum()
-)
+print("OPM differences > 1:", (df["opm_difference"] > 1).sum())
 
 
 # ==========================================================

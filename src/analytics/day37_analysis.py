@@ -4,14 +4,13 @@ Sprint 6 - Day 37
 Cluster Profiles, KPI Correlation, Sector Outliers and Portfolio Statistics
 """
 
-from pathlib import Path
 import sqlite3
 import warnings
+from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-
 
 # ---------------------------------------------------------------------
 # Paths
@@ -211,11 +210,7 @@ def load_latest_financials() -> pd.DataFrame:
 
     ratios = ratios.sort_values(["company_id", "year"])
 
-    latest = (
-        ratios.groupby("company_id", as_index=False)
-        .tail(1)
-        .copy()
-    )
+    latest = ratios.groupby("company_id", as_index=False).tail(1).copy()
 
     latest = latest.reset_index(drop=True)
 
@@ -253,9 +248,8 @@ def load_company_sector_data() -> pd.DataFrame:
     df = read_sql(query)
 
     if df["company_id"].duplicated().any():
-        df = (
-            df.sort_values(["company_id", "index_weight_pct"])
-            .drop_duplicates("company_id", keep="last")
+        df = df.sort_values(["company_id", "index_weight_pct"]).drop_duplicates(
+            "company_id", keep="last"
         )
 
     return df.reset_index(drop=True)
@@ -272,8 +266,7 @@ def create_cluster_profiles() -> pd.DataFrame:
 
     if not cluster_path.exists():
         raise FileNotFoundError(
-            f"Cluster labels not found: {cluster_path}. "
-            "Run Day 36 clustering first."
+            f"Cluster labels not found: {cluster_path}. " "Run Day 36 clustering first."
         )
 
     clusters = pd.read_csv(cluster_path)
@@ -311,7 +304,7 @@ def create_cluster_profiles() -> pd.DataFrame:
         row = {
             "cluster_id": int(cluster_id),
             "cluster_name": cluster_name,
-            "company_count": int(len(group)),
+            "company_count": len(group),
         }
 
         for feature in feature_columns:
@@ -350,25 +343,15 @@ def create_kpi_correlation() -> pd.DataFrame:
     """Calculate the Pearson correlation matrix for ten KPIs."""
     latest = load_latest_financials()
 
-    available = [
-        column
-        for column in KPI_COLUMNS
-        if column in latest.columns
-    ]
+    available = [column for column in KPI_COLUMNS if column in latest.columns]
 
     kpi_df = latest[available].copy()
 
     correlation = kpi_df.corr(method="pearson")
 
-    correlation.index = [
-        KPI_COLUMNS[column]
-        for column in correlation.index
-    ]
+    correlation.index = [KPI_COLUMNS[column] for column in correlation.index]
 
-    correlation.columns = [
-        KPI_COLUMNS[column]
-        for column in correlation.columns
-    ]
+    correlation.columns = [KPI_COLUMNS[column] for column in correlation.columns]
 
     return correlation
 
@@ -377,9 +360,7 @@ def create_correlation_heatmap(correlation: pd.DataFrame) -> Path:
     """Create and save the 10-KPI Pearson correlation heatmap."""
     output_path = REPORT_DIR / "kpi_correlation_heatmap.png"
 
-    fig, ax = plt.subplots(
-        figsize=(12, 10)
-    )
+    fig, ax = plt.subplots(figsize=(12, 10))
 
     image = ax.imshow(
         correlation.values,
@@ -509,22 +490,14 @@ def calculate_sector_outliers() -> pd.DataFrame:
             if pd.isna(std) or std == 0:
                 continue
 
-            sector_group[f"{column}_z"] = (
-                (sector_group[column] - mean) / std
-            )
+            sector_group[f"{column}_z"] = (sector_group[column] - mean) / std
 
-            for _, row in sector_group.dropna(
-                subset=[f"{column}_z"]
-            ).iterrows():
+            for _, row in sector_group.dropna(subset=[f"{column}_z"]).iterrows():
 
                 z_score = row[f"{column}_z"]
 
                 if abs(z_score) >= 2.0:
-                    direction = (
-                        "High"
-                        if z_score > 0
-                        else "Low"
-                    )
+                    direction = "High" if z_score > 0 else "Low"
 
                     results.append(
                         {
@@ -563,11 +536,7 @@ def calculate_sector_outliers() -> pd.DataFrame:
     else:
         result = result.sort_values(
             ["broad_sector", "kpi", "z_score"],
-            key=lambda s: (
-                s.abs()
-                if s.name == "z_score"
-                else s
-            ),
+            key=lambda s: (s.abs() if s.name == "z_score" else s),
         ).reset_index(drop=True)
 
     return result
@@ -652,11 +621,7 @@ def create_portfolio_statistics() -> pd.DataFrame:
             ]
         )
 
-    sector_counts = (
-        df["broad_sector"]
-        .value_counts()
-        .sort_index()
-    )
+    sector_counts = df["broad_sector"].value_counts().sort_index()
 
     for sector, count in sector_counts.items():
         statistics.append(
@@ -669,10 +634,7 @@ def create_portfolio_statistics() -> pd.DataFrame:
         )
 
     market_cap_counts = (
-        df["market_cap_category"]
-        .fillna("Unknown")
-        .value_counts()
-        .sort_index()
+        df["market_cap_category"].fillna("Unknown").value_counts().sort_index()
     )
 
     for category, count in market_cap_counts.items():
@@ -705,18 +667,17 @@ def validate_outputs(
     print("=" * 70)
 
     # Cluster profiles
-    assert len(profiles) == 5, (
-        f"Expected 5 cluster profiles, found {len(profiles)}"
-    )
+    assert len(profiles) == 5, f"Expected 5 cluster profiles, found {len(profiles)}"
 
     assert profiles["cluster_id"].nunique() == 5
 
     print(f"Cluster profiles : {len(profiles)}")
 
     # Correlation
-    assert correlation.shape == (10, 10), (
-        f"Expected 10x10 correlation matrix, found {correlation.shape}"
-    )
+    assert correlation.shape == (
+        10,
+        10,
+    ), f"Expected 10x10 correlation matrix, found {correlation.shape}"
 
     assert np.allclose(
         correlation.values,
@@ -751,12 +712,7 @@ def validate_outputs(
     if outliers.empty:
         print("No |Z| >= 2.0 sector outliers detected.")
     else:
-        print(
-            outliers["broad_sector"]
-            .value_counts()
-            .sort_index()
-            .to_string()
-        )
+        print(outliers["broad_sector"].value_counts().sort_index().to_string())
 
     print()
     print("Day 37 validation completed successfully.")
@@ -782,9 +738,7 @@ def main() -> None:
     print(f"Database: {DB_PATH}")
 
     if not DB_PATH.exists():
-        raise FileNotFoundError(
-            f"Database not found: {DB_PATH}"
-        )
+        raise FileNotFoundError(f"Database not found: {DB_PATH}")
 
     # ---------------------------------------------------------------
     # Cluster profiles
@@ -802,9 +756,7 @@ def main() -> None:
         float_format="%.6f",
     )
 
-    print(
-        f"   Saved: {profiles_path}"
-    )
+    print(f"   Saved: {profiles_path}")
 
     # ---------------------------------------------------------------
     # KPI correlation
@@ -823,16 +775,10 @@ def main() -> None:
         float_format="%.6f",
     )
 
-    heatmap_path = create_correlation_heatmap(
-        correlation
-    )
+    heatmap_path = create_correlation_heatmap(correlation)
 
-    print(
-        f"   Saved: {correlation_path}"
-    )
-    print(
-        f"   Saved: {heatmap_path}"
-    )
+    print(f"   Saved: {correlation_path}")
+    print(f"   Saved: {heatmap_path}")
 
     # ---------------------------------------------------------------
     # Sector outliers
@@ -851,9 +797,7 @@ def main() -> None:
         float_format="%.6f",
     )
 
-    print(
-        f"   Saved: {outliers_path}"
-    )
+    print(f"   Saved: {outliers_path}")
 
     # ---------------------------------------------------------------
     # Portfolio statistics
@@ -872,9 +816,7 @@ def main() -> None:
         float_format="%.6f",
     )
 
-    print(
-        f"   Saved: {portfolio_path}"
-    )
+    print(f"   Saved: {portfolio_path}")
 
     # ---------------------------------------------------------------
     # Validation

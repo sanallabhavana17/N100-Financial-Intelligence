@@ -1,10 +1,9 @@
+import sqlite3
 from pathlib import Path
 
-import sqlite3
 import pandas as pd
 
 from src.etl.loader import load_all_files
-
 
 # ==========================================================
 # PATHS
@@ -68,14 +67,12 @@ ANALYTICS_FILES = {
 FINANCIAL_RATIOS_COLUMNS = [
     "company_id",
     "year",
-
     # Profitability
     "net_profit_margin_pct",
     "operating_profit_margin_pct",
     "return_on_equity_pct",
     "return_on_capital_employed_pct",
     "return_on_assets_pct",
-
     # Leverage & Efficiency
     "debt_to_equity",
     "high_leverage_flag",
@@ -84,7 +81,6 @@ FINANCIAL_RATIOS_COLUMNS = [
     "icr_warning_flag",
     "net_debt_cr",
     "asset_turnover",
-
     # Cash Flow
     "free_cash_flow_cr",
     "capex_cr",
@@ -95,13 +91,11 @@ FINANCIAL_RATIOS_COLUMNS = [
     "capex_intensity_label",
     "fcf_conversion_pct",
     "capital_allocation_pattern",
-
     # Per-share / shareholder metrics
     "earnings_per_share",
     "book_value_per_share",
     "dividend_payout_ratio_pct",
     "total_debt_cr",
-
     # Revenue CAGR
     "revenue_cagr_3yr",
     "revenue_cagr_3yr_flag",
@@ -109,7 +103,6 @@ FINANCIAL_RATIOS_COLUMNS = [
     "revenue_cagr_5yr_flag",
     "revenue_cagr_10yr",
     "revenue_cagr_10yr_flag",
-
     # PAT CAGR
     "pat_cagr_3yr",
     "pat_cagr_3yr_flag",
@@ -117,7 +110,6 @@ FINANCIAL_RATIOS_COLUMNS = [
     "pat_cagr_5yr_flag",
     "pat_cagr_10yr",
     "pat_cagr_10yr_flag",
-
     # EPS CAGR
     "eps_cagr_3yr",
     "eps_cagr_3yr_flag",
@@ -125,7 +117,6 @@ FINANCIAL_RATIOS_COLUMNS = [
     "eps_cagr_5yr_flag",
     "eps_cagr_10yr",
     "eps_cagr_10yr_flag",
-
     # Quality
     "composite_quality_score",
 ]
@@ -156,6 +147,7 @@ LOAD_ORDER = [
 # BASIC DATAFRAME CLEANING
 # ==========================================================
 
+
 def clean_dataframe(df):
     """
     Apply common database-loading normalization.
@@ -164,38 +156,19 @@ def clean_dataframe(df):
     df = df.copy()
 
     # Normalize column names
-    df.columns = [
-        str(col).strip().lower()
-        for col in df.columns
-    ]
+    df.columns = [str(col).strip().lower() for col in df.columns]
 
     # Normalize company IDs
     if "company_id" in df.columns:
-        df["company_id"] = (
-            df["company_id"]
-            .astype(str)
-            .str.strip()
-            .str.upper()
-        )
+        df["company_id"] = df["company_id"].astype(str).str.strip().str.upper()
 
     # companies.id is the primary key
-    if (
-        "id" in df.columns
-        and "company_id" not in df.columns
-    ):
-        df["id"] = (
-            df["id"]
-            .astype(str)
-            .str.strip()
-            .str.upper()
-        )
+    if "id" in df.columns and "company_id" not in df.columns:
+        df["id"] = df["id"].astype(str).str.strip().str.upper()
 
     # Normalize year
     if "year" in df.columns:
-        df["year"] = pd.to_numeric(
-            df["year"],
-            errors="coerce"
-        )
+        df["year"] = pd.to_numeric(df["year"], errors="coerce")
 
     return df
 
@@ -203,6 +176,7 @@ def clean_dataframe(df):
 # ==========================================================
 # NORMALIZE COMPANY-YEAR KEY
 # ==========================================================
+
 
 def normalize_company_year(df):
     """
@@ -213,12 +187,7 @@ def normalize_company_year(df):
     df = df.copy()
 
     if "company_id" in df.columns:
-        df["company_id"] = (
-            df["company_id"]
-            .astype(str)
-            .str.strip()
-            .str.upper()
-        )
+        df["company_id"] = df["company_id"].astype(str).str.strip().str.upper()
 
     if "year" in df.columns:
 
@@ -227,16 +196,9 @@ def normalize_company_year(df):
         # 2014.0
         # Mar 2014
         # Dec 2012
-        df["year"] = (
-            df["year"]
-            .astype(str)
-            .str.extract(r"(\d{4})")[0]
-        )
+        df["year"] = df["year"].astype(str).str.extract(r"(\d{4})")[0]
 
-        df["year"] = pd.to_numeric(
-            df["year"],
-            errors="coerce"
-        )
+        df["year"] = pd.to_numeric(df["year"], errors="coerce")
 
     return df
 
@@ -244,6 +206,7 @@ def normalize_company_year(df):
 # ==========================================================
 # PREPARE ANALYTICS DATASET
 # ==========================================================
+
 
 def prepare_analytics_file(
     path,
@@ -257,9 +220,7 @@ def prepare_analytics_file(
     """
 
     if not path.exists():
-        raise FileNotFoundError(
-            f"Missing analytics file: {path}"
-        )
+        raise FileNotFoundError(f"Missing analytics file: {path}")
 
     df = pd.read_csv(path)
 
@@ -270,27 +231,16 @@ def prepare_analytics_file(
         "year",
     ]
 
-    missing_keys = [
-        col
-        for col in required_key_columns
-        if col not in df.columns
-    ]
+    missing_keys = [col for col in required_key_columns if col not in df.columns]
 
     if missing_keys:
         raise ValueError(
-            f"{dataset_name} is missing required "
-            f"columns: {missing_keys}"
+            f"{dataset_name} is missing required " f"columns: {missing_keys}"
         )
 
-    available_columns = [
-        col
-        for col in required_columns
-        if col in df.columns
-    ]
+    available_columns = [col for col in required_columns if col in df.columns]
 
-    df = df[
-        available_columns
-    ].copy()
+    df = df[available_columns].copy()
 
     df = df.dropna(
         subset=[
@@ -307,7 +257,7 @@ def prepare_analytics_file(
             "company_id",
             "year",
         ],
-        keep="first"
+        keep="first",
     ).copy()
 
     return df
@@ -316,6 +266,7 @@ def prepare_analytics_file(
 # ==========================================================
 # BUILD FINAL FINANCIAL RATIOS
 # ==========================================================
+
 
 def build_final_financial_ratios(datasets):
     """
@@ -337,9 +288,7 @@ def build_final_financial_ratios(datasets):
         46 data columns + SQLite id primary key.
     """
 
-    print(
-        "\nBuilding final financial_ratios table..."
-    )
+    print("\nBuilding final financial_ratios table...")
 
     # ------------------------------------------------------
     # 1. OFFICIAL COMPANIES
@@ -348,22 +297,14 @@ def build_final_financial_ratios(datasets):
     companies = datasets["companies"].copy()
 
     official_companies = set(
-        companies["id"]
-        .dropna()
-        .astype(str)
-        .str.strip()
-        .str.upper()
+        companies["id"].dropna().astype(str).str.strip().str.upper()
     )
 
-    print(
-        "Official companies:",
-        len(official_companies)
-    )
+    print("Official companies:", len(official_companies))
 
     if len(official_companies) != 92:
         raise ValueError(
-            "Expected 92 official companies, "
-            f"found {len(official_companies)}."
+            "Expected 92 official companies, " f"found {len(official_companies)}."
         )
 
     # ------------------------------------------------------
@@ -386,22 +327,15 @@ def build_final_financial_ratios(datasets):
 
     profitability = profitability.rename(
         columns={
-            "roe_pct":
-                "return_on_equity_pct",
-
-            "roce_pct":
-                "return_on_capital_employed_pct",
-
-            "roa_pct":
-                "return_on_assets_pct",
+            "roe_pct": "return_on_equity_pct",
+            "roce_pct": "return_on_capital_employed_pct",
+            "roa_pct": "return_on_assets_pct",
         }
     )
 
     # Keep official companies only
     profitability = profitability[
-        profitability["company_id"].isin(
-            official_companies
-        )
+        profitability["company_id"].isin(official_companies)
     ].copy()
 
     # ------------------------------------------------------
@@ -424,11 +358,7 @@ def build_final_financial_ratios(datasets):
         "leverage_efficiency_ratios.csv",
     )
 
-    leverage = leverage[
-        leverage["company_id"].isin(
-            official_companies
-        )
-    ].copy()
+    leverage = leverage[leverage["company_id"].isin(official_companies)].copy()
 
     # ------------------------------------------------------
     # 4. CASH-FLOW ANALYTICS
@@ -452,33 +382,22 @@ def build_final_financial_ratios(datasets):
 
     cashflow = cashflow.rename(
         columns={
-            "free_cash_flow":
-                "free_cash_flow_cr",
+            "free_cash_flow": "free_cash_flow_cr",
         }
     )
 
-    cashflow = cashflow[
-        cashflow["company_id"].isin(
-            official_companies
-        )
-    ].copy()
+    cashflow = cashflow[cashflow["company_id"].isin(official_companies)].copy()
 
     # ------------------------------------------------------
     # 5. RAW CASH-FLOW FIELDS
     # ------------------------------------------------------
 
-    raw_cashflow = datasets[
-        "cashflow"
-    ].copy()
+    raw_cashflow = datasets["cashflow"].copy()
 
-    raw_cashflow = normalize_company_year(
-        raw_cashflow
-    )
+    raw_cashflow = normalize_company_year(raw_cashflow)
 
     raw_cashflow = raw_cashflow[
-        raw_cashflow["company_id"].isin(
-            official_companies
-        )
+        raw_cashflow["company_id"].isin(official_companies)
     ].copy()
 
     # We need source fields for:
@@ -498,9 +417,7 @@ def build_final_financial_ratios(datasets):
         if column in raw_cashflow.columns:
             raw_cf_columns.append(column)
 
-    raw_cf = raw_cashflow[
-        raw_cf_columns
-    ].copy()
+    raw_cf = raw_cashflow[raw_cf_columns].copy()
 
     raw_cf = raw_cf.dropna(
         subset=[
@@ -509,9 +426,7 @@ def build_final_financial_ratios(datasets):
         ]
     ).copy()
 
-    raw_cf["year"] = raw_cf[
-        "year"
-    ].astype(int)
+    raw_cf["year"] = raw_cf["year"].astype(int)
 
     # Rename source columns
     rename_map = {}
@@ -520,33 +435,24 @@ def build_final_financial_ratios(datasets):
         rename_map["capex"] = "capex_cr"
 
     if "cfo" in raw_cf.columns:
-        rename_map["cfo"] = (
-            "cash_from_operations_cr"
-        )
+        rename_map["cfo"] = "cash_from_operations_cr"
 
     if "cash_from_operations" in raw_cf.columns:
-        rename_map[
-            "cash_from_operations"
-        ] = "cash_from_operations_cr"
+        rename_map["cash_from_operations"] = "cash_from_operations_cr"
 
-    raw_cf = raw_cf.rename(
-        columns=rename_map
-    )
+    raw_cf = raw_cf.rename(columns=rename_map)
 
     # If both cfo and cash_from_operations existed,
     # remove duplicate target column names safely.
     if raw_cf.columns.duplicated().any():
-        raw_cf = raw_cf.loc[
-            :,
-            ~raw_cf.columns.duplicated()
-        ]
+        raw_cf = raw_cf.loc[:, ~raw_cf.columns.duplicated()]
 
     raw_cf = raw_cf.drop_duplicates(
         subset=[
             "company_id",
             "year",
         ],
-        keep="first"
+        keep="first",
     )
 
     # Merge raw cash-flow values into cashflow analytics
@@ -568,21 +474,18 @@ def build_final_financial_ratios(datasets):
         [
             "company_id",
             "year",
-
             "revenue_cagr_3yr",
             "revenue_cagr_3yr_flag",
             "revenue_cagr_5yr",
             "revenue_cagr_5yr_flag",
             "revenue_cagr_10yr",
             "revenue_cagr_10yr_flag",
-
             "pat_cagr_3yr",
             "pat_cagr_3yr_flag",
             "pat_cagr_5yr",
             "pat_cagr_5yr_flag",
             "pat_cagr_10yr",
             "pat_cagr_10yr_flag",
-
             "eps_cagr_3yr",
             "eps_cagr_3yr_flag",
             "eps_cagr_5yr",
@@ -593,11 +496,7 @@ def build_final_financial_ratios(datasets):
         "cagr_ratios.csv",
     )
 
-    cagr = cagr[
-        cagr["company_id"].isin(
-            official_companies
-        )
-    ].copy()
+    cagr = cagr[cagr["company_id"].isin(official_companies)].copy()
 
     # ------------------------------------------------------
     # 7. RAW FINANCIAL-RATIO SUPPLEMENTARY FIELDS
@@ -614,19 +513,11 @@ def build_final_financial_ratios(datasets):
     # total_debt_cr
     #
 
-    raw_ratios = datasets[
-        "financial_ratios"
-    ].copy()
+    raw_ratios = datasets["financial_ratios"].copy()
 
-    raw_ratios = normalize_company_year(
-        raw_ratios
-    )
+    raw_ratios = normalize_company_year(raw_ratios)
 
-    raw_ratios = raw_ratios[
-        raw_ratios["company_id"].isin(
-            official_companies
-        )
-    ].copy()
+    raw_ratios = raw_ratios[raw_ratios["company_id"].isin(official_companies)].copy()
 
     raw_ratio_columns = [
         "company_id",
@@ -637,15 +528,9 @@ def build_final_financial_ratios(datasets):
         "total_debt_cr",
     ]
 
-    raw_ratio_columns = [
-        col
-        for col in raw_ratio_columns
-        if col in raw_ratios.columns
-    ]
+    raw_ratio_columns = [col for col in raw_ratio_columns if col in raw_ratios.columns]
 
-    raw_ratios = raw_ratios[
-        raw_ratio_columns
-    ].copy()
+    raw_ratios = raw_ratios[raw_ratio_columns].copy()
 
     raw_ratios = raw_ratios.dropna(
         subset=[
@@ -654,9 +539,7 @@ def build_final_financial_ratios(datasets):
         ]
     ).copy()
 
-    raw_ratios["year"] = raw_ratios[
-        "year"
-    ].astype(int)
+    raw_ratios["year"] = raw_ratios["year"].astype(int)
 
     # One raw ratio record per company-year
     raw_ratios = raw_ratios.drop_duplicates(
@@ -664,7 +547,7 @@ def build_final_financial_ratios(datasets):
             "company_id",
             "year",
         ],
-        keep="first"
+        keep="first",
     ).copy()
 
     # ------------------------------------------------------
@@ -702,9 +585,7 @@ def build_final_financial_ratios(datasets):
     )
 
     key_universe = key_universe[
-        key_universe["company_id"].isin(
-            official_companies
-        )
+        key_universe["company_id"].isin(official_companies)
     ].copy()
 
     key_universe = key_universe.dropna(
@@ -714,27 +595,19 @@ def build_final_financial_ratios(datasets):
         ]
     ).copy()
 
-    key_universe["year"] = key_universe[
-        "year"
-    ].astype(int)
+    key_universe["year"] = key_universe["year"].astype(int)
 
     key_universe = key_universe.drop_duplicates(
         subset=[
             "company_id",
             "year",
         ],
-        keep="first"
+        keep="first",
     ).copy()
 
-    print(
-        "Analytics company-year universe:",
-        len(key_universe)
-    )
+    print("Analytics company-year universe:", len(key_universe))
 
-    print(
-        "Analytics companies:",
-        key_universe["company_id"].nunique()
-    )
+    print("Analytics companies:", key_universe["company_id"].nunique())
 
     # ------------------------------------------------------
     # 9. MERGE ALL ANALYTICS
@@ -800,9 +673,7 @@ def build_final_financial_ratios(datasets):
     # 11. KEEP EXACT DATABASE COLUMN ORDER
     # ------------------------------------------------------
 
-    final = final[
-        FINANCIAL_RATIOS_COLUMNS
-    ].copy()
+    final = final[FINANCIAL_RATIOS_COLUMNS].copy()
 
     # ------------------------------------------------------
     # 12. FINAL DUPLICATE CHECK
@@ -827,71 +698,37 @@ def build_final_financial_ratios(datasets):
     # 13. FINAL COMPANY VALIDATION
     # ------------------------------------------------------
 
-    final_companies = set(
-        final["company_id"]
-        .dropna()
-        .astype(str)
-        .str.upper()
-    )
+    final_companies = set(final["company_id"].dropna().astype(str).str.upper())
 
-    missing_companies = sorted(
-        official_companies - final_companies
-    )
+    missing_companies = sorted(official_companies - final_companies)
 
-    extra_companies = sorted(
-        final_companies - official_companies
-    )
+    extra_companies = sorted(final_companies - official_companies)
 
-    company_count = final[
-        "company_id"
-    ].nunique()
+    company_count = final["company_id"].nunique()
 
     # ------------------------------------------------------
     # 14. REPORT
     # ------------------------------------------------------
 
-    print(
-        "\nFinal financial_ratios:"
-    )
+    print("\nFinal financial_ratios:")
 
-    print(
-        "Rows:",
-        len(final)
-    )
+    print("Rows:", len(final))
 
-    print(
-        "Companies:",
-        company_count
-    )
+    print("Companies:", company_count)
 
-    print(
-        "Columns:",
-        len(final.columns)
-    )
+    print("Columns:", len(final.columns))
 
-    print(
-        "Company-year duplicates:",
-        duplicate_count
-    )
+    print("Company-year duplicates:", duplicate_count)
 
     if missing_companies:
-        print(
-            "Missing official companies:",
-            missing_companies
-        )
+        print("Missing official companies:", missing_companies)
 
     if extra_companies:
-        print(
-            "Unexpected companies:",
-            extra_companies
-        )
+        print("Unexpected companies:", extra_companies)
 
     # Duplicate company-year records are never allowed.
     if duplicate_count != 0:
-        raise ValueError(
-            "Final financial_ratios contains "
-            "company-year duplicates."
-        )
+        raise ValueError("Final financial_ratios contains " "company-year duplicates.")
 
     # Every official company should ideally appear.
     if company_count != len(official_companies):
@@ -908,11 +745,10 @@ def build_final_financial_ratios(datasets):
 # LOAD ALL DATA
 # ==========================================================
 
-def load_data():
 
-    print(
-        "\nLoading raw Excel files..."
-    )
+def load_data():
+    """Load data."""
+    print("\nLoading raw Excel files...")
 
     raw_data = load_all_files()
 
@@ -924,15 +760,9 @@ def load_data():
 
     for filename in RAW_FILES:
 
-        table_name = Path(
-            filename
-        ).stem
+        table_name = Path(filename).stem
 
-        datasets[table_name] = (
-            clean_dataframe(
-                raw_data[filename]
-            )
-        )
+        datasets[table_name] = clean_dataframe(raw_data[filename])
 
     # ------------------------------------------------------
     # 2. CLEANED FINANCIAL DATASETS
@@ -943,33 +773,21 @@ def load_data():
         path = PROCESSED_DATA_DIR / filename
 
         if not path.exists():
-            raise FileNotFoundError(
-                f"Required processed file not found: "
-                f"{path}"
-            )
+            raise FileNotFoundError(f"Required processed file not found: " f"{path}")
 
         df = pd.read_csv(path)
 
-        datasets[table_name] = (
-            clean_dataframe(df)
-        )
+        datasets[table_name] = clean_dataframe(df)
 
     # ------------------------------------------------------
     # 3. OFFICIAL COMPANY IDs
     # ------------------------------------------------------
 
     official_companies = set(
-        datasets["companies"]["id"]
-        .dropna()
-        .astype(str)
-        .str.strip()
-        .str.upper()
+        datasets["companies"]["id"].dropna().astype(str).str.strip().str.upper()
     )
 
-    print(
-        f"\nOfficial companies: "
-        f"{len(official_companies)}"
-    )
+    print(f"\nOfficial companies: " f"{len(official_companies)}")
 
     # ------------------------------------------------------
     # 4. FILTER INVALID FOREIGN-KEY RECORDS
@@ -990,40 +808,25 @@ def load_data():
 
         before = len(df)
 
-        df = df[
-            df["company_id"].isin(
-                official_companies
-            )
-        ].copy()
+        df = df[df["company_id"].isin(official_companies)].copy()
 
         removed = before - len(df)
 
         datasets[table_name] = df
 
         if removed > 0:
-            print(
-                f"{table_name}: removed "
-                f"{removed} invalid company records"
-            )
+            print(f"{table_name}: removed " f"{removed} invalid company records")
 
     # ------------------------------------------------------
     # 5. NORMALIZE FINANCIAL RATIOS SOURCE
     # ------------------------------------------------------
 
-    ratios = datasets[
-        "financial_ratios"
-    ].copy()
+    ratios = datasets["financial_ratios"].copy()
 
-    ratios = normalize_company_year(
-        ratios
-    )
+    ratios = normalize_company_year(ratios)
 
     # Keep only official companies
-    ratios = ratios[
-        ratios["company_id"].isin(
-            official_companies
-        )
-    ].copy()
+    ratios = ratios[ratios["company_id"].isin(official_companies)].copy()
 
     # Remove invalid years
     ratios = ratios.dropna(
@@ -1033,9 +836,7 @@ def load_data():
         ]
     ).copy()
 
-    ratios["year"] = ratios[
-        "year"
-    ].astype(int)
+    ratios["year"] = ratios["year"].astype(int)
 
     before = len(ratios)
 
@@ -1051,14 +852,9 @@ def load_data():
 
     removed = before - len(ratios)
 
-    datasets[
-        "financial_ratios"
-    ] = ratios
+    datasets["financial_ratios"] = ratios
 
-    print(
-        f"financial_ratios: removed "
-        f"{removed} duplicate company-year records"
-    )
+    print(f"financial_ratios: removed " f"{removed} duplicate company-year records")
 
     return datasets
 
@@ -1067,8 +863,8 @@ def load_data():
 # RESET DATABASE
 # ==========================================================
 
-def reset_database(conn):
 
+def reset_database(conn):
     """
     Clear existing database tables before reloading.
 
@@ -1076,18 +872,12 @@ def reset_database(conn):
     are enabled.
     """
 
-    print(
-        "\nClearing existing database data..."
-    )
+    print("\nClearing existing database data...")
 
-    for table_name in reversed(
-        LOAD_ORDER
-    ):
+    for table_name in reversed(LOAD_ORDER):
 
         try:
-            conn.execute(
-                f"DELETE FROM [{table_name}]"
-            )
+            conn.execute(f"DELETE FROM [{table_name}]")
 
         except sqlite3.OperationalError:
             # Allows the loader to work if a table does not
@@ -1096,28 +886,21 @@ def reset_database(conn):
 
     conn.commit()
 
-    print(
-        "Existing data cleared."
-    )
+    print("Existing data cleared.")
 
 
 # ==========================================================
 # MAIN DATABASE LOADER
 # ==========================================================
 
+
 def main():
+    """Main."""
+    print("\n========================================")
 
-    print(
-        "\n========================================"
-    )
+    print("NIFTY100 DATABASE LOAD")
 
-    print(
-        "NIFTY100 DATABASE LOAD"
-    )
-
-    print(
-        "========================================\n"
-    )
+    print("========================================\n")
 
     # ------------------------------------------------------
     # Load source data
@@ -1129,53 +912,33 @@ def main():
     # Build final financial_ratios FIRST
     # ------------------------------------------------------
 
-    final_financial_ratios = (
-        build_final_financial_ratios(
-            datasets
-        )
-    )
+    final_financial_ratios = build_final_financial_ratios(datasets)
 
-    datasets[
-        "financial_ratios"
-    ] = final_financial_ratios
+    datasets["financial_ratios"] = final_financial_ratios
 
     # ------------------------------------------------------
     # Open SQLite database
     # ------------------------------------------------------
 
-    conn = sqlite3.connect(
-        DB_PATH
-    )
+    conn = sqlite3.connect(DB_PATH)
 
     # SQLite foreign keys are connection-specific.
-    conn.execute(
-        "PRAGMA foreign_keys = ON"
-    )
+    conn.execute("PRAGMA foreign_keys = ON")
 
-    fk_status = conn.execute(
-        "PRAGMA foreign_keys"
-    ).fetchone()[0]
+    fk_status = conn.execute("PRAGMA foreign_keys").fetchone()[0]
 
-    print(
-        "Foreign keys:",
-        fk_status
-    )
+    print("Foreign keys:", fk_status)
 
     if fk_status != 1:
         conn.close()
 
-        raise RuntimeError(
-            "SQLite foreign keys could not "
-            "be enabled."
-        )
+        raise RuntimeError("SQLite foreign keys could not " "be enabled.")
 
     # ------------------------------------------------------
     # Clear previous data
     # ------------------------------------------------------
 
-    reset_database(
-        conn
-    )
+    reset_database(conn)
 
     audit = []
 
@@ -1185,9 +948,7 @@ def main():
 
     for table_name in LOAD_ORDER:
 
-        df = datasets[
-            table_name
-        ]
+        df = datasets[table_name]
 
         source_rows = len(df)
 
@@ -1197,10 +958,7 @@ def main():
         status = "OK"
         message = ""
 
-        print(
-            f"Loading {table_name:<20} "
-            f"rows={source_rows}"
-        )
+        print(f"Loading {table_name:<20} " f"rows={source_rows}")
 
         try:
 
@@ -1213,7 +971,7 @@ def main():
 
             loaded_rows = len(df)
 
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
 
             status = "FAILED"
 
@@ -1222,11 +980,7 @@ def main():
             # Roll back this failed transaction.
             conn.rollback()
 
-            print(
-                f"ERROR loading "
-                f"{table_name}: "
-                f"{exc}"
-            )
+            print(f"ERROR loading " f"{table_name}: " f"{exc}")
 
         audit.append(
             {
@@ -1242,65 +996,40 @@ def main():
         if status == "FAILED":
             conn.close()
 
-            raise RuntimeError(
-                f"Database load failed for "
-                f"table: {table_name}"
-            )
+            raise RuntimeError(f"Database load failed for " f"table: {table_name}")
 
     # ------------------------------------------------------
     # Foreign-key validation
     # ------------------------------------------------------
 
-    print(
-        "\n========================================"
-    )
+    print("\n========================================")
 
-    print(
-        "FOREIGN KEY CHECK"
-    )
+    print("FOREIGN KEY CHECK")
 
-    print(
-        "========================================"
-    )
+    print("========================================")
 
-    violations = conn.execute(
-        "PRAGMA foreign_key_check"
-    ).fetchall()
+    violations = conn.execute("PRAGMA foreign_key_check").fetchall()
 
     if violations:
 
-        print(
-            f"FAILED - "
-            f"{len(violations)} violations"
-        )
+        print(f"FAILED - " f"{len(violations)} violations")
 
         for violation in violations[:20]:
-            print(
-                violation
-            )
+            print(violation)
 
         conn.close()
 
-        raise ValueError(
-            "Foreign-key validation failed."
-        )
+        raise ValueError("Foreign-key validation failed.")
 
-    print(
-        "PASSED - 0 violations"
-    )
+    print("PASSED - 0 violations")
 
     # ------------------------------------------------------
     # Save audit
     # ------------------------------------------------------
 
-    audit_df = pd.DataFrame(
-        audit
-    )
+    audit_df = pd.DataFrame(audit)
 
-    audit_path = (
-        OUTPUT_DIR /
-        "load_audit.csv"
-    )
+    audit_path = OUTPUT_DIR / "load_audit.csv"
 
     audit_df.to_csv(
         audit_path,
@@ -1311,28 +1040,15 @@ def main():
     # Audit display
     # ------------------------------------------------------
 
-    print(
-        "\n========================================"
-    )
+    print("\n========================================")
 
-    print(
-        "LOAD AUDIT"
-    )
+    print("LOAD AUDIT")
 
-    print(
-        "========================================"
-    )
+    print("========================================")
 
-    print(
-        audit_df.to_string(
-            index=False
-        )
-    )
+    print(audit_df.to_string(index=False))
 
-    print(
-        f"\nAudit saved to: "
-        f"{audit_path}"
-    )
+    print(f"\nAudit saved to: " f"{audit_path}")
 
     # ------------------------------------------------------
     # Close database
@@ -1348,3 +1064,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

@@ -1,11 +1,10 @@
 import pandas as pd
 
 from src.analytics.cagr import (
-    revenue_cagr,
-    pat_cagr,
     eps_cagr,
+    pat_cagr,
+    revenue_cagr,
 )
-
 
 # ==========================================================
 # 1. LOAD CLEANED P&L DATA
@@ -13,9 +12,7 @@ from src.analytics.cagr import (
 
 print("\nLoading cleaned P&L data...")
 
-pnl = pd.read_csv(
-    "data/processed/profitandloss_cleaned.csv"
-)
+pnl = pd.read_csv("data/processed/profitandloss_cleaned.csv")
 
 print("P&L rows loaded:", len(pnl))
 
@@ -39,8 +36,9 @@ pnl = pnl[
 # 3. NORMALIZE YEAR
 # ==========================================================
 
-def normalize_year(value):
 
+def normalize_year(value):
+    """Normalize year."""
     if pd.isna(value):
         return None
 
@@ -58,9 +56,7 @@ def normalize_year(value):
 
 pnl["year"] = pnl["year"].apply(normalize_year)
 
-pnl = pnl.dropna(
-    subset=["company_id", "year"]
-).copy()
+pnl = pnl.dropna(subset=["company_id", "year"]).copy()
 
 pnl["year"] = pnl["year"].astype(int)
 
@@ -69,57 +65,37 @@ pnl["year"] = pnl["year"].astype(int)
 # 4. NORMALIZE COMPANY ID
 # ==========================================================
 
-pnl["company_id"] = (
-    pnl["company_id"]
-    .astype(str)
-    .str.strip()
-    .str.upper()
-)
+pnl["company_id"] = pnl["company_id"].astype(str).str.strip().str.upper()
 
 
 # ==========================================================
 # 5. REMOVE COMPANY-YEAR DUPLICATES
 # ==========================================================
 
-pnl = pnl.drop_duplicates(
-    subset=["company_id", "year"],
-    keep="first"
-).copy()
+pnl = pnl.drop_duplicates(subset=["company_id", "year"], keep="first").copy()
 
 
 # ==========================================================
 # 6. SORT DATA
 # ==========================================================
 
-pnl = pnl.sort_values(
-    ["company_id", "year"]
-).reset_index(drop=True)
+pnl = pnl.sort_values(["company_id", "year"]).reset_index(drop=True)
 
 
-print(
-    "Companies:",
-    pnl["company_id"].nunique()
-)
+print("Companies:", pnl["company_id"].nunique())
 
-print(
-    "Company-year rows:",
-    len(pnl)
-)
+print("Company-year rows:", len(pnl))
 
-print(
-    "Company-year duplicates:",
-    pnl.duplicated(
-        ["company_id", "year"]
-    ).sum()
-)
+print("Company-year duplicates:", pnl.duplicated(["company_id", "year"]).sum())
 
 
 # ==========================================================
 # 7. CAGR CALCULATION FUNCTION
 # ==========================================================
 
-def calculate_company_cagrs(company_id, group):
 
+def calculate_company_cagrs(company_id, group):
+    """Calculate company cagrs."""
     group = group.sort_values("year").copy()
 
     results = []
@@ -141,9 +117,7 @@ def calculate_company_cagrs(company_id, group):
 
             target_year = current_year - window
 
-            previous = group[
-                group["year"] == target_year
-            ]
+            previous = group[group["year"] == target_year]
 
             # --------------------------------------------------
             # If exact target year does not exist
@@ -169,9 +143,7 @@ def calculate_company_cagrs(company_id, group):
                 # --------------------------------------------------
 
                 revenue_value, revenue_flag = revenue_cagr(
-                    previous_row["sales"],
-                    row["sales"],
-                    window
+                    previous_row["sales"], row["sales"], window
                 )
 
                 # --------------------------------------------------
@@ -179,56 +151,38 @@ def calculate_company_cagrs(company_id, group):
                 # --------------------------------------------------
 
                 pat_value, pat_flag = pat_cagr(
-                    previous_row["net_profit"],
-                    row["net_profit"],
-                    window
+                    previous_row["net_profit"], row["net_profit"], window
                 )
 
                 # --------------------------------------------------
                 # EPS CAGR
                 # --------------------------------------------------
 
-                eps_value, eps_flag = eps_cagr(
-                    previous_row["eps"],
-                    row["eps"],
-                    window
-                )
+                eps_value, eps_flag = eps_cagr(previous_row["eps"], row["eps"], window)
 
             # --------------------------------------------------
             # Revenue
             # --------------------------------------------------
 
-            result[
-                f"revenue_cagr_{window}yr"
-            ] = revenue_value
+            result[f"revenue_cagr_{window}yr"] = revenue_value
 
-            result[
-                f"revenue_cagr_{window}yr_flag"
-            ] = revenue_flag
+            result[f"revenue_cagr_{window}yr_flag"] = revenue_flag
 
             # --------------------------------------------------
             # PAT
             # --------------------------------------------------
 
-            result[
-                f"pat_cagr_{window}yr"
-            ] = pat_value
+            result[f"pat_cagr_{window}yr"] = pat_value
 
-            result[
-                f"pat_cagr_{window}yr_flag"
-            ] = pat_flag
+            result[f"pat_cagr_{window}yr_flag"] = pat_flag
 
             # --------------------------------------------------
             # EPS
             # --------------------------------------------------
 
-            result[
-                f"eps_cagr_{window}yr"
-            ] = eps_value
+            result[f"eps_cagr_{window}yr"] = eps_value
 
-            result[
-                f"eps_cagr_{window}yr_flag"
-            ] = eps_flag
+            result[f"eps_cagr_{window}yr_flag"] = eps_flag
 
         results.append(result)
 
@@ -245,10 +199,7 @@ all_results = []
 
 for company_id, group in pnl.groupby("company_id"):
 
-    company_results = calculate_company_cagrs(
-        company_id,
-        group
-    )
+    company_results = calculate_company_cagrs(company_id, group)
 
     all_results.extend(company_results)
 
@@ -260,9 +211,7 @@ result = pd.DataFrame(all_results)
 # 9. SORT FINAL RESULT
 # ==========================================================
 
-result = result.sort_values(
-    ["company_id", "year"]
-).reset_index(drop=True)
+result = result.sort_values(["company_id", "year"]).reset_index(drop=True)
 
 
 # ==========================================================
@@ -271,10 +220,7 @@ result = result.sort_values(
 
 output_path = "output/cagr_ratios.csv"
 
-result.to_csv(
-    output_path,
-    index=False
-)
+result.to_csv(output_path, index=False)
 
 
 # ==========================================================
@@ -285,45 +231,22 @@ print("\n========================================")
 print("CAGR VALIDATION")
 print("========================================")
 
-print(
-    "Rows:",
-    len(result)
-)
+print("Rows:", len(result))
 
-print(
-    "Companies:",
-    result["company_id"].nunique()
-)
+print("Companies:", result["company_id"].nunique())
 
-print(
-    "Company-year duplicates:",
-    result.duplicated(
-        ["company_id", "year"]
-    ).sum()
-)
+print("Company-year duplicates:", result.duplicated(["company_id", "year"]).sum())
 
 
 # ==========================================================
 # 12. CHECK COMPANY-YEAR COVERAGE
 # ==========================================================
 
-expected_rows = (
-    pnl[
-        ["company_id", "year"]
-    ]
-    .drop_duplicates()
-    .shape[0]
-)
+expected_rows = pnl[["company_id", "year"]].drop_duplicates().shape[0]
 
-print(
-    "Expected company-year rows:",
-    expected_rows
-)
+print("Expected company-year rows:", expected_rows)
 
-print(
-    "Actual CAGR rows:",
-    len(result)
-)
+print("Actual CAGR rows:", len(result))
 
 
 # ==========================================================
@@ -338,19 +261,11 @@ for metric in [
 
     for window in [3, 5, 10]:
 
-        column = (
-            f"{metric}_cagr_{window}yr_flag"
-        )
+        column = f"{metric}_cagr_{window}yr_flag"
 
-        print(
-            f"\n{column}:"
-        )
+        print(f"\n{column}:")
 
-        print(
-            result[column]
-            .value_counts(dropna=False)
-            .to_string()
-        )
+        print(result[column].value_counts(dropna=False).to_string())
 
 
 # ==========================================================

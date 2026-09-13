@@ -1,6 +1,6 @@
-﻿"""
+"""
 N100 Financial Intelligence Platform
-Sprint 3 â€” Screener Ranking Engine
+Sprint 3 — Screener Ranking Engine
 
 Provides:
 1. Configured single-metric ranking
@@ -14,13 +14,12 @@ Provides:
 5. CSV and Excel export
 """
 
-from pathlib import Path
 import sqlite3
+from pathlib import Path
 
 import pandas as pd
 import yaml
 from openpyxl.styles import PatternFill
-
 
 CONFIG_PATH = Path("config/screener_config.yaml")
 DATA_PATH = Path("output/final_financial_ratios.csv")
@@ -74,9 +73,7 @@ def load_data(
     ]
 
     available_market_columns = [
-        column
-        for column in market_columns
-        if column in market.columns
+        column for column in market_columns if column in market.columns
     ]
 
     market = market[available_market_columns].copy()
@@ -96,17 +93,11 @@ def load_data(
     pl = pd.read_csv(pl_data_path)
 
     if "sales" not in pl.columns:
-        raise ValueError(
-            "Cleaned P&L data must contain a 'sales' column."
-        )
+        raise ValueError("Cleaned P&L data must contain a 'sales' column.")
 
-    revenue = pl[
-        ["company_id", "year", "sales"]
-    ].copy()
+    revenue = pl[["company_id", "year", "sales"]].copy()
 
-    revenue = revenue.rename(
-        columns={"sales": "revenue_cr"}
-    )
+    revenue = revenue.rename(columns={"sales": "revenue_cr"})
 
     revenue = revenue.drop_duplicates(
         subset=["company_id", "year"],
@@ -120,15 +111,10 @@ def load_data(
     )
 
     # FCF Yield.
-    result["fcf_yield"] = (
-        result["free_cash_flow_cr"]
-        / result["market_cap_crore"]
-        * 100
-    )
+    result["fcf_yield"] = result["free_cash_flow_cr"] / result["market_cap_crore"] * 100
 
     result.loc[
-        result["market_cap_crore"].isna()
-        | result["market_cap_crore"].eq(0),
+        result["market_cap_crore"].isna() | result["market_cap_crore"].eq(0),
         "fcf_yield",
     ] = pd.NA
 
@@ -139,9 +125,7 @@ def load_sector_data(db_path=DB_PATH):
     """Load company sector mapping from the validated SQLite database."""
 
     if not Path(db_path).exists():
-        raise FileNotFoundError(
-            f"Database not found: {db_path}"
-        )
+        raise FileNotFoundError(f"Database not found: {db_path}")
 
     with sqlite3.connect(db_path) as connection:
         sectors = pd.read_sql_query(
@@ -212,15 +196,12 @@ def rank_results(
 
     if ranking_order not in {"asc", "desc"}:
         raise ValueError(
-            f"Unsupported ranking order '{ranking_order}'. "
-            "Use 'asc' or 'desc'."
+            f"Unsupported ranking order '{ranking_order}'. " "Use 'asc' or 'desc'."
         )
 
     result = df.copy()
 
-    result = result[
-        result[ranking_metric].notna()
-    ].copy()
+    result = result[result[ranking_metric].notna()].copy()
 
     ascending = ranking_order == "asc"
 
@@ -264,9 +245,7 @@ def rank_screener(
 
     screener_config = screeners[name]
 
-    ranking_metric = screener_config.get(
-        "ranking_metric"
-    )
+    ranking_metric = screener_config.get("ranking_metric")
 
     ranking_order = screener_config.get(
         "ranking_order",
@@ -310,13 +289,9 @@ def rank_latest_year(
 
     latest_year = results["year"].max()
 
-    results = results[
-        results["year"].eq(latest_year)
-    ].copy()
+    results = results[results["year"].eq(latest_year)].copy()
 
-    results = results.sort_values(
-        "ranking"
-    ).reset_index(drop=True)
+    results = results.sort_values("ranking").reset_index(drop=True)
 
     results["ranking"] = range(
         1,
@@ -327,13 +302,13 @@ def rank_latest_year(
 
 
 # ------------------------------------------------------------------
-# D17 â€” COMPOSITE RANKING ENGINE
+# D17 — COMPOSITE RANKING ENGINE
 # ------------------------------------------------------------------
 
 
 def _percentile_score(series, higher_is_better=True):
     """
-    Convert a metric into a 0â€“100 percentile score.
+    Convert a metric into a 0–100 percentile score.
 
     Higher values receive higher scores when higher_is_better=True.
     Missing values remain missing.
@@ -357,20 +332,19 @@ def _percentile_score(series, higher_is_better=True):
             pd.NA,
         )
 
-    return numeric.rank(
-        method="average",
-        pct=True,
-    ) * 100
+    return (
+        numeric.rank(
+            method="average",
+            pct=True,
+        )
+        * 100
+    )
 
 
 def _mean_available_scores(df, columns):
     """Average available score columns row-wise."""
 
-    available = [
-        column
-        for column in columns
-        if column in df.columns
-    ]
+    available = [column for column in columns if column in df.columns]
 
     if not available:
         return pd.Series(
@@ -379,12 +353,16 @@ def _mean_available_scores(df, columns):
             dtype="float64",
         )
 
-    return df[available].mean(
-        axis=1,
-        skipna=True,
-    ).where(
-        df[available].notna().any(axis=1),
-        pd.NA,
+    return (
+        df[available]
+        .mean(
+            axis=1,
+            skipna=True,
+        )
+        .where(
+            df[available].notna().any(axis=1),
+            pd.NA,
+        )
     )
 
 
@@ -423,9 +401,7 @@ def _calculate_historical_fcf_cagr(df):
             dtype="float64",
         )
 
-    history = df[
-        ["company_id", "year", "free_cash_flow_cr"]
-    ].copy()
+    history = df[["company_id", "year", "free_cash_flow_cr"]].copy()
 
     history["year"] = pd.to_numeric(
         history["year"],
@@ -451,9 +427,7 @@ def _calculate_historical_fcf_cagr(df):
     )
 
     latest = (
-        history.sort_values(
-            ["company_id", "year"]
-        )
+        history.sort_values(["company_id", "year"])
         .groupby("company_id", as_index=False)
         .tail(1)
         .rename(
@@ -479,9 +453,7 @@ def _calculate_historical_fcf_cagr(df):
         ]
     ].copy()
 
-    latest["base_year"] = (
-        latest["latest_year"] - 5
-    )
+    latest["base_year"] = latest["latest_year"] - 5
 
     latest = latest.merge(
         base[
@@ -498,10 +470,7 @@ def _calculate_historical_fcf_cagr(df):
         how="left",
     )
 
-    valid = (
-        latest["latest_fcf"].gt(0)
-        & latest["base_fcf"].gt(0)
-    )
+    valid = latest["latest_fcf"].gt(0) & latest["base_fcf"].gt(0)
 
     latest["fcf_cagr_5yr"] = float("nan")
 
@@ -509,17 +478,10 @@ def _calculate_historical_fcf_cagr(df):
         valid,
         "fcf_cagr_5yr",
     ] = (
-        (
-            latest.loc[valid, "latest_fcf"]
-            / latest.loc[valid, "base_fcf"]
-        )
-        ** (1 / 5)
-        - 1
+        (latest.loc[valid, "latest_fcf"] / latest.loc[valid, "base_fcf"]) ** (1 / 5) - 1
     ) * 100
 
-    lookup = latest.set_index(
-        "company_id"
-    )["fcf_cagr_5yr"]
+    lookup = latest.set_index("company_id")["fcf_cagr_5yr"]
 
     return df["company_id"].map(lookup)
 
@@ -558,37 +520,25 @@ def calculate_composite_score(df):
     # Profitability: 35%
     # --------------------------------------------------------------
 
-    roe = _winsorize_p10_p90(
-        result["return_on_equity_pct"]
+    roe = _winsorize_p10_p90(result["return_on_equity_pct"])
+
+    roce = _winsorize_p10_p90(result["return_on_capital_employed_pct"])
+
+    npm = _winsorize_p10_p90(result["net_profit_margin_pct"])
+
+    result["profitability_roe_score"] = _percentile_score(
+        roe,
+        higher_is_better=True,
     )
 
-    roce = _winsorize_p10_p90(
-        result["return_on_capital_employed_pct"]
+    result["profitability_roce_score"] = _percentile_score(
+        roce,
+        higher_is_better=True,
     )
 
-    npm = _winsorize_p10_p90(
-        result["net_profit_margin_pct"]
-    )
-
-    result["profitability_roe_score"] = (
-        _percentile_score(
-            roe,
-            higher_is_better=True,
-        )
-    )
-
-    result["profitability_roce_score"] = (
-        _percentile_score(
-            roce,
-            higher_is_better=True,
-        )
-    )
-
-    result["profitability_margin_score"] = (
-        _percentile_score(
-            npm,
-            higher_is_better=True,
-        )
+    result["profitability_margin_score"] = _percentile_score(
+        npm,
+        higher_is_better=True,
     )
 
     result["profitability_score"] = (
@@ -604,15 +554,11 @@ def calculate_composite_score(df):
     # FCF CAGR is supplied from the full historical dataset by rank_screener_composite().
     if "fcf_cagr_5yr" not in result.columns:
         result["fcf_cagr_5yr"] = float("nan")
-    fcf_cagr = _winsorize_p10_p90(
-        result["fcf_cagr_5yr"]
-    )
+    fcf_cagr = _winsorize_p10_p90(result["fcf_cagr_5yr"])
 
-    result["cashflow_fcf_cagr_score"] = (
-        _percentile_score(
-            fcf_cagr,
-            higher_is_better=True,
-        )
+    result["cashflow_fcf_cagr_score"] = _percentile_score(
+        fcf_cagr,
+        higher_is_better=True,
     )
 
     pat = pd.to_numeric(
@@ -631,28 +577,17 @@ def calculate_composite_score(df):
         dtype="float64",
     )
 
-    valid_pat = (
-        pat.notna()
-        & pat.ne(0)
-        & cfo.notna()
-    )
+    valid_pat = pat.notna() & pat.ne(0) & cfo.notna()
 
-    cfo_pat.loc[valid_pat] = (
-        cfo.loc[valid_pat]
-        / pat.loc[valid_pat]
-    )
+    cfo_pat.loc[valid_pat] = cfo.loc[valid_pat] / pat.loc[valid_pat]
 
     result["cfo_pat_ratio"] = cfo_pat
 
-    cfo_pat_winsorized = _winsorize_p10_p90(
-        result["cfo_pat_ratio"]
-    )
+    cfo_pat_winsorized = _winsorize_p10_p90(result["cfo_pat_ratio"])
 
-    result["cashflow_cfo_pat_score"] = (
-        _percentile_score(
-            cfo_pat_winsorized,
-            higher_is_better=True,
-        )
+    result["cashflow_cfo_pat_score"] = _percentile_score(
+        cfo_pat_winsorized,
+        higher_is_better=True,
     )
 
     fcf_numeric = pd.to_numeric(
@@ -661,26 +596,16 @@ def calculate_composite_score(df):
     )
 
     result["fcf_positive_flag"] = (
-        fcf_numeric.gt(0)
-        .astype("float64")
-        .where(fcf_numeric.notna())
+        fcf_numeric.gt(0).astype("float64").where(fcf_numeric.notna())
     )
 
-    result["cashflow_fcf_positive_score"] = (
-        result["fcf_positive_flag"] * 100
-    )
+    result["cashflow_fcf_positive_score"] = result["fcf_positive_flag"] * 100
 
     cash_components = pd.DataFrame(
         {
-            "fcf_cagr": result[
-                "cashflow_fcf_cagr_score"
-            ],
-            "cfo_pat": result[
-                "cashflow_cfo_pat_score"
-            ],
-            "fcf_positive": result[
-                "cashflow_fcf_positive_score"
-            ],
+            "fcf_cagr": result["cashflow_fcf_cagr_score"],
+            "cfo_pat": result["cashflow_cfo_pat_score"],
+            "fcf_positive": result["cashflow_fcf_positive_score"],
         },
         index=result.index,
     )
@@ -693,62 +618,40 @@ def calculate_composite_score(df):
         }
     )
 
-    cash_weighted = (
-        cash_components * cash_weights
-    )
+    cash_weighted = cash_components * cash_weights
 
-    cash_available = (
-        cash_components.notna()
-        * cash_weights
-    ).sum(axis=1)
+    cash_available = (cash_components.notna() * cash_weights).sum(axis=1)
 
-    result["cash_quality_score"] = (
-        cash_weighted.sum(axis=1)
-        / cash_available
-    ).where(
+    result["cash_quality_score"] = (cash_weighted.sum(axis=1) / cash_available).where(
         cash_available.gt(0),
         float("nan"),
     )
 
     # Existing name retained for compatibility.
-    result["cashflow_score"] = (
-        result["cash_quality_score"]
-    )
+    result["cashflow_score"] = result["cash_quality_score"]
 
     # --------------------------------------------------------------
     # Growth: 20%
     # --------------------------------------------------------------
 
-    revenue_growth = _winsorize_p10_p90(
-        result["revenue_cagr_5yr"]
+    revenue_growth = _winsorize_p10_p90(result["revenue_cagr_5yr"])
+
+    pat_growth = _winsorize_p10_p90(result["pat_cagr_5yr"])
+
+    result["growth_revenue_score"] = _percentile_score(
+        revenue_growth,
+        higher_is_better=True,
     )
 
-    pat_growth = _winsorize_p10_p90(
-        result["pat_cagr_5yr"]
-    )
-
-    result["growth_revenue_score"] = (
-        _percentile_score(
-            revenue_growth,
-            higher_is_better=True,
-        )
-    )
-
-    result["growth_pat_score"] = (
-        _percentile_score(
-            pat_growth,
-            higher_is_better=True,
-        )
+    result["growth_pat_score"] = _percentile_score(
+        pat_growth,
+        higher_is_better=True,
     )
 
     growth_components = pd.DataFrame(
         {
-            "revenue": result[
-                "growth_revenue_score"
-            ],
-            "pat": result[
-                "growth_pat_score"
-            ],
+            "revenue": result["growth_revenue_score"],
+            "pat": result["growth_pat_score"],
         },
         index=result.index,
     )
@@ -760,19 +663,11 @@ def calculate_composite_score(df):
         }
     )
 
-    growth_weighted = (
-        growth_components * growth_weights
-    )
+    growth_weighted = growth_components * growth_weights
 
-    growth_available = (
-        growth_components.notna()
-        * growth_weights
-    ).sum(axis=1)
+    growth_available = (growth_components.notna() * growth_weights).sum(axis=1)
 
-    result["growth_score"] = (
-        growth_weighted.sum(axis=1)
-        / growth_available
-    ).where(
+    result["growth_score"] = (growth_weighted.sum(axis=1) / growth_available).where(
         growth_available.gt(0),
         float("nan"),
     )
@@ -781,36 +676,24 @@ def calculate_composite_score(df):
     # Leverage: 15%
     # --------------------------------------------------------------
 
-    debt_to_equity = _winsorize_p10_p90(
-        result["debt_to_equity"]
+    debt_to_equity = _winsorize_p10_p90(result["debt_to_equity"])
+
+    interest_coverage = _winsorize_p10_p90(result["interest_coverage"])
+
+    result["leverage_de_score"] = _percentile_score(
+        debt_to_equity,
+        higher_is_better=False,
     )
 
-    interest_coverage = _winsorize_p10_p90(
-        result["interest_coverage"]
-    )
-
-    result["leverage_de_score"] = (
-        _percentile_score(
-            debt_to_equity,
-            higher_is_better=False,
-        )
-    )
-
-    result["leverage_icr_score"] = (
-        _percentile_score(
-            interest_coverage,
-            higher_is_better=True,
-        )
+    result["leverage_icr_score"] = _percentile_score(
+        interest_coverage,
+        higher_is_better=True,
     )
 
     leverage_components = pd.DataFrame(
         {
-            "de": result[
-                "leverage_de_score"
-            ],
-            "icr": result[
-                "leverage_icr_score"
-            ],
+            "de": result["leverage_de_score"],
+            "icr": result["leverage_icr_score"],
         },
         index=result.index,
     )
@@ -822,18 +705,12 @@ def calculate_composite_score(df):
         }
     )
 
-    leverage_weighted = (
-        leverage_components * leverage_weights
-    )
+    leverage_weighted = leverage_components * leverage_weights
 
-    leverage_available = (
-        leverage_components.notna()
-        * leverage_weights
-    ).sum(axis=1)
+    leverage_available = (leverage_components.notna() * leverage_weights).sum(axis=1)
 
     result["leverage_score"] = (
-        leverage_weighted.sum(axis=1)
-        / leverage_available
+        leverage_weighted.sum(axis=1) / leverage_available
     ).where(
         leverage_available.gt(0),
         float("nan"),
@@ -845,18 +722,10 @@ def calculate_composite_score(df):
 
     components = pd.DataFrame(
         {
-            "profitability": result[
-                "profitability_score"
-            ],
-            "cash_quality": result[
-                "cash_quality_score"
-            ],
-            "growth": result[
-                "growth_score"
-            ],
-            "leverage": result[
-                "leverage_score"
-            ],
+            "profitability": result["profitability_score"],
+            "cash_quality": result["cash_quality_score"],
+            "growth": result["growth_score"],
+            "leverage": result["leverage_score"],
         },
         index=result.index,
     )
@@ -872,27 +741,20 @@ def calculate_composite_score(df):
 
     weighted = components * weights
 
-    available_weight = (
-        components.notna() * weights
-    ).sum(axis=1)
+    available_weight = (components.notna() * weights).sum(axis=1)
 
-    result["composite_score"] = (
-        weighted.sum(axis=1)
-        / available_weight
-    ).where(
+    result["composite_score"] = (weighted.sum(axis=1) / available_weight).where(
         available_weight.gt(0),
         float("nan"),
     )
 
-    result["composite_score"] = (
-        result["composite_score"]
-        .clip(
-            lower=0,
-            upper=100,
-        )
+    result["composite_score"] = result["composite_score"].clip(
+        lower=0,
+        upper=100,
     )
 
     return result
+
 
 def add_sector_relative_scores(df):
     """
@@ -912,67 +774,44 @@ def add_sector_relative_scores(df):
     result = df.copy()
 
     if "broad_sector" not in result.columns:
-        raise ValueError(
-            "Sector-relative ranking requires 'broad_sector'."
-        )
+        raise ValueError("Sector-relative ranking requires 'broad_sector'.")
 
     if "composite_score" not in result.columns:
         result = calculate_composite_score(result)
 
     result["sector_percentile_score"] = (
-        result.groupby("broad_sector")[
-            "composite_score"
-        ]
-        .rank(
+        result.groupby("broad_sector")["composite_score"].rank(
             method="average",
             pct=True,
         )
         * 100
     )
 
-    sector_mean = result.groupby(
-        "broad_sector"
-    )["composite_score"].transform("mean")
+    sector_mean = result.groupby("broad_sector")["composite_score"].transform("mean")
 
-    sector_std = result.groupby(
-        "broad_sector"
-    )["composite_score"].transform("std")
+    sector_std = result.groupby("broad_sector")["composite_score"].transform("std")
 
     result["sector_z_score"] = (
         result["composite_score"] - sector_mean
     ) / sector_std.replace(0, pd.NA)
 
-    result["sector_peer_rank"] = (
-        result.groupby("broad_sector")[
-            "composite_score"
-        ]
-        .rank(
-            method="min",
-            ascending=False,
-        )
+    result["sector_peer_rank"] = result.groupby("broad_sector")["composite_score"].rank(
+        method="min",
+        ascending=False,
     )
 
-    sector_size = result.groupby(
-        "broad_sector"
-    )["company_id"].transform("count")
+    sector_size = result.groupby("broad_sector")["company_id"].transform("count")
 
-    bottom_decile = (
-        result["sector_percentile_score"].notna()
-        & result["sector_percentile_score"].le(10)
-    )
+    bottom_decile = result["sector_percentile_score"].notna() & result[
+        "sector_percentile_score"
+    ].le(10)
 
-    z_outlier = (
-        result["sector_z_score"].abs().gt(2)
-    )
+    z_outlier = result["sector_z_score"].abs().gt(2)
+
+    result["sector_outlier_flag"] = bottom_decile | z_outlier
 
     result["sector_outlier_flag"] = (
-        bottom_decile | z_outlier
-    )
-
-    result["sector_outlier_flag"] = (
-        result["sector_outlier_flag"]
-        .fillna(False)
-        .astype(bool)
+        result["sector_outlier_flag"].fillna(False).astype(bool)
     )
 
     # Suppress unused-variable warnings while keeping
@@ -994,9 +833,7 @@ def rank_composite(df):
     if "composite_score" not in result.columns:
         result = calculate_composite_score(result)
 
-    result = result[
-        result["composite_score"].notna()
-    ].copy()
+    result = result[result["composite_score"].notna()].copy()
 
     result = result.sort_values(
         [
@@ -1051,22 +888,20 @@ def rank_screener_composite(
     historical_fcf_cagr = _calculate_historical_fcf_cagr(historical)
     historical_with_cagr = historical[["company_id"]].copy()
     historical_with_cagr["fcf_cagr_5yr"] = historical_fcf_cagr.to_numpy()
-    company_fcf_cagr = historical_with_cagr.dropna(subset=["fcf_cagr_5yr"]).groupby("company_id")["fcf_cagr_5yr"].first()
+    company_fcf_cagr = (
+        historical_with_cagr.dropna(subset=["fcf_cagr_5yr"])
+        .groupby("company_id")["fcf_cagr_5yr"]
+        .first()
+    )
     results["fcf_cagr_5yr"] = results["company_id"].map(company_fcf_cagr)
     # Composite score.
-    results = calculate_composite_score(
-        results
-    )
+    results = calculate_composite_score(results)
 
     # Sector-relative score.
-    results = add_sector_relative_scores(
-        results
-    )
+    results = add_sector_relative_scores(results)
 
     # Global composite rank.
-    results = rank_composite(
-        results
-    )
+    results = rank_composite(results)
 
     # Recalculate peer rank after composite processing.
     results = results.sort_values(
@@ -1097,9 +932,7 @@ def rank_screener_latest_composite(
 
     latest_year = results["year"].max()
 
-    results = results[
-        results["year"].eq(latest_year)
-    ].copy()
+    results = results[results["year"].eq(latest_year)].copy()
 
     results = results.sort_values(
         [
@@ -1118,7 +951,7 @@ def rank_screener_latest_composite(
 
 
 # ------------------------------------------------------------------
-# D17 â€” EXPORT
+# D17 — EXPORT
 # ------------------------------------------------------------------
 
 
@@ -1156,11 +989,7 @@ def _export_columns(df):
         "revenue_cr",
     ]
 
-    return [
-        column
-        for column in preferred
-        if column in df.columns
-    ]
+    return [column for column in preferred if column in df.columns]
 
 
 def export_screener_results(
@@ -1188,17 +1017,9 @@ def export_screener_results(
         screener_name,
     )
 
-    columns = [
-        "screener"
-    ] + _export_columns(export)
+    columns = ["screener"] + _export_columns(export)
 
-    export = export[
-        [
-            column
-            for column in columns
-            if column in export.columns
-        ]
-    ]
+    export = export[[column for column in columns if column in export.columns]]
 
     file_path = Path(csv_path)
 
@@ -1264,12 +1085,8 @@ def export_all_screeners(
                 continue
 
             # Top-N output.
-            config = load_config(
-                config_path
-            )
-            expected_range = config[
-                "screeners"
-            ][name].get(
+            config = load_config(config_path)
+            expected_range = config["screeners"][name].get(
                 "expected_company_count",
                 "10-25",
             )
@@ -1283,10 +1100,10 @@ def export_all_screeners(
                         f"{expected_range}"
                     )
 
-                min_count = int(parts[0].strip())
+                int(parts[0].strip())
                 max_count = int(parts[1].strip())
             else:
-                min_count = int(expected_range[0])
+                int(expected_range[0])
                 max_count = int(expected_range[1])
 
             top_n = max(
@@ -1294,9 +1111,7 @@ def export_all_screeners(
                 max_count,
             )
 
-            results = results.head(
-                top_n
-            ).copy()
+            results = results.head(top_n).copy()
 
             export = results.copy()
 
@@ -1306,22 +1121,12 @@ def export_all_screeners(
                 name,
             )
 
-            columns = [
-                "screener"
-            ] + _export_columns(export)
+            columns = ["screener"] + _export_columns(export)
 
-            export = export[
-                [
-                    column
-                    for column in columns
-                    if column in export.columns
-                ]
-            ]
+            export = export[[column for column in columns if column in export.columns]]
 
             # Master CSV.
-            all_results.append(
-                export
-            )
+            all_results.append(export)
 
             # Individual worksheet.
             sheet_name = name[:31]
@@ -1333,14 +1138,10 @@ def export_all_screeners(
             )
 
             # Formatting.
-            worksheet = writer.sheets[
-                sheet_name
-            ]
+            worksheet = writer.sheets[sheet_name]
 
             worksheet.freeze_panes = "A2"
-            worksheet.auto_filter.ref = (
-                worksheet.dimensions
-            )
+            worksheet.auto_filter.ref = worksheet.dimensions
 
             # Colour-code cells according to the preset thresholds.
             green_fill = PatternFill(
@@ -1357,10 +1158,7 @@ def export_all_screeners(
                 [],
             )
 
-            header_map = {
-                cell.value: cell.column
-                for cell in worksheet[1]
-            }
+            header_map = {cell.value: cell.column for cell in worksheet[1]}
 
             for item in filter_config:
                 metric = item["metric"]
@@ -1404,9 +1202,7 @@ def export_all_screeners(
             for column_cells in worksheet.columns:
 
                 max_length = 0
-                column_letter = (
-                    column_cells[0].column_letter
-                )
+                column_letter = column_cells[0].column_letter
 
                 for cell in column_cells:
                     value = cell.value
@@ -1417,9 +1213,7 @@ def export_all_screeners(
                             len(str(value)),
                         )
 
-                worksheet.column_dimensions[
-                    column_letter
-                ].width = min(
+                worksheet.column_dimensions[column_letter].width = min(
                     max_length + 2,
                     30,
                 )
@@ -1449,13 +1243,9 @@ def print_screener_summary(results, name):
         print("No results.")
         return
 
-    print(
-        f"Year: {results['year'].iloc[0]}"
-    )
+    print(f"Year: {results['year'].iloc[0]}")
 
-    print(
-        f"Companies: {results['company_id'].nunique()}"
-    )
+    print(f"Companies: {results['company_id'].nunique()}")
 
     columns = [
         "ranking",
@@ -1474,17 +1264,9 @@ def print_screener_summary(results, name):
         "pb_ratio",
     ]
 
-    available = [
-        column
-        for column in columns
-        if column in results.columns
-    ]
+    available = [column for column in columns if column in results.columns]
 
-    print(
-        results[available]
-        .head(20)
-        .to_string(index=False)
-    )
+    print(results[available].head(20).to_string(index=False))
 
 
 if __name__ == "__main__":
@@ -1498,44 +1280,29 @@ if __name__ == "__main__":
         exported = export_all_screeners()
 
         print()
-        print(
-            f"Screeners exported: {len(exported)}"
-        )
+        print(f"Screeners exported: {len(exported)}")
 
-        print(
-            f"CSV: {SCREENER_CSV_PATH}"
-        )
+        print(f"CSV: {SCREENER_CSV_PATH}")
 
-        print(
-            f"Excel: {SCREENER_XLSX_PATH}"
-        )
+        print(f"Excel: {SCREENER_XLSX_PATH}")
 
         # Display latest-year results.
         for name in SCREENERS:
 
             try:
 
-                results = (
-                    rank_screener_latest_composite(
-                        name
-                    )
-                )
+                results = rank_screener_latest_composite(name)
 
                 print_screener_summary(
                     results,
                     name,
                 )
 
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001
 
-                print(
-                    f"{name}: ERROR - {exc}"
-                )
+                print(f"{name}: ERROR - {exc}")
 
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
 
-        print(
-            f"EXPORT ERROR: {exc}"
-        )
-
+        print(f"EXPORT ERROR: {exc}")
 

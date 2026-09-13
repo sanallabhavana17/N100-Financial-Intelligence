@@ -1,7 +1,6 @@
-from pathlib import Path
-import sqlite3
 import csv
-import sys
+import sqlite3
+from pathlib import Path
 
 # Project root
 ROOT = Path(__file__).resolve().parents[2]
@@ -15,10 +14,12 @@ from src.reports.tearsheet import generate_tearsheet
 
 
 def get_connection():
+    """Get connection."""
     return sqlite3.connect(DB_PATH)
 
 
 def get_all_companies():
+    """Get all companies."""
     conn = get_connection()
 
     query = """
@@ -36,6 +37,7 @@ def get_all_companies():
 
 
 def get_year_count(company_id):
+    """Get year count."""
     conn = get_connection()
 
     query = """
@@ -51,6 +53,7 @@ def get_year_count(company_id):
 
 
 def main():
+    """Main."""
     print("N100 COMPANY TEARSHEET BATCH GENERATOR")
     print("=" * 70)
     print(f"Database : {DB_PATH}")
@@ -78,7 +81,7 @@ def main():
             f"{company_id:<12} "
             f"{company_name[:30]:<30} "
             f"{year_count:>2} years",
-            end=" "
+            end=" ",
         )
 
         # Sprint 5 Day 34 requirement:
@@ -123,7 +126,7 @@ def main():
                     }
                 )
 
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             print(f"FAILED - {exc}")
 
             failed.append(
@@ -183,3 +186,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

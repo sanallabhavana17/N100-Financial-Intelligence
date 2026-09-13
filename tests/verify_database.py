@@ -27,8 +27,7 @@ print("=" * 50)
 tables = [
     row[0]
     for row in con.execute(
-        "SELECT name FROM sqlite_master "
-        "WHERE type='table' ORDER BY name"
+        "SELECT name FROM sqlite_master " "WHERE type='table' ORDER BY name"
     )
 ]
 
@@ -47,9 +46,7 @@ else:
 # Row counts
 print("\nROW COUNTS:")
 for table in expected_tables:
-    count = con.execute(
-        f"SELECT COUNT(*) FROM {table}"
-    ).fetchone()[0]
+    count = con.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
     print(f"  {table:20} {count}")
 
 # Foreign keys

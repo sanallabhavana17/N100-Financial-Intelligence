@@ -12,23 +12,21 @@ import sqlite3
 from io import BytesIO
 from pathlib import Path
 
-import pandas as pd
 import matplotlib.pyplot as plt
-
+import pandas as pd
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import mm
 from reportlab.platypus import (
-    SimpleDocTemplate,
+    Image,
+    PageBreak,
     Paragraph,
+    SimpleDocTemplate,
     Spacer,
     Table,
     TableStyle,
-    PageBreak,
-    Image,
 )
-
 
 # ============================================================================
 # PATHS
@@ -67,11 +65,11 @@ WHITE = colors.white
 # DATABASE
 # ============================================================================
 
+
 def get_connection():
+    """Get connection."""
     if not DB_PATH.exists():
-        raise FileNotFoundError(
-            f"Database not found: {DB_PATH}"
-        )
+        raise FileNotFoundError(f"Database not found: {DB_PATH}")
 
     return sqlite3.connect(DB_PATH)
 
@@ -108,7 +106,7 @@ def load_company(company_id: str) -> pd.DataFrame:
 
 
 def load_profit_loss(company_id: str) -> pd.DataFrame:
-
+    """Load profit loss."""
     conn = get_connection()
 
     query = """
@@ -134,7 +132,7 @@ def load_profit_loss(company_id: str) -> pd.DataFrame:
 
 
 def load_ratios(company_id: str) -> pd.DataFrame:
-
+    """Load ratios."""
     conn = get_connection()
 
     query = """
@@ -167,7 +165,7 @@ def load_ratios(company_id: str) -> pd.DataFrame:
 
 
 def load_balance_sheet(company_id: str) -> pd.DataFrame:
-
+    """Load balance sheet."""
     conn = get_connection()
 
     query = """
@@ -201,7 +199,7 @@ def load_balance_sheet(company_id: str) -> pd.DataFrame:
 
 
 def load_cashflow(company_id: str) -> pd.DataFrame:
-
+    """Load cashflow."""
     conn = get_connection()
 
     query = """
@@ -232,8 +230,9 @@ def load_cashflow(company_id: str) -> pd.DataFrame:
 # NLP PROS / CONS
 # ============================================================================
 
-def load_pros_cons(company_id: str):
 
+def load_pros_cons(company_id: str):
+    """Load pros cons."""
     if not PROS_CONS_PATH.exists():
         return [], []
 
@@ -241,9 +240,7 @@ def load_pros_cons(company_id: str):
 
     df["company_id"] = df["company_id"].astype(str)
 
-    df = df[
-        df["company_id"] == str(company_id)
-    ].copy()
+    df = df[df["company_id"] == str(company_id)].copy()
 
     if df.empty:
         return [], []
@@ -254,12 +251,7 @@ def load_pros_cons(company_id: str):
     )
 
     pros = (
-        df[
-            df["type"]
-            .astype(str)
-            .str.lower()
-            == "pro"
-        ]
+        df[df["type"].astype(str).str.lower() == "pro"]
         .sort_values(
             "confidence_pct",
             ascending=False,
@@ -269,12 +261,7 @@ def load_pros_cons(company_id: str):
     )
 
     cons = (
-        df[
-            df["type"]
-            .astype(str)
-            .str.lower()
-            == "con"
-        ]
+        df[df["type"].astype(str).str.lower() == "con"]
         .sort_values(
             "confidence_pct",
             ascending=False,
@@ -290,20 +277,21 @@ def load_pros_cons(company_id: str):
 # FORMATTING
 # ============================================================================
 
-def safe_float(value, default=None):
 
+def safe_float(value, default=None):
+    """Safe float."""
     try:
         if pd.isna(value):
             return default
 
         return float(value)
 
-    except Exception:
+    except Exception:  # noqa: BLE001
         return default
 
 
 def fmt_pct(value):
-
+    """Fmt pct."""
     value = safe_float(value)
 
     if value is None:
@@ -313,7 +301,7 @@ def fmt_pct(value):
 
 
 def fmt_cr(value):
-
+    """Fmt cr."""
     value = safe_float(value)
 
     if value is None:
@@ -323,7 +311,7 @@ def fmt_cr(value):
 
 
 def fmt_ratio(value):
-
+    """Fmt ratio."""
     value = safe_float(value)
 
     if value is None:
@@ -333,7 +321,7 @@ def fmt_ratio(value):
 
 
 def clean_text(value):
-
+    """Clean text."""
     if value is None:
         return ""
 
@@ -344,7 +332,7 @@ def clean_text(value):
 
 
 def latest_value(df, column):
-
+    """Latest value."""
     if df.empty or column not in df.columns:
         return None
 
@@ -360,8 +348,9 @@ def latest_value(df, column):
 # CHART HELPERS
 # ============================================================================
 
-def save_chart(fig):
 
+def save_chart(fig):
+    """Save chart."""
     buffer = BytesIO()
 
     fig.savefig(
@@ -379,7 +368,7 @@ def save_chart(fig):
 
 
 def revenue_profit_chart(pl):
-
+    """Revenue profit chart."""
     df = pl.tail(10).copy()
 
     if df.empty:
@@ -395,16 +384,12 @@ def revenue_profit_chart(pl):
         errors="coerce",
     )
 
-    df = df.dropna(
-        subset=["sales"]
-    )
+    df = df.dropna(subset=["sales"])
 
     if df.empty:
         return None
 
-    fig, ax = plt.subplots(
-        figsize=(7.0, 2.35)
-    )
+    fig, ax = plt.subplots(figsize=(7.0, 2.35))
 
     x = list(range(len(df)))
     width = 0.36
@@ -426,9 +411,7 @@ def revenue_profit_chart(pl):
     ax.set_xticks(x)
 
     ax.set_xticklabels(
-        df["year"]
-        .astype(int)
-        .astype(str),
+        df["year"].astype(int).astype(str),
         fontsize=7,
     )
 
@@ -459,7 +442,7 @@ def revenue_profit_chart(pl):
 
 
 def roe_roce_chart(ratios):
-
+    """Roe roce chart."""
     df = ratios.tail(10).copy()
 
     if df.empty:
@@ -475,14 +458,10 @@ def roe_roce_chart(ratios):
         errors="coerce",
     )
 
-    if df[["roe", "roce"]].dropna(
-        how="all"
-    ).empty:
+    if df[["roe", "roce"]].dropna(how="all").empty:
         return None
 
-    fig, ax1 = plt.subplots(
-        figsize=(7.0, 2.35)
-    )
+    fig, ax1 = plt.subplots(figsize=(7.0, 2.35))
 
     x = list(range(len(df)))
 
@@ -528,9 +507,7 @@ def roe_roce_chart(ratios):
     ax1.set_xticks(x)
 
     ax1.set_xticklabels(
-        df["year"]
-        .astype(int)
-        .astype(str),
+        df["year"].astype(int).astype(str),
         fontsize=7,
     )
 
@@ -539,13 +516,9 @@ def roe_roce_chart(ratios):
         alpha=0.20,
     )
 
-    lines1, labels1 = (
-        ax1.get_legend_handles_labels()
-    )
+    lines1, labels1 = ax1.get_legend_handles_labels()
 
-    lines2, labels2 = (
-        ax2.get_legend_handles_labels()
-    )
+    lines2, labels2 = ax2.get_legend_handles_labels()
 
     ax1.legend(
         lines1 + lines2,
@@ -561,7 +534,7 @@ def roe_roce_chart(ratios):
 
 
 def balance_sheet_chart(bs):
-
+    """Balance sheet chart."""
     df = bs.tail(10).copy()
 
     if df.empty:
@@ -581,9 +554,7 @@ def balance_sheet_chart(bs):
             errors="coerce",
         ).fillna(0)
 
-    fig, ax = plt.subplots(
-        figsize=(7.0, 2.45)
-    )
+    fig, ax = plt.subplots(figsize=(7.0, 2.45))
 
     x = list(range(len(df)))
 
@@ -611,9 +582,7 @@ def balance_sheet_chart(bs):
     ax.set_xticks(x)
 
     ax.set_xticklabels(
-        df["year"]
-        .astype(int)
-        .astype(str),
+        df["year"].astype(int).astype(str),
         fontsize=7,
     )
 
@@ -645,7 +614,7 @@ def balance_sheet_chart(bs):
 
 
 def cashflow_chart(cf):
-
+    """Cashflow chart."""
     df = cf.tail(5).copy()
 
     if df.empty:
@@ -664,9 +633,7 @@ def cashflow_chart(cf):
             errors="coerce",
         ).fillna(0)
 
-    fig, ax = plt.subplots(
-        figsize=(7.0, 2.35)
-    )
+    fig, ax = plt.subplots(figsize=(7.0, 2.35))
 
     x = list(range(len(df)))
     width = 0.23
@@ -700,9 +667,7 @@ def cashflow_chart(cf):
     ax.set_xticks(x)
 
     ax.set_xticklabels(
-        df["year"]
-        .astype(int)
-        .astype(str),
+        df["year"].astype(int).astype(str),
         fontsize=7,
     )
 
@@ -737,8 +702,9 @@ def cashflow_chart(cf):
 # REPORTLAB HELPERS
 # ============================================================================
 
-def make_styles():
 
+def make_styles():
+    """Make styles."""
     styles = getSampleStyleSheet()
 
     styles.add(
@@ -797,7 +763,7 @@ def make_styles():
 
 
 def kpi_tile(title, value):
-
+    """Kpi tile."""
     title_style = ParagraphStyle(
         "KpiTitle",
         fontSize=6.2,
@@ -850,9 +816,7 @@ def kpi_tile(title, value):
                     (0, 0),
                     (-1, -1),
                     0.5,
-                    colors.HexColor(
-                        "#D5DFEA"
-                    ),
+                    colors.HexColor("#D5DFEA"),
                 ),
                 (
                     "VALIGN",
@@ -868,7 +832,7 @@ def kpi_tile(title, value):
 
 
 def capital_badge(pattern):
-
+    """Capital badge."""
     pattern = clean_text(pattern)
 
     if pattern == "Shareholder Returns":
@@ -941,7 +905,7 @@ def capital_badge(pattern):
 
 
 def pros_cons_table(pros, cons, styles):
-
+    """Pros cons table."""
     rows = [
         [
             Paragraph(
@@ -1044,18 +1008,14 @@ def pros_cons_table(pros, cons, styles):
                     (0, 0),
                     (-1, -1),
                     0.5,
-                    colors.HexColor(
-                        "#D9DDE3"
-                    ),
+                    colors.HexColor("#D9DDE3"),
                 ),
                 (
                     "INNERGRID",
                     (0, 0),
                     (-1, -1),
                     0.3,
-                    colors.HexColor(
-                        "#E5E7EB"
-                    ),
+                    colors.HexColor("#E5E7EB"),
                 ),
                 (
                     "VALIGN",
@@ -1098,13 +1058,12 @@ def pros_cons_table(pros, cons, styles):
 # HEADER / FOOTER
 # ============================================================================
 
-def draw_header_footer(canvas, doc):
 
+def draw_header_footer(canvas, doc):
+    """Draw header footer."""
     canvas.saveState()
 
-    canvas.setStrokeColor(
-        colors.HexColor("#D9DDE3")
-    )
+    canvas.setStrokeColor(colors.HexColor("#D9DDE3"))
 
     canvas.setLineWidth(0.5)
 
@@ -1141,8 +1100,9 @@ def draw_header_footer(canvas, doc):
 # TEARSHEET GENERATOR
 # ============================================================================
 
-def generate_tearsheet(company_id):
 
+def generate_tearsheet(company_id):
+    """Generate tearsheet."""
     styles = make_styles()
 
     company_df = load_company(company_id)
@@ -1157,28 +1117,18 @@ def generate_tearsheet(company_id):
 
     if company_df.empty:
 
-        raise ValueError(
-            f"{company_id} not found in companies table."
-        )
+        raise ValueError(f"{company_id} not found in companies table.")
 
-    if len(pl) < 3:
 
-        raise ValueError(
-            f"{company_id} has fewer than 3 years of P&L data."
-        )
+    if len(pl) < 2:
+        raise ValueError(f"{company_id} has fewer than 2 years of P&L data.")
+
 
     company = company_df.iloc[0]
 
-    company_name = (
-        clean_text(
-            company["company_name"]
-        )
-        or company_id
-    )
+    company_name = clean_text(company["company_name"]) or company_id
 
-    pros, cons = load_pros_cons(
-        company_id
-    )
+    pros, cons = load_pros_cons(company_id)
 
     revenue_cagr = latest_value(
         ratios,
@@ -1228,14 +1178,9 @@ def generate_tearsheet(company_id):
     if capital_allocation is None:
         capital_allocation = "Not Available"
 
-    latest_year = int(
-        pl.iloc[-1]["year"]
-    )
+    latest_year = int(pl.iloc[-1]["year"])
 
-    output_path = (
-        OUTPUT_DIR
-        / f"{company_id}_tearsheet.pdf"
-    )
+    output_path = OUTPUT_DIR / f"{company_id}_tearsheet.pdf"
 
     doc = SimpleDocTemplate(
         str(output_path),
@@ -1244,10 +1189,7 @@ def generate_tearsheet(company_id):
         leftMargin=15 * mm,
         topMargin=12 * mm,
         bottomMargin=14 * mm,
-        title=(
-            f"{company_name} - "
-            "N100 Financial Intelligence"
-        ),
+        title=(f"{company_name} - " "N100 Financial Intelligence"),
         author="N100 Financial Intelligence",
     )
 
@@ -1323,9 +1265,7 @@ def generate_tearsheet(company_id):
 
     story.append(header)
 
-    story.append(
-        Spacer(1, 4 * mm)
-    )
+    story.append(Spacer(1, 4 * mm))
 
     # ========================================================================
     # SIX KPI TILES
@@ -1409,9 +1349,7 @@ def generate_tearsheet(company_id):
 
     story.append(kpi_table)
 
-    story.append(
-        Spacer(1, 3 * mm)
-    )
+    story.append(Spacer(1, 3 * mm))
 
     # ========================================================================
     # REVENUE / PROFIT CHART
@@ -1436,9 +1374,7 @@ def generate_tearsheet(company_id):
             )
         )
 
-    story.append(
-        Spacer(1, 1 * mm)
-    )
+    story.append(Spacer(1, 1 * mm))
 
     # ========================================================================
     # ROE / ROCE CHART
@@ -1463,9 +1399,7 @@ def generate_tearsheet(company_id):
             )
         )
 
-    story.append(
-        Spacer(1, 1 * mm)
-    )
+    story.append(Spacer(1, 1 * mm))
 
     # ========================================================================
     # METADATA
@@ -1479,13 +1413,11 @@ def generate_tearsheet(company_id):
                     styles["SmallN100"],
                 ),
                 Paragraph(
-                    f"<b>Debt / Equity:</b> "
-                    f"{fmt_ratio(debt_equity)}",
+                    f"<b>Debt / Equity:</b> " f"{fmt_ratio(debt_equity)}",
                     styles["SmallN100"],
                 ),
                 Paragraph(
-                    f"<b>Interest Coverage:</b> "
-                    f"{fmt_ratio(interest_coverage)}",
+                    f"<b>Interest Coverage:</b> " f"{fmt_ratio(interest_coverage)}",
                     styles["SmallN100"],
                 ),
             ]
@@ -1511,9 +1443,7 @@ def generate_tearsheet(company_id):
                     (0, 0),
                     (-1, -1),
                     0.4,
-                    colors.HexColor(
-                        "#D9DDE3"
-                    ),
+                    colors.HexColor("#D9DDE3"),
                 ),
                 (
                     "VALIGN",
@@ -1574,9 +1504,7 @@ def generate_tearsheet(company_id):
             )
         )
 
-    story.append(
-        Spacer(1, 2 * mm)
-    )
+    story.append(Spacer(1, 2 * mm))
 
     # ========================================================================
     # CASH FLOW
@@ -1601,9 +1529,7 @@ def generate_tearsheet(company_id):
             )
         )
 
-    story.append(
-        Spacer(1, 2 * mm)
-    )
+    story.append(Spacer(1, 2 * mm))
 
     # ========================================================================
     # CAPITAL ALLOCATION
@@ -1616,9 +1542,7 @@ def generate_tearsheet(company_id):
                     "<b>Capital Allocation Pattern</b>",
                     styles["SmallN100"],
                 ),
-                capital_badge(
-                    capital_allocation
-                ),
+                capital_badge(capital_allocation),
             ]
         ],
         colWidths=[
@@ -1652,13 +1576,9 @@ def generate_tearsheet(company_id):
         )
     )
 
-    story.append(
-        allocation_table
-    )
+    story.append(allocation_table)
 
-    story.append(
-        Spacer(1, 2 * mm)
-    )
+    story.append(Spacer(1, 2 * mm))
 
     # ========================================================================
     # PROS / CONS
@@ -1679,9 +1599,7 @@ def generate_tearsheet(company_id):
         )
     )
 
-    story.append(
-        Spacer(1, 2 * mm)
-    )
+    story.append(Spacer(1, 2 * mm))
 
     # ========================================================================
     # DATA NOTE
@@ -1717,9 +1635,7 @@ def generate_tearsheet(company_id):
                     (0, 0),
                     (-1, -1),
                     0.4,
-                    colors.HexColor(
-                        "#D9DDE3"
-                    ),
+                    colors.HexColor("#D9DDE3"),
                 ),
                 (
                     "LEFTPADDING",
@@ -1781,21 +1697,16 @@ TEST_COMPANIES = [
 # MAIN
 # ============================================================================
 
-def main():
 
+def main():
+    """Main."""
     print()
-    print(
-        "N100 COMPANY TEARSHEET GENERATOR"
-    )
+    print("N100 COMPANY TEARSHEET GENERATOR")
     print("=" * 70)
 
-    print(
-        f"Database : {DB_PATH}"
-    )
+    print(f"Database : {DB_PATH}")
 
-    print(
-        f"Output   : {OUTPUT_DIR}"
-    )
+    print(f"Output   : {OUTPUT_DIR}")
 
     print()
 
@@ -1806,30 +1717,19 @@ def main():
 
         try:
 
-            output = generate_tearsheet(
-                company_id
-            )
+            output = generate_tearsheet(company_id)
 
-            size_kb = (
-                output.stat().st_size
-                / 1024
-            )
+            size_kb = output.stat().st_size / 1024
 
             print(
-                f"{company_id:<12} "
-                f"OK  "
-                f"{output.name:<32} "
-                f"{size_kb:,.1f} KB"
+                f"{company_id:<12} " f"OK  " f"{output.name:<32} " f"{size_kb:,.1f} KB"
             )
 
             generated += 1
 
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
 
-            print(
-                f"{company_id:<12} "
-                f"ERROR - {exc}"
-            )
+            print(f"{company_id:<12} " f"ERROR - {exc}")
 
             failures.append(
                 (
@@ -1841,15 +1741,9 @@ def main():
     print()
     print("=" * 70)
 
-    print(
-        f"Generated: "
-        f"{generated}/{len(TEST_COMPANIES)}"
-    )
+    print(f"Generated: " f"{generated}/{len(TEST_COMPANIES)}")
 
-    print(
-        f"Failed   : "
-        f"{len(failures)}"
-    )
+    print(f"Failed   : " f"{len(failures)}")
 
     if failures:
 
@@ -1858,19 +1752,14 @@ def main():
 
         for company_id, error in failures:
 
-            print(
-                f"  {company_id}: "
-                f"{error}"
-            )
+            print(f"  {company_id}: " f"{error}")
 
         raise SystemExit(1)
 
     print()
-    print(
-        "Day 33 test tearsheets "
-        "generated successfully."
-    )
+    print("Day 33 test tearsheets " "generated successfully.")
 
 
 if __name__ == "__main__":
     main()
+

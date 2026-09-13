@@ -1,3 +1,5 @@
+import math
+
 """
 CAGR Engine
 
@@ -31,7 +33,7 @@ def calculate_cagr(start_value, end_value, years):
     except (TypeError, ValueError):
         return None, "INSUFFICIENT"
 
-    if start_value != start_value or end_value != end_value:
+    if math.isnan(start_value) or math.isnan(end_value):
         return None, "INSUFFICIENT"
 
     if start_value == 0:
@@ -58,11 +60,7 @@ def revenue_cagr(start_revenue, end_revenue, years):
     Revenue CAGR wrapper.
     """
 
-    return calculate_cagr(
-        start_revenue,
-        end_revenue,
-        years
-    )
+    return calculate_cagr(start_revenue, end_revenue, years)
 
 
 def pat_cagr(start_pat, end_pat, years):
@@ -70,11 +68,7 @@ def pat_cagr(start_pat, end_pat, years):
     PAT / Net Profit CAGR wrapper.
     """
 
-    return calculate_cagr(
-        start_pat,
-        end_pat,
-        years
-    )
+    return calculate_cagr(start_pat, end_pat, years)
 
 
 def eps_cagr(start_eps, end_eps, years):
@@ -82,11 +76,8 @@ def eps_cagr(start_eps, end_eps, years):
     EPS CAGR wrapper.
     """
 
-    return calculate_cagr(
-        start_eps,
-        end_eps,
-        years
-    )
+    return calculate_cagr(start_eps, end_eps, years)
+
 
 def calculate_cagr_for_years(
     df,
@@ -120,8 +111,7 @@ def calculate_cagr_for_years(
     start_year = end_year - years
 
     company_data = df[
-        (df["company_id"] == company_id)
-        & (df["year"].isin([start_year, end_year]))
+        (df["company_id"] == company_id) & (df["year"].isin([start_year, end_year]))
     ]
 
     # Both required years must exist
@@ -156,11 +146,6 @@ def calculate_growth_metrics(
 
     result = {}
 
-    windows = {
-        3: "",
-        5: "",
-        10: "",
-    }
 
     metrics = {
         "sales": "revenue_cagr",
@@ -184,3 +169,4 @@ def calculate_growth_metrics(
             result[f"{output_name}_{years}yr_flag"] = flag
 
     return result
+
